@@ -1,0 +1,386 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Squeeze-and-Excitation Networks (SENet) | Soong's blog</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Squeeze-and-Excitation Networks (SENet)论文信息 论文标题: Squeeze-and-Excitation Networks 论文链接: https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;1709.01507 官方代码: GitHub - hujie-frank&#x2F;SENet PyTorch实现: GitHub - miraclewkf&#x2F;SENet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Squeeze-and-Excitation Networks (SENet)">
+<meta property="og:url" content="https://soong-a.github.io/2025/11/27/SENet/index.html">
+<meta property="og:site_name" content="Soong&#39;s blog">
+<meta property="og:description" content="Squeeze-and-Excitation Networks (SENet)论文信息 论文标题: Squeeze-and-Excitation Networks 论文链接: https:&#x2F;&#x2F;arxiv.org&#x2F;abs&#x2F;1709.01507 官方代码: GitHub - hujie-frank&#x2F;SENet PyTorch实现: GitHub - miraclewkf&#x2F;SENet">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-11-27T08:22:00.000Z">
+<meta property="article:modified_time" content="2025-11-27T08:23:07.072Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="图像处理">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="基础知识">
+<meta property="article:tag" content="论文">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Squeeze-and-Excitation Networks (SENet)",
+  "url": "https://soong-a.github.io/2025/11/27/SENet/",
+  "image": "https://soong-a.github.io/img/avatar.jpg",
+  "datePublished": "2025-11-27T08:22:00.000Z",
+  "dateModified": "2025-11-27T08:23:07.072Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Soong",
+      "url": "https://soong-a.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2025/11/27/SENet/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Squeeze-and-Excitation Networks (SENet)',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/index.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Squeeze-and-Excitation Networks (SENet)</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Squeeze-and-Excitation Networks (SENet)</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-11-27T08:22:00.000Z" title="发表于 2025-11-27 16:22:00">2025-11-27</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-11-27T08:23:07.072Z" title="更新于 2025-11-27 16:23:07">2025-11-27</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E6%9E%90/">医学图像分析</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E6%9E%90/Squeeze-and-Excitation-Networks-SENet/">Squeeze-and-Excitation Networks (SENet)</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h1 id="Squeeze-and-Excitation-Networks-SENet"><a href="#Squeeze-and-Excitation-Networks-SENet" class="headerlink" title="Squeeze-and-Excitation Networks (SENet)"></a>Squeeze-and-Excitation Networks (SENet)</h1><h2 id="论文信息"><a href="#论文信息" class="headerlink" title="论文信息"></a>论文信息</h2><ul>
+<li><strong>论文标题:</strong> Squeeze-and-Excitation Networks</li>
+<li><strong>论文链接:</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1709.01507">https://arxiv.org/abs/1709.01507</a></li>
+<li><strong>官方代码:</strong> GitHub - hujie-frank&#x2F;SENet</li>
+<li><strong>PyTorch实现:</strong> GitHub - miraclewkf&#x2F;SENet-PyTorch</li>
+</ul>
+<h2 id="一、SENet概述"><a href="#一、SENet概述" class="headerlink" title="一、SENet概述"></a>一、SENet概述</h2><h3 id="竞赛成绩"><a href="#竞赛成绩" class="headerlink" title="竞赛成绩"></a>竞赛成绩</h3><p>SENet在ImageNet 2017竞赛图像分类任务中夺冠，取得突破性成果：</p>
+<ul>
+<li><strong>原最佳成绩:</strong> 2.991% (top-5 error)</li>
+<li><strong>SENet成绩:</strong> 2.251% (top-5 error)</li>
+<li><strong>提升幅度:</strong> 0.74% 绝对提升</li>
+</ul>
+<h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><ul>
+<li><strong>研究动机:</strong> 显式建模特征通道间的相互依赖关系</li>
+<li><strong>技术策略:</strong> 采用”特征重标定”策略，避免引入新的空间维度</li>
+<li><strong>工作机制:</strong> 通过网络学习自动获取每个特征通道的重要程度</li>
+<li><strong>实现方式:</strong> 提升有用特征通道权重，抑制次要特征通道权重</li>
+</ul>
+<h3 id="架构特点"><a href="#架构特点" class="headerlink" title="架构特点"></a>架构特点</h3><ul>
+<li><strong>模块化设计:</strong> SE block作为子结构，可嵌入现有网络</li>
+<li><strong>端到端训练:</strong> 完全可微分，支持端到端优化</li>
+<li><strong>即插即用:</strong> 灵活集成到各种分类和检测网络</li>
+</ul>
+<h2 id="二、SENet结构组成详解"><a href="#二、SENet结构组成详解" class="headerlink" title="二、SENet结构组成详解"></a>二、SENet结构组成详解</h2><h3 id="SE模块完整流程"><a href="#SE模块完整流程" class="headerlink" title="SE模块完整流程"></a>SE模块完整流程</h3><p>输入特征 → 常规卷积变换 → Squeeze操作 → Excitation操作 → Reweight操作 → 输出特征<br>↓ ↓ ↓ ↓ ↓<br>H×W×C₁ H×W×C₂ 1×1×C₂ 1×1×C₂ H×W×C₂</p>
+<h3 id="1-常规变换-Ftr"><a href="#1-常规变换-Ftr" class="headerlink" title="1. 常规变换 (Ftr)"></a>1. 常规变换 (Ftr)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">u_c = v_c * X = \sum_&#123;s=1&#125;^&#123;C_1&#125; v_c^s * x^s</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作类型:</strong> 标准卷积变换</li>
+<li><strong>输入维度:</strong> $H × W × C_1$</li>
+<li><strong>输出维度:</strong> $H × W × C_2$</li>
+<li><strong>功能说明:</strong> 基础特征提取，不属于SE核心创新</li>
+</ul>
+<h3 id="2-Squeeze操作-特征压缩"><a href="#2-Squeeze操作-特征压缩" class="headerlink" title="2. Squeeze操作 (特征压缩)"></a>2. Squeeze操作 (特征压缩)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">z_c = F_&#123;sq&#125;(u_c) = \frac&#123;1&#125;&#123;H × W&#125; \sum_&#123;i=1&#125;^&#123;H&#125; \sum_&#123;j=1&#125;^&#123;W&#125; u_c(i, j)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作类型:</strong> 全局平均池化(Global Average Pooling)</li>
+<li><strong>输入维度:</strong> $H × W × C_2$</li>
+<li><strong>输出维度:</strong> $1 × 1 × C_2$</li>
+<li><strong>功能特点:</strong><ul>
+<li>获取通道级全局感受野</li>
+<li>压缩空间维度，保留通道信息</li>
+<li>为后续通道权重学习提供全局上下文</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-Excitation操作-自适应重标定"><a href="#3-Excitation操作-自适应重标定" class="headerlink" title="3. Excitation操作 (自适应重标定)"></a>3. Excitation操作 (自适应重标定)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s = F_&#123;ex&#125;(z, W) = \sigma(W_2 \delta(W_1 z))</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>网络结构:</strong> 两全连接层瓶颈结构</p>
+</li>
+<li><p><strong>参数配置:</strong> 缩放比率 $r &#x3D; 16$</p>
+</li>
+<li><p><strong>详细流程:</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">z(1×1×C) → FC(C/r) → ReLU → FC(C) → Sigmoid → s(1×1×C)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>设计优势:</strong></p>
+<ul>
+<li>引入非线性，更好拟合通道相关性</li>
+<li>大幅减少参数量和计算量</li>
+<li>输出0-1归一化权重</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-Reweight操作-特征重加权"><a href="#4-Reweight操作-特征重加权" class="headerlink" title="4. Reweight操作 (特征重加权)"></a>4. Reweight操作 (特征重加权)</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\tilde&#123;x_c&#125; = F_&#123;scale&#125;(u_c, s_c) = s_c \cdot u_c</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>操作类型:</strong> 通道级乘法(Channel-wise Multiplication)</li>
+<li><strong>实现方式:</strong> 每个特征图乘以对应的通道权重</li>
+<li><strong>最终效果:</strong> 增强重要特征，抑制次要特征</li>
+</ul>
+<h2 id="三、SENet在具体网络中应用"><a href="#三、SENet在具体网络中应用" class="headerlink" title="三、SENet在具体网络中应用"></a>三、SENet在具体网络中应用</h2><h3 id="Inception网络集成方案"><a href="#Inception网络集成方案" class="headerlink" title="Inception网络集成方案"></a>Inception网络集成方案</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">传统Inception模块 → 全局平均池化 → 全连接(C/r) → ReLU激活 </span><br><span class="line">    → 全连接(C) → Sigmoid归一化 → 通道加权 → SE-Inception输出</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="ResNet网络集成方案"><a href="#ResNet网络集成方案" class="headerlink" title="ResNet网络集成方案"></a>ResNet网络集成方案</h3><p>text</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">残差分支特征 → SE模块处理 → 与恒等映射分支相加 → SE-ResNet输出</span><br><span class="line">          ↓</span><br><span class="line">     [设计关键: SE模块置于Addition前]</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="网络集成设计原则"><a href="#网络集成设计原则" class="headerlink" title="网络集成设计原则"></a>网络集成设计原则</h3><table>
+<thead>
+<tr>
+<th align="left">网络类型</th>
+<th align="left">SE模块位置</th>
+<th align="left">设计考虑</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Inception系列</td>
+<td align="left">模块内部</td>
+<td align="left">直接增强特征表达</td>
+</tr>
+<tr>
+<td align="left">ResNet系列</td>
+<td align="left">残差分支</td>
+<td align="left">避免梯度消失问题</td>
+</tr>
+<tr>
+<td align="left">其他网络</td>
+<td align="left">关键模块后</td>
+<td align="left">平衡计算量与性能</td>
+</tr>
+</tbody></table>
+<h3 id="支持的SENet变体"><a href="#支持的SENet变体" class="headerlink" title="支持的SENet变体"></a>支持的SENet变体</h3><ul>
+<li><strong>SE-BN-Inception</strong></li>
+<li><strong>SE-ResNet</strong></li>
+<li><strong>SE-ReNeXt</strong></li>
+<li><strong>SE-Inception-ResNet-v2</strong></li>
+</ul>
+<h2 id="四、SENet计算量分析"><a href="#四、SENet计算量分析" class="headerlink" title="四、SENet计算量分析"></a>四、SENet计算量分析</h2><h3 id="参数增加量理论计算"><a href="#参数增加量理论计算" class="headerlink" title="参数增加量理论计算"></a>参数增加量理论计算</h3><h4 id="单SE模块参数量"><a href="#单SE模块参数量" class="headerlink" title="单SE模块参数量"></a>单SE模块参数量</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\text&#123;Params&#125;_&#123;single&#125; = 2 \times \frac&#123;C^2&#125;&#123;r&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="整体网络参数量增加"><a href="#整体网络参数量增加" class="headerlink" title="整体网络参数量增加"></a>整体网络参数量增加</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\text&#123;Total Params Increase&#125; = \frac&#123;2&#125;&#123;r&#125; \sum_&#123;s=1&#125;^&#123;S&#125; N_s \cdot C_s^2</span><br></pre></td></tr></table></figure>
+
+<h4 id="参数说明表"><a href="#参数说明表" class="headerlink" title="参数说明表"></a>参数说明表</h4><table>
+<thead>
+<tr>
+<th align="left">符号</th>
+<th align="left">含义</th>
+<th align="left">典型值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">$C$</td>
+<td align="left">通道数</td>
+<td align="left">随网络层变化</td>
+</tr>
+<tr>
+<td align="left">$r$</td>
+<td align="left">缩放比率</td>
+<td align="left">16</td>
+</tr>
+<tr>
+<td align="left">$S$</td>
+<td align="left">网络stage数量</td>
+<td align="left">4(ResNet)</td>
+</tr>
+<tr>
+<td align="left">$N_s$</td>
+<td align="left">第s个stage的block数</td>
+<td align="left">随网络深度变化</td>
+</tr>
+</tbody></table>
+<h3 id="实际网络参数对比"><a href="#实际网络参数对比" class="headerlink" title="实际网络参数对比"></a>实际网络参数对比</h3><h4 id="ResNet-50-vs-SE-ResNet-50"><a href="#ResNet-50-vs-SE-ResNet-50" class="headerlink" title="ResNet-50 vs SE-ResNet-50"></a>ResNet-50 vs SE-ResNet-50</h4><table>
+<thead>
+<tr>
+<th align="left">指标</th>
+<th align="left">ResNet-50</th>
+<th align="left">SE-ResNet-50</th>
+<th align="left">增长幅度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">总参数量</td>
+<td align="left">~25M</td>
+<td align="left">~27.5M</td>
+<td align="left">+10%</td>
+</tr>
+<tr>
+<td align="left">计算量</td>
+<td align="left">~4G FLOPs</td>
+<td align="left">~4.2G FLOPs</td>
+<td align="left">+5%</td>
+</tr>
+</tbody></table>
+<h4 id="参数优化策略"><a href="#参数优化策略" class="headerlink" title="参数优化策略"></a>参数优化策略</h4><ul>
+<li><strong>问题:</strong> 最后stage通道数大(2048)，参数增长显著</li>
+<li><strong>解决方案:</strong> 移除最后stage中部分SE模块</li>
+<li><strong>优化效果:</strong> 参数量增长从10%降至2%，精度几乎无损</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2025/11/27/SENet/">https://soong-a.github.io/2025/11/27/SENet/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86/">图像处理</a><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</a><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><a class="post-meta__tags" href="/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">基础知识</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87/">论文</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/11/26/DenseNet/" title="DenseNet论文学习笔"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">DenseNet论文学习笔</div></div><div class="info-2"><div class="info-item-1">DenseNet 深度解析笔记📌 核心思想与设计哲学1. 三种网络结构对比python 12345678# 传统网络：信息逐层替换x_l = H_l(x_&#123;l-1&#125;)# ResNet：信息加法融合  x_l = H_l(x_&#123;l-1&#125;) + x_&#123;l-1&#125;  # 逐元素相加，信息混合# DenseNet：信息拼接累积x_l = H_l([x_0, x_1, ..., x_&#123;l-1&#125;])  # 通道维度拼接，信息并列    2. 信息流本质区别ResNet（接力赛跑模式）： text 12A → B → C每个运动员跑完就离开，只有当前运动员在场上    DenseNet（团队头脑风暴模式）： text 12A → [A+B] → [A+B+C]所有专家持续在场，共同贡献智慧    🏗️ 架构详解1. 完整的DenseNet数据流text 1输入图片 → 初始卷积 → Dense Block 1 → Transition 1 → Dense Block 2 → Transition 2 → ... ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/11/12/3D%20Res2Net%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--3D Res2Net的改造和使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文学习笔记--3D Res2Net的改造和使用</div></div><div class="info-2"><div class="info-item-1">编码器细节：3D Res2Net的改造和使用核心思想我们选用了一个叫Res2Net的”高手”来做编码器，但它本来是处理2D普通照片的。我们通过一些巧妙的”改造”，让它能处理我们的3D医学图像，并且还让它继承了之前在普通照片上学到的”经验”。 为什么选择Res2Net？Res2Net的每个残差块内部都有分层式的残差连接，这让它能更有效地在粒度级别使用多尺度信息，扩展每一层的感受野。 就像工人同时拿着多种不同倍数的放大镜在工作：  一个小放大镜看细微的纹理和边缘（小尺度特征） 一个中倍放大镜看局部的结构（中尺度特征） 一个大倍放大镜看大致的轮廓（大尺度特征）  这对于边界模糊的前列腺图像来说，非常有用。 编码器的具体工作流程第一步：初始卷积（Convolution Stem）给定的图像首先通过一个卷积茎，它由并行的3×3×3卷积和1×1×1卷积组成，后面跟着求和操作。  3×3×3卷积：捕捉图像中小范围的、基本的局部特征（比如某个点是不是边缘） 1×1×1卷积：主要负责调整数据的通道数，为后续处理做准备 最后把两个结果相加，得到一个包含丰富基础信息的特征图  第二步：核心特征提取然后...</div></div></div></a><a class="pagination-related" href="/2025/11/12/AFFM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--AFFM (自适应特征融合模块)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文学习笔记--AFFM (自适应特征融合模块)</div></div><div class="info-2"><div class="info-item-1">AFFM (自适应特征融合模块) 学习笔记 🎯 解决的问题传统方法的缺陷：  直接将高层特征（轮廓信息）与低层特征（细节信息）拼接 导致背景噪声混入有用信息中 影响最终分割的精准度  🏗️ 模块设计思路AFFM就像一个智能的制图师，能够智能地融合两种不同类型的地图：  低层特征 &#x3D; “细节地图” ✅ 优点：包含丰富的边缘、纹理等细节信息 ❌ 缺点：混杂大量背景噪声，缺乏整体概念   高层特征 &#x3D; “轮廓地图” ✅ 优点：包含前列腺整体形状的语义信息 ❌ 缺点：缺乏精确定位的细节    🔄 三步骤工作流程第一步：特征对齐与拼接&#x2F;img&#x2F;屏幕截图 2025-11-12 215920.png 临时特征 &#x3D; 拼接(上采样(高层特征), 低层特征)  动作：将高层特征上采样到与低层特征相同尺寸 目的：让两种特征可以在同一尺度上进行融合  第二步：智能权重计算（核心创新）&#x2F;img&#x2F;屏幕截图 2025-11-12 220019.png 重要性权重 &#x3D; Sigmoid(全连接层2(全连接层1(全局平均池化(临时...</div></div></div></a><a class="pagination-related" href="/2025/11/12/A%20mixed%20Mamba%20U%E2%80%91net%20for%20prostate%20segmentation%20in%20MR%20images%20%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" title="MM-UNet 论文学习笔记--AFFM GCM MACM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文学习笔记--AFFM GCM MACM</div></div><div class="info-2"><div class="info-item-1">MM-UNet：3D前列腺MR图像分割方法核心目标：为什么要做这个研究？医生有一张前列腺的3D核磁共振（MR）图像，他们需要精确地知道图像中哪些像素是属于前列腺的。这个过程叫做”分割”。 手动分割的问题：非常耗时、费力，而且不同医生的判断可能会有差异。 自动分割的挑战：计算机来做这件事，面临三个主要难题：  图像质量差：MR图像背景杂乱（噪声多），前列腺边界模糊。 关系复杂：前列腺的形状和它周围的组织（膀胱、直肠等）是相互关联的，计算机需要理解整个图像的”上下文”才能准确判断边界。 数据特殊：3D的MR图像在上下、左右、前后三个方向的分辨率（清晰度）是不一样的。这导致传统的3D处理方法效果不好。  MM-UNET就是为了解决这三个挑战而设计的。 创新点一：自适应特征融合模块 (AFFM) – 解决”如何精准融合信息”1. 为什么需要它？在分割网络中，存在两种信息：  低级特征：来自网络的浅层，包含丰富的细节信息（如边缘、纹理），但也混有很多背景噪声。 高级特征：来自网络的深层，包含抽象的语义信息（知道”这是前列腺”），但缺乏细节，比较粗糙。  传统方法简单地把这两种特征拼接在一起...</div></div></div></a><a class="pagination-related" href="/2025/11/26/DenseNet/" title="DenseNet论文学习笔"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-26</div><div class="info-item-2">DenseNet论文学习笔</div></div><div class="info-2"><div class="info-item-1">DenseNet 深度解析笔记📌 核心思想与设计哲学1. 三种网络结构对比python 12345678# 传统网络：信息逐层替换x_l = H_l(x_&#123;l-1&#125;)# ResNet：信息加法融合  x_l = H_l(x_&#123;l-1&#125;) + x_&#123;l-1&#125;  # 逐元素相加，信息混合# DenseNet：信息拼接累积x_l = H_l([x_0, x_1, ..., x_&#123;l-1&#125;])  # 通道维度拼接，信息并列    2. 信息流本质区别ResNet（接力赛跑模式）： text 12A → B → C每个运动员跑完就离开，只有当前运动员在场上    DenseNet（团队头脑风暴模式）： text 12A → [A+B] → [A+B+C]所有专家持续在场，共同贡献智慧    🏗️ 架构详解1. 完整的DenseNet数据流text 1输入图片 → 初始卷积 → Dense Block 1 → Transition 1 → Dense Block 2 → Transition 2 → ... ...</div></div></div></a><a class="pagination-related" href="/2025/11/13/MACM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--MACM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet 论文学习笔记--MACM</div></div><div class="info-2"><div class="info-item-1">Multi-scale Anisotropic Convolution Module (MACM) 技术笔记模块概述核心目标MACM旨在解决3D医学图像分割中的三个关键挑战：  各向异性分辨率：适应不同方向的空间分辨率差异 多尺度特征需求：同时捕获局部细节和全局上下文 计算效率：在保持性能的同时控制计算复杂度  技术定位MACM是专门为3D医学图像设计的特征提取模块，通常集成在编码器路径中，用于增强特征的判别能力和空间感知。 整体架构模块组成graph TD     A[输入特征] --&gt; B[1×1×1卷积&lt;br&gt;通道调整]     B --&gt; C[并行ACB处理]          C --&gt; D[ACB k=3]     C --&gt; E[ACB k=7]      C --&gt; F[ACB k=13]     C --&gt; G[ACB k=15]          D --&gt; H[特征拼接]     E --&gt; H     F --&gt; H     G --&gt; H          H --&gt; I[残差...</div></div></div></a><a class="pagination-related" href="/2025/11/13/GCM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--GCM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet 论文学习笔记--GCM</div></div><div class="info-2"><div class="info-item-1">Global Context-aware Module (GCM)概述GCM是一个用于医学图像分割的全局上下文理解模块，通过结合CNN的局部特征提取能力和Mamba的长序列建模能力，实现高效的全局上下文捕获。 1. GCM整体架构flowchart TD     A[输入特征图&lt;br&gt;B×C×H×W×D] --&gt; B[残差块1&lt;br&gt;Conv+IN+LeakyReLU]     B --&gt; C[残差块2&lt;br&gt;Conv+IN+LeakyReLU]     C --&gt; D[重塑序列&lt;br&gt;B×L×C&lt;br&gt;L=H×W×D]     D --&gt; E[Layer Normalization]     E --&gt; F[Mamba块]     F --&gt; G[重塑回空间结构&lt;br&gt;B×C×H×W×D]     G --&gt; H[输出特征图]          class A,B,C,D,E,F,G,H normal;          classDef normal fill:n...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Soong</div><div class="author-info-description">有关机器学习，力扣代码训练等，欢迎探索</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">12</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Soong-A" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:926315593@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Squeeze-and-Excitation-Networks-SENet"><span class="toc-number">1.</span> <span class="toc-text">Squeeze-and-Excitation Networks (SENet)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E4%BF%A1%E6%81%AF"><span class="toc-number">1.1.</span> <span class="toc-text">论文信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81SENet%E6%A6%82%E8%BF%B0"><span class="toc-number">1.2.</span> <span class="toc-text">一、SENet概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AB%9E%E8%B5%9B%E6%88%90%E7%BB%A9"><span class="toc-number">1.2.1.</span> <span class="toc-text">竞赛成绩</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="toc-number">1.2.2.</span> <span class="toc-text">核心思想</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84%E7%89%B9%E7%82%B9"><span class="toc-number">1.2.3.</span> <span class="toc-text">架构特点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81SENet%E7%BB%93%E6%9E%84%E7%BB%84%E6%88%90%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.3.</span> <span class="toc-text">二、SENet结构组成详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SE%E6%A8%A1%E5%9D%97%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B"><span class="toc-number">1.3.1.</span> <span class="toc-text">SE模块完整流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%B8%B8%E8%A7%84%E5%8F%98%E6%8D%A2-Ftr"><span class="toc-number">1.3.2.</span> <span class="toc-text">1. 常规变换 (Ftr)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Squeeze%E6%93%8D%E4%BD%9C-%E7%89%B9%E5%BE%81%E5%8E%8B%E7%BC%A9"><span class="toc-number">1.3.3.</span> <span class="toc-text">2. Squeeze操作 (特征压缩)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Excitation%E6%93%8D%E4%BD%9C-%E8%87%AA%E9%80%82%E5%BA%94%E9%87%8D%E6%A0%87%E5%AE%9A"><span class="toc-number">1.3.4.</span> <span class="toc-text">3. Excitation操作 (自适应重标定)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Reweight%E6%93%8D%E4%BD%9C-%E7%89%B9%E5%BE%81%E9%87%8D%E5%8A%A0%E6%9D%83"><span class="toc-number">1.3.5.</span> <span class="toc-text">4. Reweight操作 (特征重加权)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81SENet%E5%9C%A8%E5%85%B7%E4%BD%93%E7%BD%91%E7%BB%9C%E4%B8%AD%E5%BA%94%E7%94%A8"><span class="toc-number">1.4.</span> <span class="toc-text">三、SENet在具体网络中应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Inception%E7%BD%91%E7%BB%9C%E9%9B%86%E6%88%90%E6%96%B9%E6%A1%88"><span class="toc-number">1.4.1.</span> <span class="toc-text">Inception网络集成方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ResNet%E7%BD%91%E7%BB%9C%E9%9B%86%E6%88%90%E6%96%B9%E6%A1%88"><span class="toc-number">1.4.2.</span> <span class="toc-text">ResNet网络集成方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%9B%86%E6%88%90%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="toc-number">1.4.3.</span> <span class="toc-text">网络集成设计原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%AF%E6%8C%81%E7%9A%84SENet%E5%8F%98%E4%BD%93"><span class="toc-number">1.4.4.</span> <span class="toc-text">支持的SENet变体</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81SENet%E8%AE%A1%E7%AE%97%E9%87%8F%E5%88%86%E6%9E%90"><span class="toc-number">1.5.</span> <span class="toc-text">四、SENet计算量分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E5%A2%9E%E5%8A%A0%E9%87%8F%E7%90%86%E8%AE%BA%E8%AE%A1%E7%AE%97"><span class="toc-number">1.5.1.</span> <span class="toc-text">参数增加量理论计算</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95SE%E6%A8%A1%E5%9D%97%E5%8F%82%E6%95%B0%E9%87%8F"><span class="toc-number">1.5.1.1.</span> <span class="toc-text">单SE模块参数量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E7%BD%91%E7%BB%9C%E5%8F%82%E6%95%B0%E9%87%8F%E5%A2%9E%E5%8A%A0"><span class="toc-number">1.5.1.2.</span> <span class="toc-text">整体网络参数量增加</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E%E8%A1%A8"><span class="toc-number">1.5.1.3.</span> <span class="toc-text">参数说明表</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E9%99%85%E7%BD%91%E7%BB%9C%E5%8F%82%E6%95%B0%E5%AF%B9%E6%AF%94"><span class="toc-number">1.5.2.</span> <span class="toc-text">实际网络参数对比</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ResNet-50-vs-SE-ResNet-50"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">ResNet-50 vs SE-ResNet-50</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">参数优化策略</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/27/SENet/" title="Squeeze-and-Excitation Networks (SENet)">Squeeze-and-Excitation Networks (SENet)</a><time datetime="2025-11-27T08:22:00.000Z" title="发表于 2025-11-27 16:22:00">2025-11-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/26/DenseNet/" title="DenseNet论文学习笔">DenseNet论文学习笔</a><time datetime="2025-11-26T13:18:00.000Z" title="发表于 2025-11-26 21:18:00">2025-11-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/19/%E6%A8%A1%E5%9E%8B%E5%AD%A6%E4%B9%A0/" title="模型学习分类">模型学习分类</a><time datetime="2025-11-19T06:21:00.000Z" title="发表于 2025-11-19 14:21:00">2025-11-19</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/13/MACM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--MACM">MM-UNet 论文学习笔记--MACM</a><time datetime="2025-11-13T06:50:00.000Z" title="发表于 2025-11-13 14:50:00">2025-11-13</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/13/GCM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--GCM">MM-UNet 论文学习笔记--GCM</a><time datetime="2025-11-13T05:30:00.000Z" title="发表于 2025-11-13 13:30:00">2025-11-13</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
