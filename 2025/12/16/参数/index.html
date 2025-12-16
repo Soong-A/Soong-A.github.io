@@ -1,0 +1,268 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>参数计算 | Soong's blog</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在深度学习和模型轻量化领域，“参数个数”是一个衡量模型大小、复杂度和内存占用的关键指标。 简单来说，参数个数就是模型中所有需要通过学习（训练）来确定的数值的总数。这些数值决定了模型如何对输入数据进行转换和预测。 下面从几个层面详细解释： 一、参数是什么？模型参数主要包括：  权重：连接神经元之间的强度值。 偏置：为神经元提供基础的激活阈值。  训练过程就是通过大量数据，不断调整这些权重和偏置，使得">
+<meta property="og:type" content="article">
+<meta property="og:title" content="参数计算">
+<meta property="og:url" content="https://soong-a.github.io/2025/12/16/%E5%8F%82%E6%95%B0/index.html">
+<meta property="og:site_name" content="Soong&#39;s blog">
+<meta property="og:description" content="在深度学习和模型轻量化领域，“参数个数”是一个衡量模型大小、复杂度和内存占用的关键指标。 简单来说，参数个数就是模型中所有需要通过学习（训练）来确定的数值的总数。这些数值决定了模型如何对输入数据进行转换和预测。 下面从几个层面详细解释： 一、参数是什么？模型参数主要包括：  权重：连接神经元之间的强度值。 偏置：为神经元提供基础的激活阈值。  训练过程就是通过大量数据，不断调整这些权重和偏置，使得">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2025-12-16T13:58:00.000Z">
+<meta property="article:modified_time" content="2025-12-16T13:58:21.091Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="图像处理">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="基础知识">
+<meta property="article:tag" content="论文">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "参数计算",
+  "url": "https://soong-a.github.io/2025/12/16/%E5%8F%82%E6%95%B0/",
+  "image": "https://soong-a.github.io/img/avatar.jpg",
+  "datePublished": "2025-12-16T13:58:00.000Z",
+  "dateModified": "2025-12-16T13:58:21.091Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Soong",
+      "url": "https://soong-a.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2025/12/16/%E5%8F%82%E6%95%B0/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '参数计算',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/index.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">参数计算</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">参数计算</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-12-16T13:58:00.000Z" title="发表于 2025-12-16 21:58:00">2025-12-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-12-16T13:58:21.091Z" title="更新于 2025-12-16 21:58:21">2025-12-16</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E6%9E%90/">医学图像分析</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E6%9E%90/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">基础知识</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p>在深度学习和模型轻量化领域，“参数个数”是一个衡量模型<strong>大小、复杂度和内存占用</strong>的关键指标。</p>
+<p>简单来说，<strong>参数个数就是模型中所有需要通过学习（训练）来确定的数值的总数</strong>。这些数值决定了模型如何对输入数据进行转换和预测。</p>
+<p>下面从几个层面详细解释：</p>
+<h3 id="一、参数是什么？"><a href="#一、参数是什么？" class="headerlink" title="一、参数是什么？"></a>一、参数是什么？</h3><p>模型参数主要包括：</p>
+<ol>
+<li><strong>权重</strong>：连接神经元之间的强度值。</li>
+<li><strong>偏置</strong>：为神经元提供基础的激活阈值。</li>
+</ol>
+<p>训练过程就是通过大量数据，不断调整这些权重和偏置，使得模型的输出尽可能接近正确答案。</p>
+<h3 id="二、参数是如何计算出来的？（按层解析）"><a href="#二、参数是如何计算出来的？（按层解析）" class="headerlink" title="二、参数是如何计算出来的？（按层解析）"></a>二、参数是如何计算出来的？（按层解析）</h3><p>参数的数量不涉及输入数据，只由**模型自身的结构（架构）**决定。我们通过计算每一层的参数，然后求和得到总量。</p>
+<h4 id="1-全连接层"><a href="#1-全连接层" class="headerlink" title="1. 全连接层"></a>1. 全连接层</h4><p>这是最直观的。如果一层有 <code>m</code> 个输入神经元和 <code>n</code> 个输出神经元，那么：</p>
+<ul>
+<li><strong>权重数</strong> &#x3D; <code>m * n</code> （每个输入和每个输出之间都有一个连接权重）</li>
+<li><strong>偏置数</strong> &#x3D; <code>n</code> （每个输出神经元有一个偏置）</li>
+<li><strong>该层总参数</strong> &#x3D; <code>(m * n) + n</code></li>
+</ul>
+<p><strong>举例</strong>：一个输入为1000维，输出为500维的全连接层，其参数为 <code>(1000 * 500) + 500 = 500,500</code>。可以看到，全连接层的参数增长非常快，是导致模型臃肿的主因之一。</p>
+<h4 id="2-卷积层"><a href="#2-卷积层" class="headerlink" title="2. 卷积层"></a>2. 卷积层</h4><p>卷积层的参数与输入图像大小<strong>无关</strong>，只与卷积核的大小、数量和深度有关。<br>对于一个卷积层，假设：</p>
+<ul>
+<li>输入通道数为 <code>C_in</code></li>
+<li>输出通道数（即卷积核数量）为 <code>C_out</code></li>
+<li>卷积核尺寸为 <code>K * K</code>（例如3x3）</li>
+</ul>
+<p>那么：</p>
+<ul>
+<li><strong>每个卷积核的参数</strong>：一个卷积核要处理输入的所有通道，所以单个卷积核的权重数为 <code>C_in * K * K</code>，加上1个偏置。</li>
+<li><strong>该层总参数</strong>：因为有 <code>C_out</code> 个卷积核，所以总参数 &#x3D; <code>C_out * (C_in * K * K + 1)</code></li>
+</ul>
+<p><strong>举例</strong>：一个卷积层，输入通道为3（RGB图像），输出通道为64，使用3x3卷积核。<br>参数 &#x3D; <code>64 * (3 * 3 * 3 + 1) = 64 * 28 = 1,792</code><br><strong>这正是卷积神经网络相对轻量的原因</strong>：参数共享。一个3x3的卷积核可以滑动检测整张图片的特征，而不需要像全连接层那样为每个像素位置都设置独立的权重。</p>
+<h4 id="3-归一化层、池化层"><a href="#3-归一化层、池化层" class="headerlink" title="3. 归一化层、池化层"></a>3. 归一化层、池化层</h4><ul>
+<li><strong>批量归一化层</strong>：有可学习的缩放参数 <code>γ</code> 和偏移参数 <code>β</code>，每个通道一对。如果通道数为 <code>C</code>，则参数为 <code>2 * C</code>。这个数量通常很少。</li>
+<li><strong>池化层</strong>：没有可学习的参数。它只是执行一个固定的计算规则（如取最大值、求平均值）。</li>
+</ul>
+<h3 id="三、如何与您提供的文本和图1联系起来？"><a href="#三、如何与您提供的文本和图1联系起来？" class="headerlink" title="三、如何与您提供的文本和图1联系起来？"></a>三、如何与您提供的文本和图1联系起来？</h3><p>在您提到的<strong>轻量级皮肤病变分割</strong>的上下文中：</p>
+<ol>
+<li><strong>UNeXt 为何能“减少参数”</strong>？<ul>
+<li>传统的U-Net使用大量卷积层。UNeXt用 <strong>“tokenized MLP块”</strong> 替代了部分卷积操作。</li>
+<li>MLP（多层感知机）本质上是全连接层，但UNeXt的关键在于“<strong>tokenization</strong>”和<strong>局部MLP</strong>。它将特征图分割成局部小块（token），在每个小块内部或小块之间进行轻量级的MLP计算。</li>
+<li>这样做<strong>避免了传统卷积堆叠带来的通道数爆炸性增长</strong>，也避免了全局全连接层的巨大参数量，从而在整体上实现了参数量的显著降低。</li>
+</ul>
+</li>
+<li><strong>为什么图1用“参数个数”作为X轴？</strong><ul>
+<li><strong>参数量直接决定模型大小</strong>：参数量越少，模型文件越小（例如从几百MB降到几MB），越容易部署到手机、边缘设备。</li>
+<li><strong>间接影响速度和能耗</strong>：参数少的模型，推理时需要移动的内存数据也少，通常计算量（GFLOPs）也更低，因此更快、更省电。</li>
+<li><strong>展示“权衡”关系</strong>：图1的目的就是展示，在追求轻量化（X轴向左）的同时，如何尽可能保持高精度（Y轴向上）。这是一个核心的工程与科研权衡。</li>
+</ul>
+</li>
+</ol>
+<h3 id="四、在实际中如何获知参数量？"><a href="#四、在实际中如何获知参数量？" class="headerlink" title="四、在实际中如何获知参数量？"></a>四、在实际中如何获知参数量？</h3><p>研究人员和工程师不需要手动计算每一层。常用的深度学习框架都提供了简单的函数来统计总参数量：</p>
+<ul>
+<li><strong>PyTorch</strong>: <code>sum(p.numel() for p in model.parameters())</code></li>
+<li><strong>TensorFlow&#x2F;Keras</strong>: <code>model.count_params()</code></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2025/12/16/%E5%8F%82%E6%95%B0/">https://soong-a.github.io/2025/12/16/%E5%8F%82%E6%95%B0/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%9B%BE%E5%83%8F%E5%A4%84%E7%90%86/">图像处理</a><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</a><a class="post-meta__tags" href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a><a class="post-meta__tags" href="/tags/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">基础知识</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87/">论文</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/12/16/GFLOPs/" title="GFLOPs"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">GFLOPs</div></div><div class="info-2"><div class="info-item-1">核心定义 FLOPs：浮点运算次数。指模型进行一次前向推理（即处理一张输入图片）所需完成的浮点数加法和乘法运算的总次数。 GFLOPs：十亿次浮点运算。1 GFLOPs &#x3D; 10^9 FLOPs。为了方便表示，我们通常用 GFLOPs 来描述模型的运算量级。  简单类比：  参数量：像是一本字典的页数（静态的、存储占用的大小）。 GFLOPs：像是查完这本字典所有单词所需翻阅的总次数（动态的、完成一次任务所需的工作量）。   为什么它重要？在轻量化模型中，低GFLOPs意味着：  推理速度更快：完成一次预测所需时间更短。 功耗更低：对电池供电的设备（如手机）至关重要。 发热更少：有利于设备长期稳定运行。 更适合实时应用：如内镜下的实时病灶分割。  在您论文的图1中，颜色深度代表GFLOPs，就是为了直观展示：即使两个模型参数量相近，它们的计算开销也可能天差地别。  GFLOPs是如何计算出来的？计算基础是 “乘-加”运算。在硬件中，一次 y = w * x + b 这样的操作通常被计为 1次浮点运算（尽管它包含一次乘法和一次加法）。 我们以最耗计算资源的卷积层为例，讲解...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/11/12/3D%20Res2Net%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--3D Res2Net的改造和使用"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文学习笔记--3D Res2Net的改造和使用</div></div><div class="info-2"><div class="info-item-1">编码器细节：3D Res2Net的改造和使用核心思想我们选用了一个叫Res2Net的”高手”来做编码器，但它本来是处理2D普通照片的。我们通过一些巧妙的”改造”，让它能处理我们的3D医学图像，并且还让它继承了之前在普通照片上学到的”经验”。 为什么选择Res2Net？Res2Net的每个残差块内部都有分层式的残差连接，这让它能更有效地在粒度级别使用多尺度信息，扩展每一层的感受野。 就像工人同时拿着多种不同倍数的放大镜在工作：  一个小放大镜看细微的纹理和边缘（小尺度特征） 一个中倍放大镜看局部的结构（中尺度特征） 一个大倍放大镜看大致的轮廓（大尺度特征）  这对于边界模糊的前列腺图像来说，非常有用。 编码器的具体工作流程第一步：初始卷积（Convolution Stem）给定的图像首先通过一个卷积茎，它由并行的3×3×3卷积和1×1×1卷积组成，后面跟着求和操作。  3×3×3卷积：捕捉图像中小范围的、基本的局部特征（比如某个点是不是边缘） 1×1×1卷积：主要负责调整数据的通道数，为后续处理做准备 最后把两个结果相加，得到一个包含丰富基础信息的特征图  第二步：核心特征提取然后...</div></div></div></a><a class="pagination-related" href="/2025/11/12/AFFM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--AFFM (自适应特征融合模块)"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文学习笔记--AFFM (自适应特征融合模块)</div></div><div class="info-2"><div class="info-item-1">AFFM (自适应特征融合模块) 学习笔记 🎯 解决的问题传统方法的缺陷：  直接将高层特征（轮廓信息）与低层特征（细节信息）拼接 导致背景噪声混入有用信息中 影响最终分割的精准度  🏗️ 模块设计思路AFFM就像一个智能的制图师，能够智能地融合两种不同类型的地图：  低层特征 &#x3D; “细节地图” ✅ 优点：包含丰富的边缘、纹理等细节信息 ❌ 缺点：混杂大量背景噪声，缺乏整体概念   高层特征 &#x3D; “轮廓地图” ✅ 优点：包含前列腺整体形状的语义信息 ❌ 缺点：缺乏精确定位的细节    🔄 三步骤工作流程第一步：特征对齐与拼接&#x2F;img&#x2F;屏幕截图 2025-11-12 215920.png 临时特征 &#x3D; 拼接(上采样(高层特征), 低层特征)  动作：将高层特征上采样到与低层特征相同尺寸 目的：让两种特征可以在同一尺度上进行融合  第二步：智能权重计算（核心创新）&#x2F;img&#x2F;屏幕截图 2025-11-12 220019.png 重要性权重 &#x3D; Sigmoid(全连接层2(全连接层1(全局平均池化(临时...</div></div></div></a><a class="pagination-related" href="/2025/11/26/DenseNet/" title="DenseNet论文学习笔"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-26</div><div class="info-item-2">DenseNet论文学习笔</div></div><div class="info-2"><div class="info-item-1">DenseNet 深度解析笔记📌 核心思想与设计哲学1. 三种网络结构对比python 12345678# 传统网络：信息逐层替换x_l = H_l(x_&#123;l-1&#125;)# ResNet：信息加法融合  x_l = H_l(x_&#123;l-1&#125;) + x_&#123;l-1&#125;  # 逐元素相加，信息混合# DenseNet：信息拼接累积x_l = H_l([x_0, x_1, ..., x_&#123;l-1&#125;])  # 通道维度拼接，信息并列    2. 信息流本质区别ResNet（接力赛跑模式）： text 12A → B → C每个运动员跑完就离开，只有当前运动员在场上    DenseNet（团队头脑风暴模式）： text 12A → [A+B] → [A+B+C]所有专家持续在场，共同贡献智慧    🏗️ 架构详解1. 完整的DenseNet数据流text 1输入图片 → 初始卷积 → Dense Block 1 → Transition 1 → Dense Block 2 → Transition 2 → ... ...</div></div></div></a><a class="pagination-related" href="/2025/11/12/A%20mixed%20Mamba%20U%E2%80%91net%20for%20prostate%20segmentation%20in%20MR%20images%20%E8%AE%BA%E6%96%87%E7%AC%94%E8%AE%B0/" title="MM-UNet 论文学习笔记--AFFM GCM MACM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文学习笔记--AFFM GCM MACM</div></div><div class="info-2"><div class="info-item-1">MM-UNet：3D前列腺MR图像分割方法核心目标：为什么要做这个研究？医生有一张前列腺的3D核磁共振（MR）图像，他们需要精确地知道图像中哪些像素是属于前列腺的。这个过程叫做”分割”。 手动分割的问题：非常耗时、费力，而且不同医生的判断可能会有差异。 自动分割的挑战：计算机来做这件事，面临三个主要难题：  图像质量差：MR图像背景杂乱（噪声多），前列腺边界模糊。 关系复杂：前列腺的形状和它周围的组织（膀胱、直肠等）是相互关联的，计算机需要理解整个图像的”上下文”才能准确判断边界。 数据特殊：3D的MR图像在上下、左右、前后三个方向的分辨率（清晰度）是不一样的。这导致传统的3D处理方法效果不好。  MM-UNET就是为了解决这三个挑战而设计的。 创新点一：自适应特征融合模块 (AFFM) – 解决”如何精准融合信息”1. 为什么需要它？在分割网络中，存在两种信息：  低级特征：来自网络的浅层，包含丰富的细节信息（如边缘、纹理），但也混有很多背景噪声。 高级特征：来自网络的深层，包含抽象的语义信息（知道”这是前列腺”），但缺乏细节，比较粗糙。  传统方法简单地把这两种特征拼接在一起...</div></div></div></a><a class="pagination-related" href="/2025/11/13/GCM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--GCM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet 论文学习笔记--GCM</div></div><div class="info-2"><div class="info-item-1">Global Context-aware Module (GCM)概述GCM是一个用于医学图像分割的全局上下文理解模块，通过结合CNN的局部特征提取能力和Mamba的长序列建模能力，实现高效的全局上下文捕获。 1. GCM整体架构flowchart TD     A[输入特征图&lt;br&gt;B×C×H×W×D] --&gt; B[残差块1&lt;br&gt;Conv+IN+LeakyReLU]     B --&gt; C[残差块2&lt;br&gt;Conv+IN+LeakyReLU]     C --&gt; D[重塑序列&lt;br&gt;B×L×C&lt;br&gt;L=H×W×D]     D --&gt; E[Layer Normalization]     E --&gt; F[Mamba块]     F --&gt; G[重塑回空间结构&lt;br&gt;B×C×H×W×D]     G --&gt; H[输出特征图]          class A,B,C,D,E,F,G,H normal;          classDef normal fill:n...</div></div></div></a><a class="pagination-related" href="/2025/11/13/MACM%E5%B7%A5%E4%BD%9C%E7%BB%86%E8%8A%82/" title="MM-UNet 论文学习笔记--MACM"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet 论文学习笔记--MACM</div></div><div class="info-2"><div class="info-item-1">Multi-scale Anisotropic Convolution Module (MACM) 技术笔记模块概述核心目标MACM旨在解决3D医学图像分割中的三个关键挑战：  各向异性分辨率：适应不同方向的空间分辨率差异 多尺度特征需求：同时捕获局部细节和全局上下文 计算效率：在保持性能的同时控制计算复杂度  技术定位MACM是专门为3D医学图像设计的特征提取模块，通常集成在编码器路径中，用于增强特征的判别能力和空间感知。 整体架构模块组成graph TD     A[输入特征] --&gt; B[1×1×1卷积&lt;br&gt;通道调整]     B --&gt; C[并行ACB处理]          C --&gt; D[ACB k=3]     C --&gt; E[ACB k=7]      C --&gt; F[ACB k=13]     C --&gt; G[ACB k=15]          D --&gt; H[特征拼接]     E --&gt; H     F --&gt; H     G --&gt; H          H --&gt; I[残差...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Soong</div><div class="author-info-description">有关机器学习，力扣代码训练等，欢迎探索</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">14</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Soong-A" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:926315593@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%8F%82%E6%95%B0%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.</span> <span class="toc-text">一、参数是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%8F%82%E6%95%B0%E6%98%AF%E5%A6%82%E4%BD%95%E8%AE%A1%E7%AE%97%E5%87%BA%E6%9D%A5%E7%9A%84%EF%BC%9F%EF%BC%88%E6%8C%89%E5%B1%82%E8%A7%A3%E6%9E%90%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">二、参数是如何计算出来的？（按层解析）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E5%85%A8%E8%BF%9E%E6%8E%A5%E5%B1%82"><span class="toc-number">2.1.</span> <span class="toc-text">1. 全连接层</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E5%8D%B7%E7%A7%AF%E5%B1%82"><span class="toc-number">2.2.</span> <span class="toc-text">2. 卷积层</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%BD%92%E4%B8%80%E5%8C%96%E5%B1%82%E3%80%81%E6%B1%A0%E5%8C%96%E5%B1%82"><span class="toc-number">2.3.</span> <span class="toc-text">3. 归一化层、池化层</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%A6%82%E4%BD%95%E4%B8%8E%E6%82%A8%E6%8F%90%E4%BE%9B%E7%9A%84%E6%96%87%E6%9C%AC%E5%92%8C%E5%9B%BE1%E8%81%94%E7%B3%BB%E8%B5%B7%E6%9D%A5%EF%BC%9F"><span class="toc-number">3.</span> <span class="toc-text">三、如何与您提供的文本和图1联系起来？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%9C%A8%E5%AE%9E%E9%99%85%E4%B8%AD%E5%A6%82%E4%BD%95%E8%8E%B7%E7%9F%A5%E5%8F%82%E6%95%B0%E9%87%8F%EF%BC%9F"><span class="toc-number">4.</span> <span class="toc-text">四、在实际中如何获知参数量？</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/16/%E5%8F%82%E6%95%B0/" title="参数计算">参数计算</a><time datetime="2025-12-16T13:58:00.000Z" title="发表于 2025-12-16 21:58:00">2025-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/12/16/GFLOPs/" title="GFLOPs">GFLOPs</a><time datetime="2025-12-16T13:55:00.000Z" title="发表于 2025-12-16 21:55:00">2025-12-16</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/27/SENet/" title="Squeeze-and-Excitation Networks">Squeeze-and-Excitation Networks</a><time datetime="2025-11-27T08:22:00.000Z" title="发表于 2025-11-27 16:22:00">2025-11-27</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/26/DenseNet/" title="DenseNet论文学习笔">DenseNet论文学习笔</a><time datetime="2025-11-26T13:18:00.000Z" title="发表于 2025-11-26 21:18:00">2025-11-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/11/19/%E6%A8%A1%E5%9E%8B%E5%AD%A6%E4%B9%A0/" title="模型学习分类">模型学习分类</a><time datetime="2025-11-19T06:21:00.000Z" title="发表于 2025-11-19 14:21:00">2025-11-19</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
