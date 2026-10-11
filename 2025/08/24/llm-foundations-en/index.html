@@ -1,0 +1,519 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>LLM foundations — from tokens to alignment | Soong's blog</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Tokenisation, embeddings, attention, the Transformer block, pre-training and scaling, instruction tuning, RLHF, decoding, the KV cache, prompting, LoRA, RAG and evaluation.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LLM foundations — from tokens to alignment">
+<meta property="og:url" content="https://soong-a.github.io/2025/08/24/llm-foundations-en/index.html">
+<meta property="og:site_name" content="Soong&#39;s blog">
+<meta property="og:description" content="Tokenisation, embeddings, attention, the Transformer block, pre-training and scaling, instruction tuning, RLHF, decoding, the KV cache, prompting, LoRA, RAG and evaluation.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/study/llm-foundations.webp">
+<meta property="article:published_time" content="2025-08-24T11:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-11T18:03:49.573Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="Course notes">
+<meta property="article:tag" content="Large language models">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/study/llm-foundations.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "LLM foundations — from tokens to alignment",
+  "url": "https://soong-a.github.io/2025/08/24/llm-foundations-en/",
+  "image": "https://soong-a.github.io/img/study/llm-foundations.webp",
+  "datePublished": "2025-08-24T11:00:00.000Z",
+  "dateModified": "2026-10-11T18:03:49.573Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Soong",
+      "url": "https://soong-a.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2025/08/24/llm-foundations-en/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'LLM foundations — from tokens to alignment',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/index.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/study/llm-foundations.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">LLM foundations — from tokens to alignment</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">LLM foundations — from tokens to alignment</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-08-24T11:00:00.000Z" title="发表于 2025-08-24 12:00:00">2025-08-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-11T18:03:49.573Z" title="更新于 2026-10-11 19:03:49">2026-10-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/English-Notes/">English Notes</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><em>Studied summer 2025 · notes tidied up later · 35 min read</em></p>
+<blockquote>
+<p>中文版：<a href="/2025/08/24/llm-foundations/" title="大模型基础：从 Token 到对齐">大模型基础：从 Token 到对齐</a></p>
+</blockquote>
+<p>Worked through the DeepLearning.AI large-model material in late summer 2025, following <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Bq421A74G">the Chinese-subtitled Bilibili course</a>. The goal was not to collect prompting tricks. I wanted the whole system: how text becomes numbers, how context gets exchanged, how the next token is chosen, and how a base model becomes something useful.</p>
+<h2 id="One-small-objective-one-very-large-system"><a href="#One-small-objective-one-very-large-system" class="headerlink" title="One small objective, one very large system"></a>One small objective, one very large system</h2><p>An autoregressive language model does one thing: estimate the probability of the next token. Everything else — data, architecture, compute, fine-tuning, evaluation — exists to make that one estimate good.</p>
+<pre><code class="highlight mermaid">flowchart TD
+  A[Raw text] --&gt; B[Tokeniser splits into sub-words]
+  B --&gt; C[Embedding lookup gives a vector per token]
+  C --&gt; D[Add positional information]
+  D --&gt; E[Stack of Transformer blocks]
+  E --&gt; F[Final linear layer gives a logit per vocabulary item]
+  F --&gt; G[Softmax makes a probability distribution]
+  G --&gt; H[Decoding strategy picks the next token]
+  H --&gt; B</code></pre>
+
+<p>I drew this diagram twice before I was happy with it, because the first version left off the arrow that loops back. Generation is not one forward pass. The token the model just produced is appended to the input and the whole path runs again. A hundred-token answer is this loop run a hundred times.</p>
+<p>Once that lands, a lot of behaviour explains itself: why generation is so much slower than understanding, because every token traverses the entire network; why the KV cache is such a rescue, because the keys and values of earlier tokens are identical each round and need not be recomputed; why long context is expensive, because the cache grows linearly with length while attention grows with its square.</p>
+<p>The other point that gets skipped: the model never chooses anything. It emits a probability distribution over the whole vocabulary, and the choosing happens in the decoding step afterwards. Temperature, top-p and beam search all live outside the model. Separating the two makes tuning far less mystical — if the output is unstable, look at decoding; only if it is wrong should you look at the model.</p>
+<p>Finally, nothing in this loop stores memory. The context window is the entire memory, and it is re-read from scratch every round. A multi-turn conversation is just the earlier text pasted back into the input.</p>
+<h1 id="Part-I-—-How-text-becomes-computation"><a href="#Part-I-—-How-text-becomes-computation" class="headerlink" title="Part I — How text becomes computation"></a>Part I — How text becomes computation</h1><h2 id="1-Tokens-are-not-words"><a href="#1-Tokens-are-not-words" class="headerlink" title="1. Tokens are not words"></a>1. Tokens are not words</h2><p>Tokenisation sits between text and the model, and it explains a surprising amount of odd behaviour.</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;unbelievable&quot;  -&gt;  [&quot;un&quot;, &quot;believ&quot;, &quot;able&quot;]</span><br><span class="line">&quot;深度学习&quot;       -&gt;  often 2-4 tokens, sometimes 1 per character</span><br><span class="line">&quot;1234567&quot;       -&gt;  [&quot;123&quot;, &quot;456&quot;, &quot;7&quot;]   digits split unevenly</span><br></pre></td></tr></table></figure>
+
+<p>Sub-word schemes such as BPE keep the vocabulary finite while still representing any string. BPE starts from single characters and repeatedly merges the most frequent adjacent pair, so common words end up as one token and rare ones stay in pieces.</p>
+<p>Three consequences worth remembering:</p>
+<ul>
+<li><strong>Arithmetic is hard partly because of tokenisation.</strong> If <code>1234</code> and <code>1235</code> decompose differently, the model does not see a tidy number line.</li>
+<li><strong>Chinese costs more tokens per character than English does per word</strong>, so the same context window holds less Chinese text — and the same API call costs more.</li>
+<li><strong>Counting letters is hard for the same reason.</strong> The model never sees individual characters of a word that arrived as one token.</li>
+</ul>
+<h2 id="2-Embeddings-and-the-geometry-of-meaning"><a href="#2-Embeddings-and-the-geometry-of-meaning" class="headerlink" title="2. Embeddings and the geometry of meaning"></a>2. Embeddings and the geometry of meaning</h2><p>An embedding is a lookup table: token id → a learned vector. Similar meanings end up near each other, and that geometry is learned from co-occurrence alone — nobody defines it.</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Cosine similarity, not Euclidean distance:</span><br><span class="line"></span><br><span class="line">  similarity = (a · b) / (|a| * |b|)</span><br><span class="line"></span><br><span class="line">Direction carries meaning; magnitude mostly carries frequency.</span><br></pre></td></tr></table></figure>
+
+<p>The same mechanism is what makes vector search work later on in RAG: embed a question, embed the documents, compare directions.</p>
+<h2 id="3-Position-attention-has-to-be-told"><a href="#3-Position-attention-has-to-be-told" class="headerlink" title="3. Position: attention has to be told"></a>3. Position: attention has to be told</h2><p>Attention is permutation-invariant by itself — it has no idea which token came first. <em>The cat sat on the mat</em> and <em>the mat sat on the cat</em> would be identical to it. Position has to be added explicitly.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">How</th>
+<th align="left">Trade-off</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Learned absolute</td>
+<td align="left">A trained vector per position</td>
+<td align="left">Cannot exceed the trained length</td>
+</tr>
+<tr>
+<td align="left">Sinusoidal</td>
+<td align="left">Fixed waves of different frequencies</td>
+<td align="left">Extrapolates somewhat</td>
+</tr>
+<tr>
+<td align="left"><strong>RoPE</strong></td>
+<td align="left">Rotates the query and key by an angle proportional to position</td>
+<td align="left">Encodes <em>relative</em> distance, extrapolates best</td>
+</tr>
+</tbody></table>
+<p>RoPE is now the common choice, and the reason is worth holding onto: because it rotates queries and keys rather than adding to the embedding, the dot product between two tokens ends up depending on <strong>how far apart they are</strong>, not where each sits absolutely.</p>
+<h2 id="4-Self-attention-is-the-whole-idea"><a href="#4-Self-attention-is-the-whole-idea" class="headerlink" title="4. Self-attention is the whole idea"></a>4. Self-attention is the whole idea</h2><p>Every token creates three vectors: a <strong>query</strong> (what am I looking for), a <strong>key</strong> (what do I offer), and a <strong>value</strong> (what I actually pass on).</p>
+<pre><code class="highlight mermaid">flowchart TD
+  A[Token embedding] --&gt; B[Query vector]
+  A --&gt; C[Key vector]
+  A --&gt; D[Value vector]
+  B --&gt; E[Dot product of query with every key]
+  C --&gt; E
+  E --&gt; F[Scale by square root of head dimension]
+  F --&gt; G[Softmax gives attention weights]
+  G --&gt; H[Weighted sum of value vectors]
+  D --&gt; H
+  H --&gt; I[New contextual representation]</code></pre>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Attention(Q, K, V) = softmax( Q K^T / sqrt(d_k) ) V</span><br></pre></td></tr></table></figure>
+
+<p>Why divide by <code>sqrt(d_k)</code>? Because with large dimensions the dot products grow large, softmax saturates, and gradients vanish. The scaling keeps the distribution soft enough to learn from.</p>
+<p>The cost is the part that shapes the whole field: attention is <strong>O(n²)</strong> in sequence length. Doubling the context quadruples the compute. Every long-context trick exists to attack that number.</p>
+<h2 id="5-Multi-head-attention"><a href="#5-Multi-head-attention" class="headerlink" title="5. Multi-head attention"></a>5. Multi-head attention</h2><p>One attention operation produces one view of the relationships. Running several in parallel, each with its own projection, lets different heads specialise.</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">d_model = 512, heads = 8  -&gt;  d_k = 64 per head</span><br><span class="line"></span><br><span class="line">Each head: project to 64 dims, attend, produce 64 dims</span><br><span class="line">Concatenate all 8 -&gt; 512 -&gt; one final linear projection</span><br></pre></td></tr></table></figure>
+
+<p>The total computation is roughly the same as one big head, but the model gets several independent relationship patterns instead of one averaged one. Interpretability work has found heads that track syntax, heads that resolve pronouns, and heads that mostly attend to the first token as a no-op.</p>
+<h2 id="6-The-Transformer-block"><a href="#6-The-Transformer-block" class="headerlink" title="6. The Transformer block"></a>6. The Transformer block</h2><pre><code class="highlight mermaid">flowchart TD
+  A[Input] --&gt; B[Layer norm]
+  B --&gt; C[Multi-head self-attention]
+  C --&gt; D[Residual add]
+  A --&gt; D
+  D --&gt; E[Layer norm]
+  E --&gt; F[Feed-forward network]
+  F --&gt; G[Residual add]
+  D --&gt; G
+  G --&gt; H[Output to the next block]</code></pre>
+
+<p>Two details I had glossed over:</p>
+<ul>
+<li><strong>The feed-forward network holds most of the parameters.</strong> It expands to roughly 4× the model dimension and back. Attention moves information <em>between</em> positions; the FFN does the processing <em>at</em> each position. Roughly two-thirds of a model’s weights live here.</li>
+<li><strong>Residual connections are what make depth possible</strong>, exactly as in ResNet. Without them a 96-layer stack would not train.</li>
+</ul>
+<p>Modern models moved layer norm <em>before</em> the sublayer rather than after (“pre-norm”), because it makes very deep stacks train without a warmup schedule.</p>
+<h2 id="7-Encoder-decoder-or-both"><a href="#7-Encoder-decoder-or-both" class="headerlink" title="7. Encoder, decoder, or both"></a>7. Encoder, decoder, or both</h2><table>
+<thead>
+<tr>
+<th align="left">Family</th>
+<th align="left">Attention</th>
+<th align="left">Sees</th>
+<th align="left">Good at</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Encoder-only (BERT)</td>
+<td align="left">Bidirectional</td>
+<td align="left">Whole sequence at once</td>
+<td align="left">Classification, retrieval, embeddings</td>
+</tr>
+<tr>
+<td align="left">Decoder-only (GPT)</td>
+<td align="left">Causal mask</td>
+<td align="left">Only the past</td>
+<td align="left">Generation, and nearly everything now</td>
+</tr>
+<tr>
+<td align="left">Encoder–decoder (T5)</td>
+<td align="left">Both</td>
+<td align="left">Input fully, output causally</td>
+<td align="left">Translation, summarisation</td>
+</tr>
+</tbody></table>
+<p><strong>Causal masking</strong> is the single mechanism that makes a decoder autoregressive: position <em>i</em> may only attend to positions ≤ <em>i</em>. Implemented by setting the masked scores to −∞ before the softmax, so they become exactly zero weight.</p>
+<h1 id="Part-II-—-From-base-model-to-assistant"><a href="#Part-II-—-From-base-model-to-assistant" class="headerlink" title="Part II — From base model to assistant"></a>Part II — From base model to assistant</h1><h2 id="8-Pre-training-and-the-scaling-picture"><a href="#8-Pre-training-and-the-scaling-picture" class="headerlink" title="8. Pre-training, and the scaling picture"></a>8. Pre-training, and the scaling picture</h2><p>Pre-training is self-supervised: the label is simply the next token in the text, so no human annotation is needed and the whole internet becomes training data.</p>
+<p>The finding that reorganised the field is that performance improves predictably with scale — but only if the three ingredients grow <strong>together</strong>:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">compute  ≈  parameters  ×  training tokens</span><br><span class="line"></span><br><span class="line">Early large models were badly under-trained: too many parameters,</span><br><span class="line">not enough tokens. Rebalancing produced smaller models that beat</span><br><span class="line">larger ones on the same compute budget.</span><br></pre></td></tr></table></figure>
+
+<p>Which is why “how many parameters?” turned out to be the wrong question on its own. A well-trained smaller model is often better <em>and</em> cheaper to serve.</p>
+<h2 id="9-Three-stages-from-raw-model-to-assistant"><a href="#9-Three-stages-from-raw-model-to-assistant" class="headerlink" title="9. Three stages from raw model to assistant"></a>9. Three stages from raw model to assistant</h2><pre><code class="highlight mermaid">flowchart TD
+  A[Pre-training on a very large corpus] --&gt; B[Base model predicts plausible continuations]
+  B --&gt; C[Supervised fine-tuning on instruction pairs]
+  C --&gt; D[Model follows instructions]
+  D --&gt; E[Preference optimisation such as RLHF or DPO]
+  E --&gt; F[Aligned assistant]</code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="left">Stage</th>
+<th align="left">Data</th>
+<th align="left">What it changes</th>
+<th align="left">Relative cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Pre-training</td>
+<td align="left">Trillions of unlabelled tokens</td>
+<td align="left">Knowledge and language ability</td>
+<td align="left">Enormous</td>
+</tr>
+<tr>
+<td align="left">Supervised fine-tuning</td>
+<td align="left">Thousands of instruction–response pairs</td>
+<td align="left">Behaviour and format</td>
+<td align="left">Small</td>
+</tr>
+<tr>
+<td align="left">Preference optimisation</td>
+<td align="left">Human rankings of candidate answers</td>
+<td align="left">Tone, safety, helpfulness</td>
+<td align="left">Moderate</td>
+</tr>
+</tbody></table>
+<p>The base model is not a bad assistant — it is not an assistant at all. It continues text. Ask it a question and a plausible continuation might be <em>another question</em>, because that is what documents full of questions look like. “Assistant” is a behaviour installed afterwards, and that reframing explains most of what alignment is for.</p>
+<h2 id="10-Instruction-tuning-in-a-little-more-detail"><a href="#10-Instruction-tuning-in-a-little-more-detail" class="headerlink" title="10. Instruction tuning, in a little more detail"></a>10. Instruction tuning, in a little more detail</h2><p>The data is pairs: an instruction, and a good response. Only a few thousand are needed, because the model is not learning new knowledge — it is learning a <em>format</em> and a <em>stance</em>.</p>
+<p>Two things the course emphasised:</p>
+<ul>
+<li><strong>Quality beats quantity, sharply.</strong> A few thousand carefully written examples outperform hundreds of thousands of scraped ones.</li>
+<li><strong>Loss is usually computed on the response only.</strong> You do not want the model getting better at generating instructions; you want it better at answering them.</li>
+</ul>
+<p>This is also where <strong>catastrophic forgetting</strong> shows up: fine-tune hard on one narrow task and general ability degrades. Mixing in general data keeps it in check.</p>
+<h2 id="11-Learning-from-preferences"><a href="#11-Learning-from-preferences" class="headerlink" title="11. Learning from preferences"></a>11. Learning from preferences</h2><p>Humans are unreliable at scoring an answer out of ten, but quite reliable at saying which of two answers is better. Both RLHF and DPO are built on that observation.</p>
+<pre><code class="highlight mermaid">flowchart TD
+  A[Prompt] --&gt; B[Model generates two candidate answers]
+  B --&gt; C[A human marks which one is better]
+  C --&gt; D[Collect many such comparisons]
+  D --&gt; E[RLHF: train a reward model then optimise with PPO]
+  D --&gt; F[DPO: optimise the preference directly, no reward model]
+  E --&gt; G[Aligned model]
+  F --&gt; G</code></pre>
+
+<table>
+<thead>
+<tr>
+<th align="left"></th>
+<th align="left">RLHF</th>
+<th align="left">DPO</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Extra model needed</td>
+<td align="left">Yes, a reward model</td>
+<td align="left">No</td>
+</tr>
+<tr>
+<td align="left">Training stability</td>
+<td align="left">Fiddly, PPO needs care</td>
+<td align="left">Much simpler</td>
+</tr>
+<tr>
+<td align="left">Pipeline stages</td>
+<td align="left">Three</td>
+<td align="left">Two</td>
+</tr>
+</tbody></table>
+<p>Both need a constraint that keeps the tuned model close to the original, or it drifts into degenerate text that scores well on the reward model and reads like nonsense — <strong>reward hacking</strong>, and a good demonstration that optimising a proxy is not the same as optimising the goal.</p>
+<h1 id="Part-III-—-Using-it"><a href="#Part-III-—-Using-it" class="headerlink" title="Part III — Using it"></a>Part III — Using it</h1><h2 id="12-Decoding-the-same-model-different-personalities"><a href="#12-Decoding-the-same-model-different-personalities" class="headerlink" title="12. Decoding: the same model, different personalities"></a>12. Decoding: the same model, different personalities</h2><p>The model outputs a distribution. How you sample from it changes the output more than most people expect.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Strategy</th>
+<th align="left">How it picks</th>
+<th align="left">Good for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Greedy</td>
+<td align="left">Always the top token</td>
+<td align="left">Extraction, classification</td>
+</tr>
+<tr>
+<td align="left">Beam search</td>
+<td align="left">Keeps k partial sequences</td>
+<td align="left">Translation, summarisation</td>
+</tr>
+<tr>
+<td align="left">Top-k</td>
+<td align="left">Samples from the k most likely</td>
+<td align="left">General generation</td>
+</tr>
+<tr>
+<td align="left">Top-p (nucleus)</td>
+<td align="left">Samples from the smallest set with cumulative probability p</td>
+<td align="left">The common default</td>
+</tr>
+<tr>
+<td align="left">Temperature</td>
+<td align="left">Flattens or sharpens the distribution before sampling</td>
+<td align="left">Tuning creativity</td>
+</tr>
+</tbody></table>
+<p>Temperature below 1 sharpens toward the likeliest token; above 1 flattens and produces more variety and more errors. For anything factual, low temperature plus top-p is the sane starting point.</p>
+<p>Top-p is usually preferred over top-k because it adapts: when the model is confident, the nucleus is one or two tokens; when it is genuinely uncertain, the nucleus widens. A fixed k cannot do that.</p>
+<h2 id="13-The-context-window-and-the-KV-cache"><a href="#13-The-context-window-and-the-KV-cache" class="headerlink" title="13. The context window and the KV cache"></a>13. The context window and the KV cache</h2><p>Generating token 500 does not mean re-reading the first 499 from scratch. Their keys and values are cached.</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Without cache:  every new token re-runs attention over the whole prefix</span><br><span class="line">With cache:     keys and values are stored, only the new token is projected</span><br><span class="line"></span><br><span class="line">Cost:  cache size grows linearly with context length,</span><br><span class="line">       and it lives in GPU memory</span><br></pre></td></tr></table></figure>
+
+<p>That is why long contexts are expensive at <em>inference</em> time and not only at training time, and why context length is a pricing dimension rather than just a feature.</p>
+<h2 id="14-Prompting-that-actually-changes-behaviour"><a href="#14-Prompting-that-actually-changes-behaviour" class="headerlink" title="14. Prompting that actually changes behaviour"></a>14. Prompting that actually changes behaviour</h2><p>Most prompt “tricks” are noise. Three are mechanistically real:</p>
+<ul>
+<li><strong>Few-shot examples.</strong> Showing two or three worked examples sets the format far more reliably than describing it. The model is pattern-completing.</li>
+<li><strong>Chain of thought.</strong> Asking for reasoning steps genuinely helps on multi-step problems, because each generated token is extra computation the model can condition on. It is not simulating thought so much as giving itself more working space.</li>
+<li><strong>Structure the request.</strong> Clear delimiters between instruction, context and data reduce the chance that data gets read as an instruction.</li>
+</ul>
+<p>What does <em>not</em> reliably help: politeness, threats, claiming urgency, or telling the model it is an expert.</p>
+<h2 id="15-Fine-tuning-without-retraining-everything"><a href="#15-Fine-tuning-without-retraining-everything" class="headerlink" title="15. Fine-tuning without retraining everything"></a>15. Fine-tuning without retraining everything</h2><p>Full fine-tuning updates every weight and needs optimiser state for all of them. <strong>LoRA</strong> freezes the base weights and learns a low-rank update instead.</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">W&#x27; = W + B A</span><br><span class="line"></span><br><span class="line">W is frozen, shape d x k</span><br><span class="line">A is r x k, B is d x r, with r much smaller than d</span><br><span class="line">Trainable parameters drop by roughly 100x to 1000x</span><br></pre></td></tr></table></figure>
+
+<p>The assumption underneath is that the <em>change</em> needed to adapt a model to a task is low-rank, even though the model itself is not. Empirically that holds well.</p>
+<p>Because the base model is untouched, several LoRA adapters can share one set of weights and be swapped at inference. That is why adapter marketplaces exist at all. <strong>QLoRA</strong> goes further by quantising the frozen base to 4-bit, which is what makes fine-tuning a large model on a single GPU possible.</p>
+<h2 id="16-RAG-and-why-it-is-not-fine-tuning"><a href="#16-RAG-and-why-it-is-not-fine-tuning" class="headerlink" title="16. RAG, and why it is not fine-tuning"></a>16. RAG, and why it is not fine-tuning</h2><pre><code class="highlight mermaid">flowchart TD
+  A[User question] --&gt; B[Embed the question]
+  B --&gt; C[Search a vector database]
+  C --&gt; D[Retrieve the most relevant chunks]
+  D --&gt; E[Insert them into the prompt as context]
+  A --&gt; E
+  E --&gt; F[Model answers grounded in the retrieved text]</code></pre>
+
+<p>Fine-tuning changes <strong>behaviour</strong>; retrieval supplies <strong>facts</strong>. If the model writes in the wrong style, fine-tune. If it does not know your documents, retrieve. Choosing the wrong one is an expensive mistake.</p>
+<p>The part that is harder than it looks is chunking. Split too small and a chunk loses the context that made it meaningful; split too large and the embedding averages several topics into one vector that matches nothing well. Overlapping windows are the usual compromise.</p>
+<h2 id="17-Evaluation-which-is-genuinely-hard"><a href="#17-Evaluation-which-is-genuinely-hard" class="headerlink" title="17. Evaluation, which is genuinely hard"></a>17. Evaluation, which is genuinely hard</h2><p>There is no single number. For generation there is often no one right answer, so the usual metrics all measure something slightly beside the point.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Method</th>
+<th align="left">Measures</th>
+<th align="left">Weakness</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Perplexity</td>
+<td align="left">How surprised the model is by held-out text</td>
+<td align="left">Not correlated with usefulness</td>
+</tr>
+<tr>
+<td align="left">Benchmarks (MMLU etc.)</td>
+<td align="left">Multiple-choice knowledge</td>
+<td align="left">Contamination; not how anyone uses it</td>
+</tr>
+<tr>
+<td align="left">LLM-as-judge</td>
+<td align="left">Another model scores the output</td>
+<td align="left">Inherits the judge’s biases, prefers longer answers</td>
+</tr>
+<tr>
+<td align="left">Human preference</td>
+<td align="left">What people actually prefer</td>
+<td align="left">Slow, expensive, subjective</td>
+</tr>
+</tbody></table>
+<p>For anything I build myself, the honest approach is a small fixed set of real examples with known good answers, re-run after every change. Unglamorous, but it catches regressions that a benchmark number hides.</p>
+<h2 id="18-Hallucination-stated-honestly"><a href="#18-Hallucination-stated-honestly" class="headerlink" title="18. Hallucination, stated honestly"></a>18. Hallucination, stated honestly</h2><p>The objective is next-token plausibility, not truth. A fluent wrong answer and a fluent right answer can score almost identically under that objective. Nothing in pre-training rewards saying “I don’t know” — documents that confidently state things are far more common than documents expressing uncertainty.</p>
+<p>Mitigations help without solving it: retrieval grounds answers in real text, low temperature reduces invention, citation requirements make claims checkable, and asking for reasoning steps exposes where an argument breaks. Treating fluency as evidence of correctness remains the most common mistake I see — including in my own early use.</p>
+<h2 id="Where-this-connects"><a href="#Where-this-connects" class="headerlink" title="Where this connects"></a>Where this connects</h2><p>Reading the Mamba component of MM-UNet a few months later was much easier with this background: Mamba exists precisely because attention is O(n²), and a 3D medical volume flattened into a sequence is very long indeed. The courses were separate; the bottleneck turned out to be the same one.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2025/08/24/llm-foundations-en/">https://soong-a.github.io/2025/08/24/llm-foundations-en/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Course-notes/">Course notes</a><a class="post-meta__tags" href="/tags/Large-language-models/">Large language models</a></div><div class="post-share"><div class="social-share" data-image="/img/study/llm-foundations.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/08/24/llm-foundations/" title="大模型基础：从 Token 到对齐"><img class="cover" src="/img/study/llm-foundations.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">大模型基础：从 Token 到对齐</div></div><div class="info-2"><div class="info-item-1">分词、嵌入、注意力、Transformer 块、预训练与规模、指令微调、RLHF、解码、KV 缓存、提示词、LoRA、RAG 与评测。</div></div></div></a><a class="pagination-related" href="/2025/08/11/122/" title="122"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">122</div></div><div class="info-2"><div class="info-item-1"> 这是 </div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/08/02/cs231n-foundations-en/" title="CS231n foundations — teaching a machine to see"><img class="cover" src="/img/study/cs231n-foundations.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-02</div><div class="info-item-2">CS231n foundations — teaching a machine to see</div></div><div class="info-2"><div class="info-item-1">Linear classifiers, losses, optimisers, backpropagation, initialisation, batch norm, convolution, architecture history, transfer learning and what the network actually learned.</div></div></div></a><a class="pagination-related" href="/2025/07/06/machine-learning-specialization-en/" title="Andrew Ng&#39;s Machine Learning Specialization — the foundation map"><img class="cover" src="/img/study/machine-learning-specialization.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-06</div><div class="info-item-2">Andrew Ng&#39;s Machine Learning Specialization — the foundation map</div></div><div class="info-2"><div class="info-item-1">Regression, classification, neural networks, evaluation, decision trees, clustering, anomaly detection, recommenders, PCA and reinforcement learning — the whole specialization as one connected map.</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Soong</div><div class="author-info-description">有关机器学习，力扣代码训练等，欢迎探索</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Soong-A" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:926315593@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#One-small-objective-one-very-large-system"><span class="toc-number">1.</span> <span class="toc-text">One small objective, one very large system</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Part-I-%E2%80%94-How-text-becomes-computation"><span class="toc-number"></span> <span class="toc-text">Part I — How text becomes computation</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Tokens-are-not-words"><span class="toc-number">1.</span> <span class="toc-text">1. Tokens are not words</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Embeddings-and-the-geometry-of-meaning"><span class="toc-number">2.</span> <span class="toc-text">2. Embeddings and the geometry of meaning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Position-attention-has-to-be-told"><span class="toc-number">3.</span> <span class="toc-text">3. Position: attention has to be told</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Self-attention-is-the-whole-idea"><span class="toc-number">4.</span> <span class="toc-text">4. Self-attention is the whole idea</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Multi-head-attention"><span class="toc-number">5.</span> <span class="toc-text">5. Multi-head attention</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-The-Transformer-block"><span class="toc-number">6.</span> <span class="toc-text">6. The Transformer block</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Encoder-decoder-or-both"><span class="toc-number">7.</span> <span class="toc-text">7. Encoder, decoder, or both</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Part-II-%E2%80%94-From-base-model-to-assistant"><span class="toc-number"></span> <span class="toc-text">Part II — From base model to assistant</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Pre-training-and-the-scaling-picture"><span class="toc-number">1.</span> <span class="toc-text">8. Pre-training, and the scaling picture</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-Three-stages-from-raw-model-to-assistant"><span class="toc-number">2.</span> <span class="toc-text">9. Three stages from raw model to assistant</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-Instruction-tuning-in-a-little-more-detail"><span class="toc-number">3.</span> <span class="toc-text">10. Instruction tuning, in a little more detail</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-Learning-from-preferences"><span class="toc-number">4.</span> <span class="toc-text">11. Learning from preferences</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Part-III-%E2%80%94-Using-it"><span class="toc-number"></span> <span class="toc-text">Part III — Using it</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#12-Decoding-the-same-model-different-personalities"><span class="toc-number">1.</span> <span class="toc-text">12. Decoding: the same model, different personalities</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-The-context-window-and-the-KV-cache"><span class="toc-number">2.</span> <span class="toc-text">13. The context window and the KV cache</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-Prompting-that-actually-changes-behaviour"><span class="toc-number">3.</span> <span class="toc-text">14. Prompting that actually changes behaviour</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-Fine-tuning-without-retraining-everything"><span class="toc-number">4.</span> <span class="toc-text">15. Fine-tuning without retraining everything</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#16-RAG-and-why-it-is-not-fine-tuning"><span class="toc-number">5.</span> <span class="toc-text">16. RAG, and why it is not fine-tuning</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#17-Evaluation-which-is-genuinely-hard"><span class="toc-number">6.</span> <span class="toc-text">17. Evaluation, which is genuinely hard</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#18-Hallucination-stated-honestly"><span class="toc-number">7.</span> <span class="toc-text">18. Hallucination, stated honestly</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Where-this-connects"><span class="toc-number">8.</span> <span class="toc-text">Where this connects</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/gflops/" title="GFLOPs：模型到底算了多少次"><img src="/img/study/gflops.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GFLOPs：模型到底算了多少次"/></a><div class="content"><a class="title" href="/2025/12/16/gflops/" title="GFLOPs：模型到底算了多少次">GFLOPs：模型到底算了多少次</a><time datetime="2025-12-16T12:00:01.000Z" title="发表于 2025-12-16 12:00:01">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/parameter-count/" title="参数量：逐层数清一个模型"><img src="/img/study/parameter-count.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="参数量：逐层数清一个模型"/></a><div class="content"><a class="title" href="/2025/12/16/parameter-count/" title="参数量：逐层数清一个模型">参数量：逐层数清一个模型</a><time datetime="2025-12-16T12:00:01.000Z" title="发表于 2025-12-16 12:00:01">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/gflops-en/" title="GFLOPs: counting the work"><img src="/img/study/gflops.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GFLOPs: counting the work"/></a><div class="content"><a class="title" href="/2025/12/16/gflops-en/" title="GFLOPs: counting the work">GFLOPs: counting the work</a><time datetime="2025-12-16T12:00:00.000Z" title="发表于 2025-12-16 12:00:00">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/parameter-count-en/" title="Parameter count, layer by layer"><img src="/img/study/parameter-count.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Parameter count, layer by layer"/></a><div class="content"><a class="title" href="/2025/12/16/parameter-count-en/" title="Parameter count, layer by layer">Parameter count, layer by layer</a><time datetime="2025-12-16T12:00:00.000Z" title="发表于 2025-12-16 12:00:00">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/11/27/senet/" title="SENet：让网络学会看重哪个通道"><img src="/img/study/senet.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SENet：让网络学会看重哪个通道"/></a><div class="content"><a class="title" href="/2025/11/27/senet/" title="SENet：让网络学会看重哪个通道">SENet：让网络学会看重哪个通道</a><time datetime="2025-11-27T12:00:01.000Z" title="发表于 2025-11-27 12:00:01">2025-11-27</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

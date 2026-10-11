@@ -1,0 +1,276 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>GFLOPs: counting the work | Soong's blog</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Where the number comes from, and why it is not the same thing as parameter count.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GFLOPs: counting the work">
+<meta property="og:url" content="https://soong-a.github.io/2025/12/16/gflops-en/index.html">
+<meta property="og:site_name" content="Soong&#39;s blog">
+<meta property="og:description" content="Where the number comes from, and why it is not the same thing as parameter count.">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/study/gflops.webp">
+<meta property="article:published_time" content="2025-12-16T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-11T18:03:49.570Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="Computer vision">
+<meta property="article:tag" content="Fundamentals">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/study/gflops.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "GFLOPs: counting the work",
+  "url": "https://soong-a.github.io/2025/12/16/gflops-en/",
+  "image": "https://soong-a.github.io/img/study/gflops.webp",
+  "datePublished": "2025-12-16T12:00:00.000Z",
+  "dateModified": "2026-10-11T18:03:49.570Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Soong",
+      "url": "https://soong-a.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2025/12/16/gflops-en/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'GFLOPs: counting the work',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/index.png);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/study/gflops.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">GFLOPs: counting the work</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group hide"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">GFLOPs: counting the work</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-12-16T12:00:00.000Z" title="发表于 2025-12-16 12:00:00">2025-12-16</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-11T18:03:49.570Z" title="更新于 2026-10-11 19:03:49">2026-10-11</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/English-Notes/">English Notes</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><p><em>5 min read</em></p>
+<blockquote>
+<p>中文版：<a href="/2025/12/16/gflops/" title="GFLOPs：模型到底算了多少次">GFLOPs：模型到底算了多少次</a></p>
+</blockquote>
+<h2 id="Definitions"><a href="#Definitions" class="headerlink" title="Definitions"></a>Definitions</h2><ul>
+<li><strong>FLOPs</strong> — floating point operations. The total number of floating-point multiplications and additions needed for one forward pass, that is, to process one input.</li>
+<li><strong>GFLOPs</strong> — one billion FLOPs. <code>1 GFLOPs = 10⁹ FLOPs</code>.</li>
+</ul>
+<p>The analogy I use:</p>
+<ul>
+<li><strong>Parameter count</strong> is the number of pages in a dictionary — static, and it tells you how much storage it occupies.</li>
+<li><strong>GFLOPs</strong> is how many page-turns it takes to look up every word — dynamic, and it tells you how much work one task costs.</li>
+</ul>
+<h2 id="Why-it-matters"><a href="#Why-it-matters" class="headerlink" title="Why it matters"></a>Why it matters</h2><p>For a lightweight model, low GFLOPs means:</p>
+<ol>
+<li><strong>Faster inference</strong> — less time per prediction.</li>
+<li><strong>Lower power</strong> — critical on battery-powered devices.</li>
+<li><strong>Less heat</strong> — better for sustained operation.</li>
+<li><strong>Real-time feasibility</strong> — for example, live lesion segmentation during endoscopy.</li>
+</ol>
+<p>When a paper’s figure uses colour depth to encode GFLOPs, the point is usually this: <strong>two models with similar parameter counts can still have wildly different compute costs.</strong></p>
+<h2 id="How-it-is-calculated"><a href="#How-it-is-calculated" class="headerlink" title="How it is calculated"></a>How it is calculated</h2><p>The basic unit is the <strong>multiply-accumulate</strong>. In hardware, <code>y = w * x + b</code> is usually counted as one floating-point operation, even though it contains both a multiply and an add.</p>
+<p>Take a convolutional layer — normally the most expensive part:</p>
+<ul>
+<li>Input feature map: <code>H_in × W_in × C_in</code></li>
+<li>Output feature map: <code>H_out × W_out × C_out</code></li>
+<li>Kernel: <code>K × K</code></li>
+<li>Bias: present</li>
+</ul>
+<p><strong>Step one — one output pixel.</strong></p>
+<p>Producing a single output value means multiplying <code>K × K × C_in</code> weights with the matching input window and summing them. That is <code>K × K × C_in</code> multiplications and <code>(K × K × C_in − 1)</code> additions, plus one more for the bias.</p>
+<p>Counting a multiply-accumulate as one FLOP:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLOPs_per_pixel ≈ 2 x K x K x C_in</span><br></pre></td></tr></table></figure>
+
+<p><strong>Step two — the whole layer.</strong></p>
+<p>Multiply by the number of output pixels, and by the number of filters:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FLOPs_conv = 2 x C_out x H_out x W_out x (C_in x K x K)</span><br></pre></td></tr></table></figure>
+
+<p>Reading the formula:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Term</th>
+<th align="left">What it counts</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>C_in × K × K</code></td>
+<td align="left">Work for one output pixel in one channel</td>
+</tr>
+<tr>
+<td align="left"><code>H_out × W_out</code></td>
+<td align="left">Number of output positions</td>
+</tr>
+<tr>
+<td align="left"><code>C_out</code></td>
+<td align="left">Number of filters</td>
+</tr>
+<tr>
+<td align="left"><code>× 2</code></td>
+<td align="left">The multiply and the add</td>
+</tr>
+</tbody></table>
+<h2 id="The-caveat"><a href="#The-caveat" class="headerlink" title="The caveat"></a>The caveat</h2><p>Some papers count a multiply-accumulate as <strong>one</strong> operation rather than two, which drops the factor of 2 and halves every number. Neither convention is wrong — but a comparison is only meaningful if every model in it was measured the same way. When reading a figure, the relative ordering is trustworthy; the absolute values are only as trustworthy as the stated convention.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2025/12/16/gflops-en/">https://soong-a.github.io/2025/12/16/gflops-en/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Computer-vision/">Computer vision</a><a class="post-meta__tags" href="/tags/Fundamentals/">Fundamentals</a></div><div class="post-share"><div class="social-share" data-image="/img/study/gflops.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/12/16/parameter-count-en/" title="Parameter count, layer by layer"><img class="cover" src="/img/study/parameter-count.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Parameter count, layer by layer</div></div><div class="info-2"><div class="info-item-1">Counting weights per layer, and why convolution's weight sharing keeps it so much lighter than a dense layer.</div></div></div></a><a class="pagination-related" href="/2025/11/27/senet/" title="SENet：让网络学会看重哪个通道"><img class="cover" src="/img/study/senet.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">SENet：让网络学会看重哪个通道</div></div><div class="info-2"><div class="info-item-1">Squeeze-and-Excitation：用全局平均池化加两层全连接，为每个通道学出一个重要性权重。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/08/02/cs231n-foundations-en/" title="CS231n foundations — teaching a machine to see"><img class="cover" src="/img/study/cs231n-foundations.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-02</div><div class="info-item-2">CS231n foundations — teaching a machine to see</div></div><div class="info-2"><div class="info-item-1">Linear classifiers, losses, optimisers, backpropagation, initialisation, batch norm, convolution, architecture history, transfer learning and what the network actually learned.</div></div></div></a><a class="pagination-related" href="/2025/11/11/thresholding-edges-and-learning-en/" title="Thresholding, edge filters, and learning"><img class="cover" src="/img/study/thresholding-edges-and-learning.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-11</div><div class="info-item-2">Thresholding, edge filters, and learning</div></div><div class="info-2"><div class="info-item-1">Three ways to pull structure out of an image, what each one assumes, and what each one costs.</div></div></div></a><a class="pagination-related" href="/2025/12/16/parameter-count-en/" title="Parameter count, layer by layer"><img class="cover" src="/img/study/parameter-count.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-16</div><div class="info-item-2">Parameter count, layer by layer</div></div><div class="info-2"><div class="info-item-1">Counting weights per layer, and why convolution's weight sharing keeps it so much lighter than a dense layer.</div></div></div></a><a class="pagination-related" href="/2025/11/26/densenet-en/" title="DenseNet: concatenate, don&#39;t add"><img class="cover" src="/img/study/densenet.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-26</div><div class="info-item-2">DenseNet: concatenate, don&#39;t add</div></div><div class="info-2"><div class="info-item-1">Addition mixes features irreversibly; concatenation keeps every earlier feature available. That one difference explains most of the architecture.</div></div></div></a><a class="pagination-related" href="/2025/11/27/senet-en/" title="SENet: learning which channel matters"><img class="cover" src="/img/study/senet.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-27</div><div class="info-item-2">SENet: learning which channel matters</div></div><div class="info-2"><div class="info-item-1">Squeeze to a vector, excite through two dense layers, then rescale every channel. A small block that keeps showing up everywhere.</div></div></div></a><a class="pagination-related" href="/2025/07/06/machine-learning-specialization-en/" title="Andrew Ng&#39;s Machine Learning Specialization — the foundation map"><img class="cover" src="/img/study/machine-learning-specialization.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-07-06</div><div class="info-item-2">Andrew Ng&#39;s Machine Learning Specialization — the foundation map</div></div><div class="info-2"><div class="info-item-1">Regression, classification, neural networks, evaluation, decision trees, clustering, anomaly detection, recommenders, PCA and reinforcement learning — the whole specialization as one connected map.</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Soong</div><div class="author-info-description">有关机器学习，力扣代码训练等，欢迎探索</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">32</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">13</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Soong-A" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:926315593@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Definitions"><span class="toc-number">1.</span> <span class="toc-text">Definitions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Why-it-matters"><span class="toc-number">2.</span> <span class="toc-text">Why it matters</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#How-it-is-calculated"><span class="toc-number">3.</span> <span class="toc-text">How it is calculated</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#The-caveat"><span class="toc-number">4.</span> <span class="toc-text">The caveat</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/gflops/" title="GFLOPs：模型到底算了多少次"><img src="/img/study/gflops.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GFLOPs：模型到底算了多少次"/></a><div class="content"><a class="title" href="/2025/12/16/gflops/" title="GFLOPs：模型到底算了多少次">GFLOPs：模型到底算了多少次</a><time datetime="2025-12-16T12:00:01.000Z" title="发表于 2025-12-16 12:00:01">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/parameter-count/" title="参数量：逐层数清一个模型"><img src="/img/study/parameter-count.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="参数量：逐层数清一个模型"/></a><div class="content"><a class="title" href="/2025/12/16/parameter-count/" title="参数量：逐层数清一个模型">参数量：逐层数清一个模型</a><time datetime="2025-12-16T12:00:01.000Z" title="发表于 2025-12-16 12:00:01">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/gflops-en/" title="GFLOPs: counting the work"><img src="/img/study/gflops.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GFLOPs: counting the work"/></a><div class="content"><a class="title" href="/2025/12/16/gflops-en/" title="GFLOPs: counting the work">GFLOPs: counting the work</a><time datetime="2025-12-16T12:00:00.000Z" title="发表于 2025-12-16 12:00:00">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/12/16/parameter-count-en/" title="Parameter count, layer by layer"><img src="/img/study/parameter-count.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Parameter count, layer by layer"/></a><div class="content"><a class="title" href="/2025/12/16/parameter-count-en/" title="Parameter count, layer by layer">Parameter count, layer by layer</a><time datetime="2025-12-16T12:00:00.000Z" title="发表于 2025-12-16 12:00:00">2025-12-16</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/11/27/senet/" title="SENet：让网络学会看重哪个通道"><img src="/img/study/senet.webp" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SENet：让网络学会看重哪个通道"/></a><div class="content"><a class="title" href="/2025/11/27/senet/" title="SENet：让网络学会看重哪个通道">SENet：让网络学会看重哪个通道</a><time datetime="2025-11-27T12:00:01.000Z" title="发表于 2025-11-27 12:00:01">2025-11-27</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
