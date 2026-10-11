@@ -323,6 +323,8 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
   --soong-card: rgba(255, 255, 255, .94);
   --soong-shadow: 0 8px 28px -18px rgba(34, 76, 112, .42);
   --soong-shadow-hover: 0 14px 34px -18px rgba(47, 110, 166, .38);
+  --btn-bg: #2f6ea6;
+  --btn-hover-color: #245984;
 }
 
 [data-theme="dark"] {
@@ -448,13 +450,13 @@ body {
   background: var(--soong-blue-pale);
 }
 
-#aside-content #card-info-btn {
+#aside-content .card-info #card-info-btn {
   border-radius: 10px;
   background: var(--soong-blue);
   box-shadow: 0 9px 20px -14px rgba(36, 89, 132, .72);
 }
 
-#aside-content #card-info-btn:hover {
+#aside-content .card-info #card-info-btn:hover {
   background: var(--soong-blue-deep);
 }
 
@@ -560,4 +562,3 @@ button:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
-
