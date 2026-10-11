@@ -965,6 +965,9 @@ body {
 #aside-content .card-webinfo .webinfo .webinfo-item .item-name {
   min-width: 0;
   padding-right: 0 !important;
+  color: var(--font-color);
+  font-size: .86rem !important;
+  font-weight: 500;
   line-height: 1.45;
   white-space: nowrap;
 }
@@ -972,6 +975,9 @@ body {
 #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
   justify-self: end;
   min-width: 5.7rem;
+  color: var(--font-color) !important;
+  font-size: .86rem !important;
+  font-weight: 600 !important;
   line-height: 1.45;
   text-align: right;
   white-space: nowrap;
