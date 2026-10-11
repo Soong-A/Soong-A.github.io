@@ -8,43 +8,195 @@
   background-color: #787878;
 }
 
-/* ---------- Blur: every image except the home banner ---------- */
+/* ---------- Softened images: every image except the home banner ----------
+   The images themselves are pre-blurred (index-soft.webp, *-header.webp).
+   CSS filter / backdrop-filter only kick in after the theme's entry
+   animations finish, which made the blur pop in a second after load. */
 
-/* Site background (the doodle wallpaper): blurred and washed so text on top stays readable */
-#web_bg {
-  filter: blur(12px);
-  transform: scale(1.1);
-}
+/* Site background: a light wash so text on top stays readable */
 #web_bg::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, .45);
+  background: rgba(255, 255, 255, .3);
 }
 [data-theme="dark"] #web_bg::after {
   background: rgba(0, 0, 0, .5);
 }
 
-/* Article cover / page header images: frosted layer under the title */
+/* Article header: darken towards the bottom, where the title sits */
 #page-header.post-bg::before,
 #page-header.not-home-page::before {
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  background: linear-gradient(180deg, rgba(0, 0, 0, .28), rgba(0, 0, 0, .48));
+  background: linear-gradient(180deg, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, .22) 45%, rgba(0, 0, 0, .5) 100%);
 }
 #page-header.post-bg #post-info,
 #page-header.not-home-page #page-site-info {
-  text-shadow: 0 2px 8px rgba(0, 0, 0, .35);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .35);
 }
 
-/* Pages without a header image: frosted top bar */
+/* Pages without a header image: solid top bar */
 #page-header.not-top-img #nav {
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, .72);
+  background: rgba(255, 255, 255, .88);
 }
 [data-theme="dark"] #page-header.not-top-img #nav {
-  background: rgba(18, 18, 18, .72);
+  background: rgba(18, 18, 18, .88);
+}
+
+/* ---------- Typography: bold headline titles ---------- */
+#site-title,
+#page-site-info #site-title,
+#post-info .post-title,
+#page h1.page-title,
+.recent-post-info .article-title,
+.article-sort-title,
+.category-lists .category-title {
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+#site-title {
+  font-weight: 800;
+}
+#nav .site-name {
+  font-weight: 700;
+}
+
+/* ---------- Unified cards ---------- */
+#recent-posts > .recent-post-item,
+#aside-content .card-widget,
+#page,
+#post,
+#archive,
+#tag,
+#category {
+  border: 1px solid rgba(107, 79, 163, .08);
+  box-shadow: 0 6px 24px -12px rgba(45, 42, 50, .28);
+}
+#recent-posts > .recent-post-item:hover,
+#aside-content .card-widget:hover {
+  box-shadow: 0 10px 30px -12px rgba(107, 79, 163, .35);
+}
+[data-theme="dark"] #recent-posts > .recent-post-item,
+[data-theme="dark"] #aside-content .card-widget,
+[data-theme="dark"] #page,
+[data-theme="dark"] #post {
+  border-color: rgba(255, 255, 255, .06);
+}
+
+/* ---------- Categories page: one card per topic ---------- */
+.category-lists ul.category-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+.category-lists ul.category-list > li.category-list-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(107, 79, 163, .16);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(107, 79, 163, .07), rgba(183, 121, 31, .05));
+  list-style: none;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.category-lists ul.category-list > li.category-list-item::before {
+  display: none;
+}
+.category-lists ul.category-list > li.category-list-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(107, 79, 163, .4);
+  box-shadow: 0 10px 24px -14px rgba(107, 79, 163, .6);
+}
+.category-lists .category-list-link {
+  font-size: 1.05em;
+  font-weight: 600;
+  color: var(--font-color);
+}
+.category-lists .category-list-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.category-lists .category-list-count {
+  margin-left: .6rem;
+  padding: .1em .6em;
+  border-radius: 999px;
+  background: rgba(107, 79, 163, .12);
+  color: #6b4fa3;
+  font-size: .85em;
+  font-weight: 600;
+}
+.category-lists .category-list-count::before,
+.category-lists .category-list-count::after {
+  content: none;
+}
+[data-theme="dark"] .category-lists .category-list-count {
+  color: #b49ce8;
+}
+
+/* ---------- About page ---------- */
+.about-lead {
+  margin: .2rem 0 1.4rem;
+  font-size: 1.12em;
+  line-height: 1.8;
+}
+.about-title {
+  margin: 0 0 .6rem !important;
+  font-size: 1.55em !important;
+  font-weight: 800 !important;
+  line-height: 1.4;
+}
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin: 1rem 0 1.4rem;
+}
+.about-grid .about-card {
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(107, 79, 163, .16);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(107, 79, 163, .06), rgba(183, 121, 31, .04));
+}
+.about-grid .about-card h3 {
+  margin: 0 0 .4rem !important;
+  padding: 0 !important;
+  font-size: 1.08em !important;
+  font-weight: 700;
+}
+.about-grid .about-card h3::before {
+  content: none !important;
+}
+.about-grid .about-card p {
+  margin: 0;
+  line-height: 1.75;
+}
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 1rem;
+}
+#article-container .about-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  padding: .55em 1.1em;
+  border-radius: 999px;
+  border: 1px solid #6b4fa3;
+  color: #6b4fa3;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .18s ease, color .18s ease;
+}
+#article-container .about-actions a.primary,
+#article-container .about-actions a:hover {
+  background: #6b4fa3;
+  color: #fff;
 }
 
 /* ---------- Tags page: word cloud ---------- */
