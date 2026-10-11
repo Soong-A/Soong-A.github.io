@@ -503,6 +503,36 @@ body {
   border-bottom: 1px solid var(--soong-line);
 }
 
+#article-container .seo-related {
+  margin-top: 2.6rem;
+  padding: 1rem 1.15rem .9rem;
+  border: 1px solid var(--soong-line);
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--soong-blue-pale), rgba(217, 164, 179, .06));
+}
+
+#article-container .seo-related h2 {
+  margin: 0 0 .55rem;
+  padding: 0;
+  border: 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+
+#article-container .seo-related ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+#article-container .seo-related li {
+  margin: .32rem 0;
+  line-height: 1.65;
+}
+
+#article-container .seo-related a {
+  font-weight: 600;
+}
+
 #article-container blockquote {
   border-left-color: var(--soong-blue);
   border-radius: 0 10px 10px 0;

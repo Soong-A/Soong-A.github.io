@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://soong-a.github.io/sitemap.xml
