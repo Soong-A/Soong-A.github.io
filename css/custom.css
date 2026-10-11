@@ -465,41 +465,6 @@ body {
   color: var(--soong-blue);
 }
 
-/* Keep the complete desktop sidebar anchored below the navigation bar. */
-@media screen and (min-width: 901px) {
-  .layout > #aside-content {
-    position: sticky;
-    top: 76px;
-    align-self: flex-start;
-    max-height: calc(100vh - 92px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(82, 122, 150, .24) transparent;
-  }
-
-  /* The parent now handles the fixed position; avoid nested sticky movement. */
-  .layout > #aside-content > .sticky_layout {
-    position: static;
-    top: auto;
-    transition: none;
-  }
-
-  .layout > #aside-content::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .layout > #aside-content::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: rgba(82, 122, 150, .24);
-  }
-
-  .layout > #aside-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-}
-
 #aside-content .card-webinfo .webinfo-item:nth-child(2),
 #aside-content .card-webinfo .webinfo-item:nth-child(3) {
   margin: .2rem 0;
@@ -1335,38 +1300,202 @@ html[data-lang="en"] .recent-post-info .article-title {
   }
 }
 
-/* Keep the long desktop sidebar within the viewport and let it scroll itself. */
-@media (min-width: 901px) {
-  #aside-content {
+/*
+ * Desktop sidebar: two balanced columns that remain anchored while the page
+ * moves. The sidebar has no independent scroll area, so the wheel always
+ * controls the page itself.
+ */
+@media (min-width: 1101px) {
+  .layout {
+    max-width: 1460px;
+  }
+
+  .layout > div:first-child {
+    width: 64%;
+  }
+
+  .layout > #aside-content {
     position: sticky;
-    top: 76px;
+    top: 68px;
     align-self: flex-start;
-    max-height: calc(100vh - 96px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-color: rgba(82, 122, 150, .28) transparent;
-    scrollbar-width: thin;
+    width: 36%;
+    max-height: none;
+    overflow: visible;
+    column-count: 2;
+    column-gap: 12px;
   }
 
-  #aside-content > .sticky_layout {
+  .layout > #aside-content > .sticky_layout {
+    display: contents;
     position: static !important;
+    top: auto;
+    transition: none;
   }
 
-  #aside-content::-webkit-scrollbar {
-    width: 5px;
+  #aside-content .card-widget {
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 12px 14px;
+    break-inside: avoid;
+    vertical-align: top;
   }
 
-  #aside-content::-webkit-scrollbar-track {
-    background: transparent;
+  #aside-content .card-info .avatar-img {
+    width: 54px;
+    height: 54px;
   }
 
-  #aside-content::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: rgba(82, 122, 150, .24);
+  #aside-content .card-info .author-info-name {
+    font-size: 1.1rem;
+    line-height: 1.35;
   }
 
-  #aside-content:hover::-webkit-scrollbar-thumb {
-    background: rgba(82, 122, 150, .4);
+  #aside-content .card-info .author-info-description {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: .75rem;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #aside-content .card-info .site-data-chart {
+    gap: .35rem;
+    margin: .7rem 0 .25rem;
+  }
+
+  #aside-content .card-info .site-data-ring {
+    width: 34px;
+    height: 34px;
+  }
+
+  #aside-content .card-info .site-data-chart .headline {
+    font-size: .64rem;
+  }
+
+  #aside-content .card-info #card-info-btn {
+    margin-top: 8px;
+    line-height: 2.05;
+  }
+
+  #aside-content .card-info .card-info-social-icons {
+    display: none;
+  }
+
+  #aside-content .item-headline {
+    padding-bottom: 4px;
+    font-size: .96rem;
+    line-height: 1.35;
+  }
+
+  #aside-content .card-announcement .announcement_content {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: .82rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  #aside-content .aside-list > .aside-list-item {
+    min-height: 0;
+    padding: 3px 0;
+  }
+
+  #aside-content .card-recent-post .aside-list-item .thumbnail {
+    display: none;
+  }
+
+  #aside-content .card-recent-post .aside-list-item .content {
+    min-width: 0;
+    padding-left: 0;
+  }
+
+  #aside-content .card-recent-post .aside-list-item .content > .title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 1;
+    font-size: .8rem;
+    line-height: 1.4;
+  }
+
+  #aside-content .card-recent-post .aside-list-item .content > time {
+    display: none;
+  }
+
+  #aside-content .card-tag-cloud {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 7px;
+  }
+
+  #aside-content .card-tag-cloud a {
+    overflow: hidden;
+    padding: 0 3px;
+    font-size: .84rem !important;
+    line-height: 1.38;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  #aside-content .card-archives ul.card-archive-list > .card-archive-list-item a,
+  #aside-content .card-categories ul.card-category-list > .card-category-list-item a {
+    margin: 0;
+    padding: 0 4px;
+    font-size: .82rem;
+    line-height: 1.45;
+  }
+
+  #aside-content .card-webinfo .webinfo {
+    grid-auto-rows: 1.9rem;
+    margin-top: 0;
+  }
+
+  #aside-content .card-webinfo .webinfo .webinfo-item {
+    grid-template-columns: minmax(0, 1fr) minmax(4.8rem, max-content);
+    height: 1.9rem;
+    min-height: 1.9rem;
+    column-gap: .55rem;
+  }
+
+  #aside-content .card-webinfo .webinfo .webinfo-item .item-name,
+  #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
+    font-size: .84rem !important;
+  }
+
+  #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
+    min-width: 4.8rem;
+  }
+
+  #aside-content #card-toc .toc-content {
+    margin: 0 -14px;
+    overflow: visible;
+    max-height: none;
+    width: calc(100% + 28px);
+    font-size: .76rem;
+    line-height: 1.45;
+  }
+
+  #aside-content #card-toc .toc-content .toc-link {
+    font-size: .76rem;
+    line-height: 1.45;
+  }
+}
+
+/* On small laptops, keep the single column readable but still remove the
+ * sidebar's own scrollbar. Tablet/mobile layouts continue to flow normally. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .layout > #aside-content {
+    position: sticky;
+    top: 68px;
+    align-self: flex-start;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .layout > #aside-content > .sticky_layout {
+    position: static !important;
   }
 }
