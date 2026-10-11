@@ -4,11 +4,13 @@
   const counters = [
     {
       id: 'busuanzi_value_site_uv',
+      baseline: 628,
       zh: '累计独立访客；同一浏览器首次访问本站时计为 1 位',
       en: 'All-time unique visitors; one browser is counted once'
     },
     {
       id: 'busuanzi_value_site_pv',
+      baseline: 898,
       zh: '累计页面浏览；每次打开或切换页面计为 1 次',
       en: 'All-time page views; each page load counts once'
     },
@@ -29,14 +31,17 @@
     element.setAttribute('title', item[language()])
 
     const render = () => {
-      const raw = element.textContent.replace(/[^0-9]/g, '')
+      const raw = element.dataset.counterRaw || element.textContent.replace(/[^0-9]/g, '')
       if (!raw) return false
 
-      const value = Number(raw)
-      if (!Number.isSafeInteger(value)) return false
+      const serviceValue = Number(raw)
+      if (!Number.isSafeInteger(serviceValue)) return false
+
+      const value = serviceValue + (item.baseline || 0)
 
       const formatted = new Intl.NumberFormat(language() === 'en' ? 'en-GB' : 'zh-CN').format(value)
       if (element.textContent.trim() !== formatted) element.textContent = formatted
+      element.dataset.counterRaw = String(serviceValue)
       element.dataset.counterReady = 'true'
       element.setAttribute('aria-label', `${item[language()]}：${formatted}`)
       return true

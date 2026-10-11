@@ -68,12 +68,12 @@
 #archive,
 #tag,
 #category {
-  border: 1px solid rgba(47, 110, 166, .08);
+  border: 1px solid rgba(0, 47, 167, .08);
   box-shadow: 0 6px 24px -12px rgba(45, 42, 50, .28);
 }
 #recent-posts > .recent-post-item:hover,
 #aside-content .card-widget:hover {
-  box-shadow: 0 10px 30px -12px rgba(47, 110, 166, .35);
+  box-shadow: 0 10px 30px -12px rgba(0, 47, 167, .35);
 }
 [data-theme="dark"] #recent-posts > .recent-post-item,
 [data-theme="dark"] #aside-content .card-widget,
@@ -97,9 +97,9 @@
   justify-content: space-between;
   margin: 0;
   padding: 1rem 1.1rem;
-  border: 1px solid rgba(47, 110, 166, .16);
+  border: 1px solid rgba(0, 47, 167, .16);
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(47, 110, 166, .07), rgba(111, 159, 198, .05));
+  background: linear-gradient(135deg, rgba(0, 47, 167, .07), rgba(111, 159, 198, .05));
   list-style: none;
   transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
@@ -108,8 +108,8 @@
 }
 .category-lists ul.category-list > li.category-list-item:hover {
   transform: translateY(-2px);
-  border-color: rgba(47, 110, 166, .4);
-  box-shadow: 0 10px 24px -14px rgba(47, 110, 166, .6);
+  border-color: rgba(0, 47, 167, .4);
+  box-shadow: 0 10px 24px -14px rgba(0, 47, 167, .6);
 }
 .category-lists .category-list-link {
   font-size: 1.05em;
@@ -125,8 +125,8 @@
   margin-left: .6rem;
   padding: .1em .6em;
   border-radius: 999px;
-  background: rgba(47, 110, 166, .12);
-  color: #2f6ea6;
+  background: rgba(0, 47, 167, .12);
+  color: #002FA7;
   font-size: .85em;
   font-weight: 600;
 }
@@ -158,9 +158,9 @@
 }
 .about-grid .about-card {
   padding: 1rem 1.15rem;
-  border: 1px solid rgba(47, 110, 166, .16);
+  border: 1px solid rgba(0, 47, 167, .16);
   border-radius: 14px;
-  background: linear-gradient(135deg, rgba(47, 110, 166, .06), rgba(111, 159, 198, .04));
+  background: linear-gradient(135deg, rgba(0, 47, 167, .06), rgba(111, 159, 198, .04));
 }
 .about-grid .about-card h3 {
   margin: 0 0 .4rem !important;
@@ -187,15 +187,15 @@
   gap: .4em;
   padding: .55em 1.1em;
   border-radius: 999px;
-  border: 1px solid #2f6ea6;
-  color: #2f6ea6;
+  border: 1px solid #002FA7;
+  color: #002FA7;
   font-weight: 600;
   text-decoration: none;
   transition: background .18s ease, color .18s ease;
 }
 #article-container .about-actions a.primary,
 #article-container .about-actions a:hover {
-  background: #2f6ea6;
+  background: #002FA7;
   color: #fff;
 }
 
@@ -216,7 +216,7 @@
   border-radius: 16px;
   background:
     radial-gradient(ellipse at 50% 45%, rgba(111, 159, 198, .10), transparent 62%),
-    radial-gradient(ellipse at 20% 80%, rgba(47, 110, 166, .07), transparent 55%),
+    radial-gradient(ellipse at 20% 80%, rgba(0, 47, 167, .07), transparent 55%),
     radial-gradient(ellipse at 85% 20%, rgba(70, 135, 181, .07), transparent 50%);
   border: 1px solid rgba(127, 127, 127, .14);
 }
@@ -272,7 +272,7 @@
   background: rgba(255, 255, 255, .22);
 }
 
-/* ---------- 涓?/ EN switch in the nav bar ---------- */
+/* ---------- 娑?/ EN switch in the nav bar ---------- */
 #nav .lang-toggle {
   --lt: var(--light-grey);
   --lt-on: #2d2a32;
@@ -314,17 +314,18 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
 /* ---------- Blue-and-white refinement ----------
    Keep Butterfly's original composition; refine rhythm, hierarchy and states. */
 :root {
-  --soong-blue: #2f6ea6;
-  --soong-blue-deep: #245984;
+  --soong-blue: #002FA7;
+  --soong-blue-deep: #001F73;
+  --soong-yellow: #FFD600;
   --soong-blue-soft: #eaf3fb;
   --soong-blue-pale: #f5f9fd;
-  --soong-line: rgba(47, 110, 166, .13);
+  --soong-line: rgba(0, 47, 167, .13);
   --soong-muted: #6f7d8c;
   --soong-card: rgba(255, 255, 255, .94);
   --soong-shadow: 0 8px 28px -18px rgba(34, 76, 112, .42);
-  --soong-shadow-hover: 0 14px 34px -18px rgba(47, 110, 166, .38);
-  --btn-bg: #2f6ea6;
-  --btn-hover-color: #245984;
+  --soong-shadow-hover: 0 14px 34px -18px rgba(0, 47, 167, .38);
+  --btn-bg: #002FA7;
+  --btn-hover-color: #FFD600;
 }
 
 [data-theme="dark"] {
@@ -404,7 +405,7 @@ body {
 
 #recent-posts > .recent-post-item:hover,
 #aside-content .card-widget:hover {
-  border-color: rgba(47, 110, 166, .24);
+  border-color: rgba(0, 47, 167, .24);
   box-shadow: var(--soong-shadow-hover);
 }
 
@@ -446,27 +447,28 @@ body {
 
 #aside-content .card-info .avatar-img {
   padding: 3px;
-  border: 1px solid rgba(47, 110, 166, .25);
+  border: 1px solid rgba(0, 47, 167, .25);
   background: var(--soong-blue-pale);
 }
 
 #aside-content .card-info #card-info-btn {
   border-radius: 10px;
   background: var(--soong-blue);
-  box-shadow: 0 9px 20px -14px rgba(36, 89, 132, .72);
+  box-shadow: 0 9px 20px -14px rgba(0, 47, 167, .72);
 }
 
 #aside-content .card-info #card-info-btn:hover {
-  background: var(--soong-blue-deep);
+  background: var(--soong-yellow);
+  color: #101828;
 }
 
 #aside-content .card-webinfo .webinfo-item:nth-child(2),
 #aside-content .card-webinfo .webinfo-item:nth-child(3) {
-  margin: .28rem 0;
-  padding: .52rem .65rem;
-  border: 1px solid var(--soong-line);
-  border-radius: 10px;
-  background: linear-gradient(90deg, var(--soong-blue-pale), transparent);
+  margin: .2rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 #aside-content .card-webinfo .webinfo-item:nth-child(2) .item-count,
@@ -522,6 +524,14 @@ body {
   background: var(--soong-blue);
 }
 
+#pagination a.page-number:hover,
+#pagination a.extend:hover,
+#rightside > div > button:hover,
+#rightside > div > a:hover {
+  background-color: var(--soong-yellow) !important;
+  color: #101828 !important;
+}
+
 #rightside > div > button,
 #rightside > div > a {
   background-color: var(--soong-blue);
@@ -529,6 +539,16 @@ body {
 
 #footer {
   border-top: 1px solid var(--soong-line);
+}
+
+::selection {
+  background: #002FA7 !important;
+  color: #fff !important;
+}
+
+::-moz-selection {
+  background: #002FA7 !important;
+  color: #fff !important;
 }
 
 a:focus-visible,
@@ -562,3 +582,4 @@ button:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
+
