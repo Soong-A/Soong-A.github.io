@@ -119,3 +119,41 @@
 .wc-chips .wc-chip:focus-visible em {
   background: rgba(255, 255, 255, .22);
 }
+
+/* ---------- 中 / EN switch in the nav bar ---------- */
+#nav .lang-toggle {
+  --lt: var(--light-grey);
+  --lt-on: #2d2a32;
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 0 .7rem;
+  padding: 2px;
+  border: 1px solid color-mix(in srgb, var(--lt) 55%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lt);
+  font-size: .68em;
+  font-weight: 600;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+#nav .lang-toggle span {
+  padding: .38em .65em;
+  border-radius: 999px;
+  transition: background .2s ease, color .2s ease;
+}
+html:not([data-lang="en"]) #nav .lang-toggle [data-l="zh"],
+html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
+  background: var(--lt);
+  color: var(--lt-on);
+}
+#page-header.not-top-img #nav .lang-toggle,
+#page-header.nav-fixed #nav .lang-toggle {
+  --lt: var(--font-color);
+  --lt-on: var(--card-bg, #fff);
+}
+#nav .lang-toggle:focus-visible {
+  outline: 2px solid var(--lt);
+  outline-offset: 2px;
+}
