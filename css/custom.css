@@ -465,6 +465,41 @@ body {
   color: var(--soong-blue);
 }
 
+/* Keep the complete desktop sidebar anchored below the navigation bar. */
+@media screen and (min-width: 901px) {
+  .layout > #aside-content {
+    position: sticky;
+    top: 76px;
+    align-self: flex-start;
+    max-height: calc(100vh - 92px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(82, 122, 150, .24) transparent;
+  }
+
+  /* The parent now handles the fixed position; avoid nested sticky movement. */
+  .layout > #aside-content > .sticky_layout {
+    position: static;
+    top: auto;
+    transition: none;
+  }
+
+  .layout > #aside-content::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .layout > #aside-content::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(82, 122, 150, .24);
+  }
+
+  .layout > #aside-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
 #aside-content .card-webinfo .webinfo-item:nth-child(2),
 #aside-content .card-webinfo .webinfo-item:nth-child(3) {
   margin: .2rem 0;
