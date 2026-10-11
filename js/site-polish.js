@@ -76,3 +76,57 @@
   document.addEventListener('pjax:complete', enhance)
   document.addEventListener('site-lang-change', enhance)
 })()
+
+;(function () {
+  'use strict'
+
+  function updateAsideToggle(aside, button) {
+    const expanded = aside.classList.contains('aside-expanded')
+    const english = document.documentElement.getAttribute('data-lang') === 'en'
+    const label = expanded
+      ? (english ? 'Collapse sidebar' : '收起右侧栏')
+      : (english ? 'Expand sidebar' : '展开右侧栏')
+    const icon = button.querySelector('i')
+
+    button.setAttribute('aria-expanded', String(expanded))
+    button.setAttribute('aria-label', label)
+    button.setAttribute('title', label)
+    if (icon) {
+      icon.classList.toggle('fa-chevron-right', expanded)
+      icon.classList.toggle('fa-chevron-left', !expanded)
+    }
+  }
+
+  function initAsideToggle() {
+    const aside = document.getElementById('aside-content')
+    const button = document.getElementById('aside-collapse-toggle')
+    if (!aside || !button) return
+
+    if (!aside.classList.contains('aside-expanded') && !aside.classList.contains('aside-collapsed')) {
+      const home = location.pathname === '/' || /^\/page\/\d+\/?$/.test(location.pathname)
+      aside.classList.add(home ? 'aside-expanded' : 'aside-collapsed')
+    }
+
+    if (button.dataset.toggleReady !== 'true') {
+      button.dataset.toggleReady = 'true'
+      button.addEventListener('click', () => {
+        const shouldExpand = aside.classList.contains('aside-collapsed')
+        aside.classList.toggle('aside-expanded', shouldExpand)
+        aside.classList.toggle('aside-collapsed', !shouldExpand)
+        updateAsideToggle(aside, button)
+        window.setTimeout(() => window.dispatchEvent(new Event('resize')), 280)
+      })
+    }
+
+    updateAsideToggle(aside, button)
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAsideToggle, { once: true })
+  } else {
+    initAsideToggle()
+  }
+
+  document.addEventListener('pjax:complete', initAsideToggle)
+  document.addEventListener('site-lang-change', initAsideToggle)
+})()

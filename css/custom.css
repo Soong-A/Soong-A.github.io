@@ -1305,7 +1305,7 @@ html[data-lang="en"] .recent-post-info .article-title {
  * moves. The sidebar has no independent scroll area, so the wheel always
  * controls the page itself.
  */
-@media (min-width: 1101px) {
+@media (min-width: 1001px) {
   .layout {
     max-width: 1460px;
   }
@@ -1498,5 +1498,84 @@ html[data-lang="en"] .recent-post-info .article-title {
 
   .layout > #aside-content > .sticky_layout {
     position: static !important;
+  }
+}
+
+/* Desktop sidebar disclosure: open on the home page, compact elsewhere. */
+#aside-collapse-toggle {
+  display: none;
+}
+
+@media (min-width: 901px) {
+  .layout > div:first-child,
+  .layout > #aside-content {
+    transition: width .26s ease, opacity .2s ease;
+  }
+
+  #aside-collapse-toggle {
+    position: absolute;
+    top: 100px;
+    left: 15px;
+    z-index: 12;
+    display: grid;
+    width: 34px;
+    height: 58px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid rgba(82, 122, 150, .2);
+    border-radius: 999px;
+    background: rgba(241, 248, 252, .96);
+    box-shadow: 0 9px 24px -15px rgba(63, 92, 112, .5);
+    color: var(--soong-blue-deep);
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: left .26s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+
+  #aside-collapse-toggle:hover,
+  #aside-collapse-toggle:focus-visible {
+    border-color: rgba(82, 122, 150, .35);
+    outline: none;
+    background: var(--soong-hover);
+    box-shadow: 0 10px 25px -13px rgba(63, 92, 112, .65);
+    color: var(--soong-blue);
+  }
+
+  #aside-collapse-toggle i {
+    font-size: .92rem;
+    transition: transform .22s ease;
+  }
+
+  .layout:has(> #aside-content.aside-collapsed) > div:first-child {
+    width: calc(100% - 58px);
+  }
+
+  .layout > #aside-content.aside-collapsed {
+    width: 58px;
+    min-height: calc(100vh - 60px);
+    padding-left: 15px;
+    column-count: initial;
+    column-gap: normal;
+  }
+
+  #aside-content.aside-collapsed .card-widget {
+    visibility: hidden;
+    overflow: hidden;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #aside-content.aside-collapsed #aside-collapse-toggle {
+    left: calc(50% + 7px);
+  }
+
+  [data-theme="dark"] #aside-collapse-toggle {
+    border-color: rgba(185, 212, 226, .24);
+    background: rgba(33, 42, 49, .96);
+    color: #B9D4E2;
   }
 }
