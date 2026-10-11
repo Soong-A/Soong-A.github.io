@@ -590,7 +590,10 @@ button:focus-visible {
    Typography & interaction refinement
    ========================= */
 :root {
-  --soong-sans: "Noto Sans SC", "HarmonyOS Sans SC", "MiSans", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --soong-latin: "Inter", "Segoe UI Variable Text", "SF Pro Text", "Segoe UI", Arial, sans-serif;
+  --soong-cjk: "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
+  --soong-sans: var(--soong-latin), var(--soong-cjk);
+  --soong-display: "Aptos Display", "Inter", "Segoe UI Variable Display", "SF Pro Display", var(--soong-cjk);
 }
 
 body {
@@ -604,7 +607,7 @@ body {
 }
 
 #site-title {
-  font-family: var(--soong-sans);
+  font-family: var(--soong-display);
   font-size: clamp(2.45rem, 6vw, 4rem);
   font-weight: 800;
   letter-spacing: -.035em;
@@ -651,7 +654,7 @@ body {
 #article-container h2,
 #article-container h3,
 #article-container h4 {
-  font-family: var(--soong-sans);
+  font-family: var(--soong-display);
   font-weight: 750;
   letter-spacing: -.018em;
   line-height: 1.42;
@@ -973,4 +976,181 @@ body {
   text-align: right;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+/* Distinct Chinese/English reading rhythm without relying on web-font downloads. */
+html:not([data-lang="en"]) body {
+  letter-spacing: .008em;
+}
+
+html[data-lang="en"] body,
+.lang-block[data-lang="en"] {
+  font-family: var(--soong-latin), var(--soong-cjk);
+  letter-spacing: 0;
+}
+
+#site-title,
+#post-info .post-title,
+#page h1,
+#page .page-title,
+.recent-post-info .article-title,
+.article-sort-title,
+.category-lists .category-title {
+  font-family: var(--soong-display);
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+html:not([data-lang="en"]) #article-container {
+  letter-spacing: .012em;
+}
+
+html[data-lang="en"] #article-container,
+.lang-block[data-lang="en"] {
+  line-height: 1.82;
+}
+
+html[data-lang="en"] #article-container h1,
+html[data-lang="en"] #article-container h2,
+html[data-lang="en"] #article-container h3,
+html[data-lang="en"] .recent-post-info .article-title {
+  letter-spacing: -.018em;
+}
+
+#aside-content .card-info .author-info-description {
+  margin-top: .15rem;
+  color: var(--soong-muted);
+  font-size: .84rem;
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: .02em;
+}
+
+/* Turn article/tag/category counts into a compact visual summary. */
+#aside-content .card-info .site-data-chart {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .55rem;
+  margin: 1rem 0 .45rem;
+}
+
+#aside-content .card-info .site-data-chart > a {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: .4rem;
+}
+
+#aside-content .card-info .site-data-ring {
+  --stat-color: var(--soong-blue);
+  position: relative;
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(var(--stat-color) calc(var(--stat) * 1%), rgba(82, 122, 150, .1) 0);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+#aside-content .card-info .site-data-ring::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: inherit;
+  background: var(--card-bg, #fff);
+}
+
+#aside-content .card-info .site-data-chart > a:nth-child(2) .site-data-ring {
+  --stat-color: var(--soong-pink);
+}
+
+#aside-content .card-info .site-data-chart > a:nth-child(3) .site-data-ring {
+  --stat-color: #91B5C9;
+}
+
+#aside-content .card-info .site-data-chart .length-num {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: var(--soong-blue-deep);
+  font-size: .88rem;
+  font-weight: 760;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+#aside-content .card-info .site-data-chart .headline {
+  max-width: 100%;
+  color: var(--soong-muted);
+  font-size: .7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: .04em;
+}
+
+#aside-content .card-info .site-data-chart > a:hover .site-data-ring {
+  box-shadow: 0 7px 16px -10px rgba(82, 122, 150, .5);
+  transform: translateY(-2px);
+}
+
+#aside-content .card-info .site-data-chart > a:hover .headline,
+#aside-content .card-info .site-data-chart > a:hover .length-num {
+  color: var(--soong-blue-deep) !important;
+}
+
+/* A quieter, consistent icon scale across navigation and information cards. */
+#nav .site-page > i,
+#sidebar-menus .site-page > i {
+  width: 1.1em;
+  margin-right: .22rem;
+  font-size: .84rem;
+  text-align: center;
+}
+
+#nav #toggle-menu i,
+#nav #search-button i {
+  font-size: .94rem;
+}
+
+#aside-content .item-headline i {
+  width: 1.05rem;
+  margin-right: .38rem;
+  font-size: .88rem;
+  line-height: 1;
+  text-align: center;
+}
+
+#aside-content .card-info #card-info-btn i {
+  margin-right: .38rem;
+  font-size: .9rem;
+}
+
+#aside-content .card-info .card-info-social-icons .social-icon {
+  margin: 0 .55rem;
+  font-size: 1.08rem;
+}
+
+.article-meta-wrap i,
+#post-info .post-meta-icon {
+  width: 1em;
+  font-size: .76rem;
+  text-align: center;
+}
+
+#rightside > div > button i,
+#rightside > div > a i {
+  font-size: .86rem;
+}
+
+#pagination i {
+  font-size: .78rem;
+}
+
+@media (max-width: 700px) {
+  #aside-content .card-info .site-data-ring {
+    width: 48px;
+    height: 48px;
+  }
 }
