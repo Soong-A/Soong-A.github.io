@@ -1311,14 +1311,15 @@ html[data-lang="en"] .recent-post-info .article-title {
   }
 
   .layout > div:first-child {
-    width: 64%;
+    width: 61%;
   }
 
   .layout > #aside-content {
     position: sticky;
-    top: 68px;
+    top: 60px;
     align-self: flex-start;
-    width: 36%;
+    width: 39%;
+    min-height: calc(100vh - 60px);
     max-height: none;
     overflow: visible;
     column-count: 2;
@@ -1335,8 +1336,8 @@ html[data-lang="en"] .recent-post-info .article-title {
   #aside-content .card-widget {
     display: inline-block;
     width: 100%;
-    margin: 0 0 8px;
-    padding: 12px 14px;
+    margin: 0 0 7px;
+    padding: 10px 15px;
     break-inside: avoid;
     vertical-align: top;
   }
@@ -1354,7 +1355,7 @@ html[data-lang="en"] .recent-post-info .article-title {
   #aside-content .card-info .author-info-description {
     display: -webkit-box;
     overflow: hidden;
-    font-size: .75rem;
+    font-size: .82rem;
     line-height: 1.4;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -1371,7 +1372,7 @@ html[data-lang="en"] .recent-post-info .article-title {
   }
 
   #aside-content .card-info .site-data-chart .headline {
-    font-size: .64rem;
+    font-size: .72rem;
   }
 
   #aside-content .card-info #card-info-btn {
@@ -1385,14 +1386,14 @@ html[data-lang="en"] .recent-post-info .article-title {
 
   #aside-content .item-headline {
     padding-bottom: 4px;
-    font-size: .96rem;
+    font-size: 1.05rem;
     line-height: 1.35;
   }
 
   #aside-content .card-announcement .announcement_content {
     display: -webkit-box;
     overflow: hidden;
-    font-size: .82rem;
+    font-size: .9rem;
     line-height: 1.5;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -1417,7 +1418,7 @@ html[data-lang="en"] .recent-post-info .article-title {
     white-space: nowrap;
     text-overflow: ellipsis;
     -webkit-line-clamp: 1;
-    font-size: .8rem;
+    font-size: .88rem;
     line-height: 1.4;
   }
 
@@ -1428,14 +1429,14 @@ html[data-lang="en"] .recent-post-info .article-title {
   #aside-content .card-tag-cloud {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2px 7px;
+    gap: 5px 8px;
   }
 
   #aside-content .card-tag-cloud a {
     overflow: hidden;
     padding: 0 3px;
-    font-size: .84rem !important;
-    line-height: 1.38;
+    font-size: .96rem !important;
+    line-height: 1.55;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
@@ -1444,25 +1445,25 @@ html[data-lang="en"] .recent-post-info .article-title {
   #aside-content .card-categories ul.card-category-list > .card-category-list-item a {
     margin: 0;
     padding: 0 4px;
-    font-size: .82rem;
-    line-height: 1.45;
+    font-size: .9rem;
+    line-height: 1.55;
   }
 
   #aside-content .card-webinfo .webinfo {
-    grid-auto-rows: 1.9rem;
+    grid-auto-rows: 2.15rem;
     margin-top: 0;
   }
 
   #aside-content .card-webinfo .webinfo .webinfo-item {
     grid-template-columns: minmax(0, 1fr) minmax(4.8rem, max-content);
-    height: 1.9rem;
-    min-height: 1.9rem;
+    height: 2.15rem;
+    min-height: 2.15rem;
     column-gap: .55rem;
   }
 
   #aside-content .card-webinfo .webinfo .webinfo-item .item-name,
   #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
-    font-size: .84rem !important;
+    font-size: .9rem !important;
   }
 
   #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
@@ -1474,12 +1475,12 @@ html[data-lang="en"] .recent-post-info .article-title {
     overflow: visible;
     max-height: none;
     width: calc(100% + 28px);
-    font-size: .76rem;
+    font-size: .84rem;
     line-height: 1.45;
   }
 
   #aside-content #card-toc .toc-content .toc-link {
-    font-size: .76rem;
+    font-size: .84rem;
     line-height: 1.45;
   }
 }
@@ -1489,7 +1490,7 @@ html[data-lang="en"] .recent-post-info .article-title {
 @media (min-width: 901px) and (max-width: 1100px) {
   .layout > #aside-content {
     position: sticky;
-    top: 68px;
+    top: 60px;
     align-self: flex-start;
     max-height: none;
     overflow: visible;
