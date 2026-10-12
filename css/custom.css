@@ -1300,51 +1300,47 @@ html[data-lang="en"] .recent-post-info .article-title {
   }
 }
 
-/*
- * Desktop sidebar: two balanced columns that remain anchored while the page
- * moves. The sidebar has no independent scroll area, so the wheel always
- * controls the page itself.
- */
-@media (min-width: 1001px) {
+/* Natural one-column sidebar: it moves with the page and never creates its
+ * own scrolling area. */
+@media (min-width: 901px) {
   .layout {
-    max-width: 1460px;
+    max-width: 1200px;
   }
 
   .layout > div:first-child {
-    width: 61%;
+    width: 72%;
   }
 
   .layout > #aside-content {
-    position: sticky;
-    top: 60px;
+    position: static;
+    top: auto;
     align-self: flex-start;
-    width: 39%;
-    min-height: calc(100vh - 60px);
+    width: 28%;
+    min-height: 0;
     max-height: none;
     overflow: visible;
-    column-count: 2;
-    column-gap: 12px;
+    column-count: 1;
+    padding-left: 18px;
   }
 
   .layout > #aside-content > .sticky_layout {
-    display: contents;
+    display: block;
     position: static !important;
     top: auto;
     transition: none;
   }
 
   #aside-content .card-widget {
-    display: inline-block;
+    display: block;
     width: 100%;
-    margin: 0 0 7px;
-    padding: 10px 15px;
-    break-inside: avoid;
-    vertical-align: top;
+    margin: 0 0 14px;
+    padding: 18px 20px;
+    break-inside: auto;
   }
 
   #aside-content .card-info .avatar-img {
-    width: 54px;
-    height: 54px;
+    width: 82px;
+    height: 82px;
   }
 
   #aside-content .card-info .author-info-name {
@@ -1353,55 +1349,42 @@ html[data-lang="en"] .recent-post-info .article-title {
   }
 
   #aside-content .card-info .author-info-description {
-    display: -webkit-box;
-    overflow: hidden;
-    font-size: .82rem;
-    line-height: 1.4;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    font-size: .9rem;
+    line-height: 1.65;
   }
 
   #aside-content .card-info .site-data-chart {
-    gap: .35rem;
-    margin: .7rem 0 .25rem;
+    gap: .55rem;
+    margin: .9rem 0 .45rem;
   }
 
   #aside-content .card-info .site-data-ring {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
   }
 
   #aside-content .card-info .site-data-chart .headline {
-    font-size: .72rem;
+    font-size: .78rem;
   }
 
   #aside-content .card-info #card-info-btn {
-    margin-top: 8px;
-    line-height: 2.05;
+    margin-top: 10px;
+    line-height: 2.35;
   }
 
   #aside-content .card-info .card-info-social-icons {
-    display: none;
+    display: block;
   }
 
   #aside-content .item-headline {
-    padding-bottom: 4px;
-    font-size: 1.05rem;
-    line-height: 1.35;
-  }
-
-  #aside-content .card-announcement .announcement_content {
-    display: -webkit-box;
-    overflow: hidden;
-    font-size: .9rem;
-    line-height: 1.5;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    padding-bottom: 7px;
+    font-size: 1rem;
+    line-height: 1.45;
   }
 
   #aside-content .aside-list > .aside-list-item {
     min-height: 0;
-    padding: 3px 0;
+    padding: 5px 0;
   }
 
   #aside-content .card-recent-post .aside-list-item .thumbnail {
@@ -1415,11 +1398,12 @@ html[data-lang="en"] .recent-post-info .article-title {
 
   #aside-content .card-recent-post .aside-list-item .content > .title {
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    -webkit-line-clamp: 1;
-    font-size: .88rem;
-    line-height: 1.4;
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: .9rem;
+    line-height: 1.5;
   }
 
   #aside-content .card-recent-post .aside-list-item .content > time {
@@ -1427,155 +1411,203 @@ html[data-lang="en"] .recent-post-info .article-title {
   }
 
   #aside-content .card-tag-cloud {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px 8px;
+    display: block;
   }
 
   #aside-content .card-tag-cloud a {
-    overflow: hidden;
-    padding: 0 3px;
-    font-size: .96rem !important;
-    line-height: 1.55;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    display: inline-block;
+    padding: 0 4px;
+    font-size: .88rem !important;
+    line-height: 1.8;
   }
 
   #aside-content .card-archives ul.card-archive-list > .card-archive-list-item a,
   #aside-content .card-categories ul.card-category-list > .card-category-list-item a {
-    margin: 0;
-    padding: 0 4px;
-    font-size: .9rem;
-    line-height: 1.55;
+    margin: 1px 0;
+    padding: 2px 5px;
+    font-size: .92rem;
+    line-height: 1.65;
   }
 
   #aside-content .card-webinfo .webinfo {
-    grid-auto-rows: 2.15rem;
+    grid-auto-rows: 2.45rem;
     margin-top: 0;
   }
 
   #aside-content .card-webinfo .webinfo .webinfo-item {
-    grid-template-columns: minmax(0, 1fr) minmax(4.8rem, max-content);
-    height: 2.15rem;
-    min-height: 2.15rem;
+    grid-template-columns: minmax(0, 1fr) minmax(5.1rem, max-content);
+    height: 2.45rem;
+    min-height: 2.45rem;
     column-gap: .55rem;
   }
 
   #aside-content .card-webinfo .webinfo .webinfo-item .item-name,
   #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
-    font-size: .9rem !important;
+    font-size: .94rem !important;
   }
 
   #aside-content .card-webinfo .webinfo .webinfo-item .item-count {
-    min-width: 4.8rem;
+    min-width: 5.1rem;
   }
 
   #aside-content #card-toc .toc-content {
-    margin: 0 -14px;
+    margin: 0 -12px;
     overflow: visible;
     max-height: none;
-    width: calc(100% + 28px);
-    font-size: .84rem;
-    line-height: 1.45;
+    width: calc(100% + 24px);
+    font-size: .88rem;
+    line-height: 1.55;
   }
 
   #aside-content #card-toc .toc-content .toc-link {
-    font-size: .84rem;
-    line-height: 1.45;
+    font-size: .88rem;
+    line-height: 1.55;
   }
 }
 
-/* On small laptops, keep the single column readable but still remove the
- * sidebar's own scrollbar. Tablet/mobile layouts continue to flow normally. */
-@media (min-width: 901px) and (max-width: 1100px) {
-  .layout > #aside-content {
-    position: sticky;
-    top: 60px;
-    align-self: flex-start;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .layout > #aside-content > .sticky_layout {
-    position: static !important;
-  }
+/* Quiet sidebar cards and the theme's built-in sidebar toggle. */
+#aside-content .card-widget {
+  border-radius: 12px;
+  box-shadow: 0 5px 20px -16px rgba(51, 76, 93, .5);
 }
 
-/* Desktop sidebar disclosure: open on the home page, compact elsewhere. */
-#aside-collapse-toggle {
-  display: none;
+#aside-content .card-widget:hover {
+  transform: none;
+  border-color: rgba(82, 122, 150, .2);
+  box-shadow: 0 8px 24px -18px rgba(51, 76, 93, .62);
 }
 
-@media (min-width: 901px) {
-  .layout > div:first-child,
-  .layout > #aside-content {
-    transition: width .26s ease, opacity .2s ease;
-  }
+#rightside > div > button,
+#rightside > div > a {
+  border: 1px solid var(--soong-line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 6px 18px -13px rgba(51, 76, 93, .55);
+  color: var(--soong-blue-deep);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
 
-  #aside-collapse-toggle {
-    position: absolute;
-    top: 100px;
-    left: 15px;
-    z-index: 12;
-    display: grid;
-    width: 34px;
-    height: 58px;
-    padding: 0;
-    place-items: center;
-    border: 1px solid rgba(82, 122, 150, .2);
-    border-radius: 999px;
-    background: rgba(241, 248, 252, .96);
-    box-shadow: 0 9px 24px -15px rgba(63, 92, 112, .5);
-    color: var(--soong-blue-deep);
-    cursor: pointer;
-    transform: translate(-50%, -50%);
-    transition: left .26s ease, color .2s ease, background .2s ease, box-shadow .2s ease;
-  }
+#rightside > div > button:hover,
+#rightside > div > a:hover {
+  background: var(--soong-hover) !important;
+  color: var(--soong-blue) !important;
+}
 
-  #aside-collapse-toggle:hover,
-  #aside-collapse-toggle:focus-visible {
-    border-color: rgba(82, 122, 150, .35);
-    outline: none;
-    background: var(--soong-hover);
-    box-shadow: 0 10px 25px -13px rgba(63, 92, 112, .65);
-    color: var(--soong-blue);
-  }
+#rightside #hide-aside-btn i {
+  font-size: .8rem;
+}
 
-  #aside-collapse-toggle i {
-    font-size: .92rem;
-    transition: transform .22s ease;
-  }
+#rightside-config i {
+  animation: none !important;
+}
 
-  .layout:has(> #aside-content.aside-collapsed) > div:first-child {
-    width: calc(100% - 58px);
-  }
+/* Dark mode: calm charcoal surfaces with cool blue hierarchy. */
+[data-theme="dark"] {
+  --global-bg: #0D151B;
+  --font-color: #CBD6DC;
+  --text-highlight-color: #EFF5F7;
+  --card-bg: #152029;
+  --card-meta: #8FA0A9;
+  --sidebar-bg: #101920;
+  --sidebar-menu-bg: #18242C;
+  --btn-bg: #243640;
+  --btn-color: #E1EBF0;
+  --btn-hover-color: #304956;
+  --text-bg-hover: rgba(145, 190, 212, .14);
+  --blockquote-bg: #1B2932;
+  --toc-link-color: #AAB9C2;
+  --scrollbar-color: #405865;
+  --soong-hover: rgba(145, 190, 212, .14);
+  --soong-selection: #315567;
+  --soong-card: rgba(20, 30, 38, .96);
+  --soong-line: rgba(168, 200, 217, .11);
+}
 
-  .layout > #aside-content.aside-collapsed {
-    width: 58px;
-    min-height: calc(100vh - 60px);
-    padding-left: 15px;
-    column-count: initial;
-    column-gap: normal;
-  }
+[data-theme="dark"] body {
+  background: #0D151B;
+}
 
-  #aside-content.aside-collapsed .card-widget {
-    visibility: hidden;
-    overflow: hidden;
-    width: 0;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    opacity: 0;
-    pointer-events: none;
-  }
+[data-theme="dark"] #web_bg::after {
+  background: linear-gradient(180deg, rgba(8, 15, 21, .76), rgba(10, 19, 25, .88));
+}
 
-  #aside-content.aside-collapsed #aside-collapse-toggle {
-    left: calc(50% + 7px);
-  }
+[data-theme="dark"] #recent-posts > .recent-post-item,
+[data-theme="dark"] #aside-content .card-widget,
+[data-theme="dark"] #page,
+[data-theme="dark"] #post,
+[data-theme="dark"] #archive,
+[data-theme="dark"] #tag,
+[data-theme="dark"] #category {
+  border-color: rgba(168, 200, 217, .09);
+  background: var(--soong-card);
+  box-shadow: 0 8px 28px -21px rgba(0, 0, 0, .92);
+}
 
-  [data-theme="dark"] #aside-collapse-toggle {
-    border-color: rgba(185, 212, 226, .24);
-    background: rgba(33, 42, 49, .96);
-    color: #B9D4E2;
-  }
+[data-theme="dark"] #aside-content .card-widget:hover {
+  border-color: rgba(168, 200, 217, .18);
+  box-shadow: 0 10px 28px -21px rgba(0, 0, 0, .98);
+}
+
+[data-theme="dark"] #aside-content .card-info #card-info-btn {
+  background: #263C48;
+  box-shadow: 0 8px 22px -16px rgba(0, 0, 0, .95);
+  color: #DDEAF0;
+}
+
+[data-theme="dark"] #aside-content .card-info #card-info-btn:hover {
+  background: rgba(145, 190, 212, .16);
+  color: #DDEAF0;
+}
+
+[data-theme="dark"] .category-lists ul.category-list > li.category-list-item,
+[data-theme="dark"] .category-lists-rich ul.category-list > li.category-list-item,
+[data-theme="dark"] .about-grid .about-card {
+  border-color: rgba(168, 200, 217, .1);
+  background: linear-gradient(135deg, rgba(49, 75, 90, .42), rgba(28, 41, 50, .58));
+}
+
+[data-theme="dark"] .wc-intro {
+  background: rgba(145, 190, 212, .1);
+  color: #AFC4CF;
+}
+
+[data-theme="dark"] .wc-stage {
+  border-color: rgba(168, 200, 217, .1);
+  background:
+    radial-gradient(circle at 19% 22%, rgba(91, 145, 174, .16), transparent 31%),
+    radial-gradient(circle at 82% 72%, rgba(173, 117, 135, .12), transparent 29%),
+    linear-gradient(145deg, #17242D, #101A21);
+  box-shadow: inset 0 1px 0 rgba(220, 235, 242, .04);
+}
+
+[data-theme="dark"] .wc-stage .wc-word:hover {
+  text-shadow: 0 6px 20px rgba(168, 200, 217, .22);
+}
+
+[data-theme="dark"] .wc-chips .wc-chip {
+  border-color: rgba(168, 200, 217, .1);
+  background: rgba(35, 51, 61, .74);
+  color: #B9C9D1;
+}
+
+[data-theme="dark"] .wc-chips .wc-chip:hover,
+[data-theme="dark"] .wc-chips .wc-chip:focus-visible {
+  border-color: rgba(168, 200, 217, .2);
+  background: rgba(145, 190, 212, .12);
+  color: #D8E7ED;
+}
+
+[data-theme="dark"] #rightside > div > button,
+[data-theme="dark"] #rightside > div > a {
+  border-color: rgba(168, 200, 217, .12);
+  background: rgba(22, 33, 41, .94);
+  box-shadow: 0 7px 20px -14px rgba(0, 0, 0, .95);
+  color: #B9D1DD;
+}
+
+[data-theme="dark"] ::selection,
+[data-theme="dark"] ::-moz-selection {
+  background: var(--soong-selection) !important;
+  color: #F4F9FC !important;
 }
