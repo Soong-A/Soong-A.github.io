@@ -76,147 +76,73 @@
   .px h1 { font-size: 15px; }
 }
 
-/* ======================= Archive: pixel world map ======================= */
-#archive.pxm-on .article-sort-title { margin-left: 0; padding-left: 0; text-align: center; }
-#archive.pxm-on .article-sort-title::before,
-#archive.pxm-on .article-sort-title::after { display: none; }
+/* ======================= Archive: card list ======================= */
+#archive.pxm-on > .article-sort-title { display: none; }
 
-.pxm {
-  --pxm-ink: #2b2d42;
-  --pxm-line: #2b2d42;
-  --pxm-card: #fffdf7;
-  --pxm-dim: #7a7d93;
-  --pxm-road: #a5844a;
-  --pxm-shadow: #2b2d42;
-  --pxm-font: "Press Start 2P", "Zpix", "Courier New", ui-monospace, monospace;
-  /* terrain: [light tile A, tile B] per world, cycling grass / sand / ice / ember */
-  --t0a: #c7e8b9; --t0b: #bbe0ac;
-  --t1a: #f3e2b5; --t1b: #ecd7a4;
-  --t2a: #d3e8f4; --t2b: #c6e0ef;
-  --t3a: #f4cfc4; --t3b: #ecc0b3;
-  --c0: #ff6b9a; --c1: #ffd23f; --c2: #6ec6ff; --c3: #5ee6a8;
-  margin: 8px 0 12px;
-  color: var(--pxm-ink);
+.pxi {
+  --i-ink: #2b2d42;
+  --i-line: rgba(43, 45, 66, .16);
+  --i-card: #fffdf7;
+  --i-dim: #7a7d93;
+  --i-accent: #ff6b9a;
+  --i-hover: rgba(43, 45, 66, .08);
+  --i-font: "Press Start 2P", "Zpix", "Courier New", ui-monospace, monospace;
+  margin: 4px 0 8px; color: var(--i-ink);
 }
-[data-theme="dark"] .pxm {
-  --pxm-ink: #cbd6dc;
-  --pxm-line: #3d5666;
-  --pxm-card: #152029;
-  --pxm-dim: #8fa0a9;
-  --pxm-road: #6f8798;
-  --pxm-shadow: rgba(0, 0, 0, .55);
-  --t0a: #1b3430; --t0b: #18302c;
-  --t1a: #342f22; --t1b: #2f2b1f;
-  --t2a: #1b3040; --t2b: #182b3a;
-  --t3a: #392830; --t3b: #33242b;
-  --c0: #e8c3cd; --c1: #e5bd9b; --c2: #a8c8d9; --c3: #b5d1bd;
+[data-theme="dark"] .pxi {
+  --i-ink: #cbd6dc;
+  --i-line: rgba(168, 200, 217, .16);
+  --i-card: #152029;
+  --i-dim: #8fa0a9;
+  --i-accent: #e8c3cd;
+  --i-hover: rgba(0, 0, 0, .35);
 }
 
-/* Each world is a tiled field with a stepped pixel frame. */
-.pxm-world {
-  position: relative;
-  margin: 0 4px 34px;
-  padding: 16px 14px 18px;
-  border: 2px solid var(--pxm-line);
-  box-shadow: 4px 4px 0 var(--pxm-shadow);
-  background:
-    conic-gradient(var(--ta) 25%, var(--tb) 0 50%, var(--ta) 0 75%, var(--tb) 0) 0 0 / 24px 24px;
-}
-.pxm-world.t0 { --ta: var(--t0a); --tb: var(--t0b); }
-.pxm-world.t1 { --ta: var(--t1a); --tb: var(--t1b); }
-.pxm-world.t2 { --ta: var(--t2a); --tb: var(--t2b); }
-.pxm-world.t3 { --ta: var(--t3a); --tb: var(--t3b); }
+.pxi-bar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 2px 14px; font-size: 14px; color: var(--i-dim); }
+.pxi-bar-t { font-weight: 600; font-size: 17px; color: var(--i-ink); }
+.pxi-bar-s em { font-style: normal; color: var(--i-ink); }
 
-.pxm-banner {
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 14px;
-  width: fit-content; max-width: 100%; margin: -34px auto 18px; padding: 8px 16px;
-  background: var(--pxm-card); border: 2px solid var(--pxm-line); box-shadow: 3px 3px 0 var(--pxm-shadow);
-  font-family: var(--pxm-font);
-}
-.pxm-banner .pxm-w { font-size: 10px; color: var(--c0); }
-.pxm-banner b { font-size: 16px; font-weight: 400; }
-.pxm-banner .pxm-n { font-size: 9px; font-style: normal; color: var(--pxm-dim); }
+.pxi-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
 
-/* The road: a dotted line down the middle; stages alternate left and right. */
-.pxm-road { position: relative; list-style: none; margin: 0; padding: 0; }
-.pxm-road::before {
-  content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 8px; margin-left: -4px;
-  background: repeating-linear-gradient(to bottom, var(--pxm-road) 0 8px, transparent 8px 16px);
+.pxi-slot {
+  position: relative; display: flex; align-items: center; gap: 14px; min-width: 0; margin: 0; padding: 10px;
+  background: var(--i-card); border: 1px solid var(--i-line); border-radius: 8px;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
 }
-.pxm-node {
-  position: relative; display: grid; grid-template-columns: 1fr 64px 1fr; align-items: center;
-  margin: 0 0 22px; padding: 0;
+.pxi-cover { position: relative; flex: none; width: 76px; height: 76px; border-radius: 6px; background: var(--i-line); }
+.pxi-cover img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
+.pxi-ok {
+  position: absolute; top: -6px; left: -6px; display: none; width: 18px; height: 18px; line-height: 18px; text-align: center;
+  font-size: 11px; font-style: normal; font-weight: 700; color: #fff; background: #3b9c6b; border-radius: 50%;
 }
-.pxm-node:last-child { margin-bottom: 4px; }
-.pxm-pin { grid-column: 2; grid-row: 1; justify-self: center; z-index: 1; }
-.pxm-node.is-left .pxm-card { grid-column: 1; grid-row: 1; }
-.pxm-node.is-right .pxm-card { grid-column: 3; grid-row: 1; }
-
-.pxm-pin {
-  position: relative; display: grid; place-items: center; width: 52px; height: 36px;
-  font-family: var(--pxm-font); font-size: 10px; color: #2b2d42;
-  background: var(--pin); border: 2px solid var(--pxm-line); box-shadow: 3px 3px 0 var(--pxm-shadow);
-}
-.pxm-node.c0 { --pin: var(--c0); }
-.pxm-node.c1 { --pin: var(--c1); }
-.pxm-node.c2 { --pin: var(--c2); }
-.pxm-node.c3 { --pin: var(--c3); }
-.pxm-new {
-  position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-  font: 400 8px/1 var(--pxm-font); font-style: normal; padding: 3px 5px; background: #2b2d42; color: #ffd23f;
-  animation: pxm-hop 1s steps(2) infinite;
-}
-[data-theme="dark"] .pxm-new { background: #e8c3cd; color: #152029; }
-@keyframes pxm-hop { 50% { transform: translate(-50%, -4px); } }
-
-/* The stage card reuses the theme's own post element (image + date + title). */
-.pxm .pxm-card.article-sort-item {
-  margin: 0; padding: 8px; display: flex; align-items: center; gap: 10px; min-width: 0;
-  background: var(--pxm-card); border: 2px solid var(--pxm-line); box-shadow: 4px 4px 0 var(--pxm-shadow);
-  transition: transform .12s steps(2), box-shadow .12s steps(2);
-}
-.pxm .pxm-card.article-sort-item::before,
-.pxm .pxm-card.article-sort-item::after { display: none; }
-.pxm .pxm-card.article-sort-item:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--pxm-shadow); }
-.pxm .pxm-card .article-sort-item-img { flex: none; width: 64px; height: 64px; border-radius: 0; border: 2px solid var(--pxm-line); }
-.pxm .pxm-card .article-sort-item-img img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
-.pxm .pxm-card .article-sort-item-info { flex: 1; min-width: 0; padding: 0; }
-.pxm .pxm-card .article-sort-item-time { font-size: 12px; color: var(--pxm-dim); }
-.pxm .pxm-card .article-sort-item-title { font-size: 14px; line-height: 1.5; color: var(--pxm-ink); transform: none; transition: none; }
-.pxm .pxm-card .article-sort-item-title:hover { color: var(--c0); transform: none; }
-
-/* Start flag at the foot of the map. */
-.pxm-start { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 0 0 8px; font-family: var(--pxm-font); font-size: 11px; }
-.pxm-flag { position: relative; width: 4px; height: 48px; background: var(--pxm-line); }
-.pxm-flag::after { content: ""; position: absolute; top: 0; left: 4px; width: 28px; height: 20px; background: var(--c0); box-shadow: 0 0 0 2px var(--pxm-line); }
-@media (prefers-reduced-motion: reduce) { .pxm-new { animation: none; } }
-
-/* Narrow screens: the road moves to the left edge and every card sits on its right. */
-@media (max-width: 720px) {
-  .pxm-world { padding: 14px 10px 16px; }
-  .pxm-road::before { left: 28px; margin-left: -4px; }
-  .pxm-node { grid-template-columns: 56px 1fr; }
-  .pxm-pin { grid-column: 1; width: 44px; height: 32px; font-size: 9px; }
-  .pxm-node.is-left .pxm-card, .pxm-node.is-right .pxm-card { grid-column: 2; }
-  .pxm .pxm-card .article-sort-item-img { width: 52px; height: 52px; }
-  .pxm-new { left: 22px; }
+.pxi-slot.is-seen .pxi-ok { display: block; }
+.pxi-new {
+  position: absolute; top: -8px; right: -6px; font: 400 8px/1 var(--i-font); font-style: normal; white-space: nowrap;
+  padding: 4px 5px; background: var(--i-accent); color: #2b2d42;
 }
 
-/* Roadside scenery: one sprite in the empty half of every stage row. */
-@media (min-width: 721px) {
-  .pxm-node::after { content: ""; position: relative; z-index: 0; width: 4px; height: 4px; justify-self: center; grid-row: 1; transform: translate(-16px, -14px); image-rendering: pixelated; opacity: .95; }
-  [data-theme="dark"] .pxm-node::after { filter: brightness(.72) saturate(.8); }
-  .pxm-node.is-left::after { grid-column: 3; }
-  .pxm-node.is-right::after { grid-column: 1; }
-  .pxm-node.c0::after { box-shadow: 8px 0px #3fae5a, 12px 0px #3fae5a, 16px 0px #3fae5a, 20px 0px #3fae5a, 4px 4px #3fae5a, 8px 4px #3fae5a, 12px 4px #3fae5a, 16px 4px #3fae5a, 20px 4px #3fae5a, 24px 4px #3fae5a, 0px 8px #3fae5a, 4px 8px #3fae5a, 8px 8px #3fae5a, 12px 8px #6fd07f, 16px 8px #3fae5a, 20px 8px #3fae5a, 24px 8px #3fae5a, 28px 8px #3fae5a, 0px 12px #3fae5a, 4px 12px #3fae5a, 8px 12px #3fae5a, 12px 12px #3fae5a, 16px 12px #3fae5a, 20px 12px #2f8a45, 24px 12px #3fae5a, 28px 12px #3fae5a, 4px 16px #3fae5a, 8px 16px #3fae5a, 12px 16px #3fae5a, 16px 16px #3fae5a, 20px 16px #3fae5a, 24px 16px #3fae5a, 12px 20px #8b5a2b, 16px 20px #8b5a2b, 12px 24px #8b5a2b, 16px 24px #8b5a2b, 12px 28px #8b5a2b, 16px 28px #8b5a2b; }
-  .pxm-node.c1::after { box-shadow: 8px 8px #4bb868, 12px 8px #4bb868, 16px 8px #4bb868, 20px 8px #4bb868, 4px 12px #4bb868, 8px 12px #4bb868, 12px 12px #7ad88d, 16px 12px #4bb868, 20px 12px #4bb868, 24px 12px #4bb868, 0px 16px #4bb868, 4px 16px #4bb868, 8px 16px #4bb868, 12px 16px #4bb868, 16px 16px #4bb868, 20px 16px #4bb868, 24px 16px #4bb868, 28px 16px #4bb868, 0px 20px #4bb868, 4px 20px #4bb868, 8px 20px #2f8a45, 12px 20px #4bb868, 16px 20px #4bb868, 20px 20px #4bb868, 24px 20px #2f8a45, 28px 20px #4bb868, 0px 24px #4bb868, 4px 24px #4bb868, 8px 24px #4bb868, 12px 24px #4bb868, 16px 24px #4bb868, 20px 24px #4bb868, 24px 24px #4bb868, 28px 24px #4bb868; }
-  .pxm-node.c2::after { box-shadow: 12px 8px #9aa0ab, 16px 8px #9aa0ab, 20px 8px #9aa0ab, 8px 12px #9aa0ab, 12px 12px #9aa0ab, 16px 12px #c4c9d2, 20px 12px #9aa0ab, 24px 12px #9aa0ab, 4px 16px #9aa0ab, 8px 16px #9aa0ab, 12px 16px #9aa0ab, 16px 16px #9aa0ab, 20px 16px #9aa0ab, 24px 16px #9aa0ab, 28px 16px #9aa0ab, 0px 20px #9aa0ab, 4px 20px #9aa0ab, 8px 20px #9aa0ab, 12px 20px #9aa0ab, 16px 20px #767c88, 20px 20px #9aa0ab, 24px 20px #9aa0ab, 28px 20px #9aa0ab, 0px 24px #9aa0ab, 4px 24px #9aa0ab, 8px 24px #767c88, 12px 24px #9aa0ab, 16px 24px #9aa0ab, 20px 24px #9aa0ab, 24px 24px #9aa0ab, 28px 24px #9aa0ab; }
-  .pxm-node.c3::after { box-shadow: 12px 0px #ff8fb1, 16px 0px #ff8fb1, 8px 4px #ff8fb1, 12px 4px #ff8fb1, 16px 4px #ff8fb1, 20px 4px #ff8fb1, 12px 8px #ffd23f, 16px 8px #ffd23f, 16px 12px #3fae5a, 8px 16px #3fae5a, 16px 16px #3fae5a, 12px 20px #3fae5a, 16px 20px #3fae5a, 16px 24px #3fae5a; }
+.pxi-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pxi-meta { font-size: 12px; line-height: 1.4; color: var(--i-dim); }
+.pxi-meta time { padding: 0; cursor: inherit; }
+.pxi-title {
+  font-size: 15px; line-height: 1.5; font-weight: 600; color: var(--i-ink); text-decoration: none;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: none; transform: none;
 }
+/* The whole card is the link. */
+.pxi-title::after { content: ""; position: absolute; inset: 0; border-radius: 8px; }
+.pxi-title:hover { color: var(--i-ink); transform: none; }
 
-/* Short road stubs from each stage card to its pin. */
-@media (min-width: 721px) {
-  .pxm .pxm-card.article-sort-item::before { display: block; content: ""; position: absolute; top: 50%; width: 12px; height: 6px; margin-top: -3px; background: var(--pxm-road); border: 0; border-radius: 0; }
-  .pxm-node.is-left .pxm-card.article-sort-item::before { left: 100%; }
-  .pxm-node.is-right .pxm-card.article-sort-item::before { right: 100%; left: auto; }
+.pxi-slot:hover, .pxi-slot:focus-within { border-color: var(--i-accent); box-shadow: 0 6px 16px -10px var(--i-hover); transform: translateY(-2px); }
+.pxi-slot:focus-within { outline: 2px solid var(--i-accent); outline-offset: 2px; }
+/* The one pixel touch: a small selection triangle. */
+.pxi-slot:hover .pxi-title::before, .pxi-slot:focus-within .pxi-title::before {
+  content: ""; position: absolute; right: 12px; top: 12px; width: 0; height: 0; border-style: solid;
+  border-width: 5px 0 5px 8px; border-color: transparent transparent transparent var(--i-accent);
+}
+@media (prefers-reduced-motion: reduce) { .pxi-slot { transition: none; } .pxi-slot:hover, .pxi-slot:focus-within { transform: none; } }
+
+@media (max-width: 560px) {
+  .pxi-grid { grid-template-columns: 1fr; gap: 12px; }
+  .pxi-cover { width: 64px; height: 64px; }
+  .pxi-title { font-size: 14px; }
 }
