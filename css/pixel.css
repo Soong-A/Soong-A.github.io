@@ -99,7 +99,7 @@
 }
 
 .pxi-bar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0 2px 14px; font-size: 14px; color: var(--i-dim); }
-.pxi-bar-t { font-weight: 600; font-size: 17px; color: var(--i-ink); }
+.pxi-bar-t { font-weight: 800; font-size: 20px; color: var(--i-ink); }
 .pxi-bar-s em { font-style: normal; color: var(--i-ink); }
 
 .pxi-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
@@ -122,15 +122,22 @@
 }
 
 .pxi-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.pxi-meta { font-size: 12px; line-height: 1.4; color: var(--i-dim); }
+.pxi-meta { font-size: 12px; line-height: 1.4; font-weight: 600; color: var(--i-dim); }
 .pxi-meta time { padding: 0; cursor: inherit; }
-.pxi-title {
-  font-size: 15px; line-height: 1.5; font-weight: 600; color: var(--i-ink); text-decoration: none;
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; transition: none; transform: none;
-}
+/* The anchor carries the full title for the link and screen readers; .pxi-view is what you see. */
+.pxi-title { display: block; height: 0; overflow: hidden; font-size: 0; line-height: 0; color: transparent; text-decoration: none; transition: none; transform: none; }
+.pxi-title:hover { transform: none; color: transparent; }
 /* The whole card is the link. */
 .pxi-title::after { content: ""; position: absolute; inset: 0; border-radius: 8px; }
-.pxi-title:hover { color: var(--i-ink); transform: none; }
+.pxi-view { display: block; }
+.pxi-head {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: 18px; line-height: 1.35; font-weight: 800; letter-spacing: .01em; color: var(--i-ink);
+}
+.pxi-tail {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 4px; font-size: 13px; line-height: 1.55; font-weight: 400; color: var(--i-dim);
+}
 
 .pxi-slot:hover, .pxi-slot:focus-within { border-color: var(--i-accent); box-shadow: 0 6px 16px -10px var(--i-hover); transform: translateY(-2px); }
 .pxi-slot:focus-within { outline: 2px solid var(--i-accent); outline-offset: 2px; }
@@ -144,5 +151,6 @@
 @media (max-width: 560px) {
   .pxi-grid { grid-template-columns: 1fr; gap: 12px; }
   .pxi-cover { width: 64px; height: 64px; }
-  .pxi-title { font-size: 14px; }
+  .pxi-head { font-size: 16px; }
+  .pxi-tail { font-size: 12.5px; }
 }

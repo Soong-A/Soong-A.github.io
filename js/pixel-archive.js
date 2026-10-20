@@ -23,6 +23,30 @@
     try { localStorage.setItem(SEEN_KEY, JSON.stringify(list)); } catch (e) {}
   }
 
+  /* "Topic: what it covers" -> bold topic, lighter rest. Splits at the first
+     colon or question mark (Chinese or English); no separator = all headline. */
+  function renderTitle(p) {
+    var full = p.a.textContent.trim();
+    var m = full.match(/^(.*?[：:？?])\s*([\s\S]*)$/);
+    var head = full;
+    var tail = "";
+    if (m && m[2]) {
+      head = /[：:]$/.test(m[1]) ? m[1].slice(0, -1) : m[1];
+      tail = m[2];
+    }
+    p.view.textContent = "";
+    var h = document.createElement("strong");
+    h.className = "pxi-head";
+    h.textContent = head;
+    p.view.appendChild(h);
+    if (tail) {
+      var t = document.createElement("span");
+      t.className = "pxi-tail";
+      t.textContent = tail;
+      p.view.appendChild(t);
+    }
+  }
+
   function build() {
     var archive = document.getElementById("archive");
     var sort = archive && archive.querySelector(".article-sort");
@@ -68,8 +92,18 @@
       if (p.time) { p.time.removeAttribute("title"); meta.appendChild(p.time); }
       p.a.classList.add("pxi-title");
       p.a.removeAttribute("title");
+      // The anchor keeps the (translatable) full title for the link and screen
+      // readers; this view shows it split into a bold headline and a lighter tail.
+      var view = document.createElement("span");
+      view.className = "pxi-view";
+      view.setAttribute("aria-hidden", "true");
+      p.view = view;
       info.appendChild(meta);
+      info.appendChild(view);
       info.appendChild(p.a);
+      renderTitle(p);
+      new MutationObserver(function () { renderTitle(p); })
+        .observe(p.a, { childList: true, characterData: true, subtree: true });
 
       li.appendChild(cover);
       li.appendChild(info);
