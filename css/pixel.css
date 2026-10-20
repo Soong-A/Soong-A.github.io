@@ -1,0 +1,63 @@
+/* Light pixel accents for selected pages. Everything is scoped under .px so the
+   rest of the site is untouched; reuse it on any page by wrapping it in
+   <div class="px"> ... </div>. */
+
+.px {
+  --px-ink: #2b2d42;
+  --px-dim: #7a7d93;
+  --px-line: #2b2d42;
+  --px-bg: #fffdf7;
+  --px-accent: #ff6b9a;
+  --px-soft: #fff1f5;
+  --px-font: "Press Start 2P", "Zpix", "Courier New", ui-monospace, monospace;
+
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 8px 0 24px;
+  color: var(--px-ink);
+}
+.px *, .px *::before, .px *::after { box-sizing: border-box; }
+
+/* One thin pixel frame with a hard, offset shadow. */
+.px-box {
+  background: var(--px-bg);
+  border: 2px solid var(--px-line);
+  box-shadow: 4px 4px 0 var(--px-line);
+  padding: 22px 24px;
+  margin: 8px 4px 28px;
+}
+
+.px-label {
+  font-family: var(--px-font); font-size: 10px; letter-spacing: .08em; color: var(--px-accent);
+  margin: 0 0 10px;
+}
+.px h1 { font-family: var(--px-font); font-size: 18px; line-height: 1.6; font-weight: 400; margin: 0 0 12px; padding: 0; border: 0; }
+.px h1::before, .px h1::after { display: none; }
+.px p { margin: 0 0 8px; line-height: 1.9; }
+.px .px-dim { color: var(--px-dim); }
+
+/* Blinking pixel cursor after the heading. */
+.px-blink::after {
+  content: ""; display: inline-block; width: 8px; height: 14px; margin-left: 8px;
+  background: var(--px-accent); vertical-align: -2px; animation: px-blink 1s steps(1) infinite;
+}
+@keyframes px-blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .px-blink::after { animation: none; } }
+
+/* Three short hints on one line. */
+.px-hints { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--px-dim); }
+.px-hints li { display: flex; align-items: center; gap: 8px; }
+.px-hints li::before { content: ""; width: 8px; height: 8px; background: var(--px-accent); flex: none; }
+.px-hints b { color: var(--px-ink); font-weight: 600; }
+
+/* The comment area. Giscus is an iframe, so only its frame is styled here. */
+.px-save { padding: 16px; }
+.px-save .giscus, .px-save .giscus-frame { width: 100%; }
+.px-notice { font-size: 14px; color: var(--px-dim); margin: 0; }
+.px-notice b { display: block; font-family: var(--px-font); font-size: 10px; color: var(--px-accent); margin-bottom: 6px; font-weight: 400; }
+.px-notice code { font-size: 13px; background: var(--px-soft); padding: 1px 6px; }
+
+@media (max-width: 720px) {
+  .px-box { padding: 18px 16px; }
+  .px h1 { font-size: 15px; }
+}
