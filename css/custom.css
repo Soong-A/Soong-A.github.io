@@ -993,8 +993,8 @@ body {
 
 .wc-chips {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: .65rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: .75rem;
   justify-content: initial;
 }
 
@@ -1002,26 +1002,30 @@ body {
   display: flex;
   width: 100%;
   min-width: 0;
-  padding: .56rem .72rem;
+  padding: .72rem .9rem;
   border-color: rgba(82, 122, 150, .1);
   border-radius: 12px;
   background: rgba(234, 243, 251, .64);
-  color: #526C7C;
-  font-size: .78rem;
+  color: #3f5666;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .wc-chips .wc-chip::before {
   content: "";
   flex: 0 0 auto;
-  width: 7px;
-  height: 7px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--c);
 }
 
 .wc-chips .wc-chip em {
   margin-left: auto;
-  background: rgba(82, 122, 150, .08);
+  background: rgba(82, 122, 150, .1);
+  font-size: .85rem;
+  font-weight: 600;
 }
 
 .wc-chips .wc-chip:hover,
