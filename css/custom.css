@@ -1615,3 +1615,234 @@ html[data-lang="en"] .recent-post-info .article-title {
   background: var(--soong-selection) !important;
   color: #F4F9FC !important;
 }
+
+/* =========================
+   Home page: the cat banner stays; everything around it is quieter.
+   ========================= */
+
+/* Banner text rests on the cat's dark body, below the eyes. */
+#page-header.full_page #site-info {
+  top: auto;
+  bottom: 10vh;
+}
+
+#page-header.full_page #site-title {
+  font-size: clamp(2.3rem, 4.6vw, 3.6rem);
+  font-weight: 760;
+  letter-spacing: .01em;
+  text-shadow: none;
+}
+
+#page-header.full_page #site-subtitle {
+  margin-top: .2rem;
+  color: rgba(255, 255, 255, .6);
+  font-size: .9rem;
+  letter-spacing: .32em;
+  text-shadow: none;
+}
+
+/* A short gold rule, the colour of the cat's eyes. */
+#page-header.full_page #site-subtitle::before {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 1px;
+  margin: .9rem auto 1rem;
+  background: rgba(246, 196, 69, .8);
+}
+
+html[data-lang="en"] #page-header.full_page #site-subtitle {
+  letter-spacing: .14em;
+}
+
+#page-header.full_page #scroll-down .scroll-down-effects {
+  color: rgba(255, 255, 255, .45);
+  font-size: 16px;
+}
+
+/* A calm surface instead of the doodle background. */
+body:has(#page-header.full_page) {
+  background: #F4F6F7;
+}
+
+body:has(#page-header.full_page) #web_bg {
+  display: none;
+}
+
+[data-theme="dark"] body:has(#page-header.full_page) {
+  background: #0D151B;
+}
+
+/* Section heading above the post list. */
+#recent-posts .home-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 4px 2px 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--soong-line);
+}
+
+#recent-posts .home-list-title {
+  position: relative;
+  padding-left: 14px;
+  color: var(--font-color);
+  font-family: var(--soong-display);
+  font-size: 1.3rem;
+  font-weight: 760;
+  letter-spacing: -.01em;
+}
+
+#recent-posts .home-list-title::before {
+  content: "";
+  position: absolute;
+  top: .32em;
+  bottom: .32em;
+  left: 0;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--soong-pink);
+}
+
+#recent-posts .home-list-count {
+  color: var(--soong-muted);
+  font-size: .84rem;
+  letter-spacing: .04em;
+}
+
+/* Post cards: lighter frames, category and date above the title. */
+#recent-posts .recent-post-item {
+  height: 14em;
+  margin-bottom: 16px;
+  border: 1px solid var(--soong-line);
+  border-radius: 14px;
+  background: var(--card-bg);
+  box-shadow: 0 1px 2px rgba(30, 52, 70, .04), 0 14px 32px -26px rgba(30, 52, 70, .4);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+#recent-posts .recent-post-item:hover {
+  border-color: rgba(82, 122, 150, .22);
+  box-shadow: 0 1px 2px rgba(30, 52, 70, .04), 0 20px 40px -26px rgba(30, 52, 70, .5);
+  transform: translateY(-2px);
+}
+
+#recent-posts .recent-post-item .post_cover {
+  width: 38%;
+}
+
+#recent-posts .recent-post-item:hover .post-bg {
+  transform: scale(1.04);
+}
+
+#recent-posts .recent-post-item > .recent-post-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 62%;
+  padding: 0 38px;
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .article-meta-wrap {
+  order: -1;
+  margin: 0 0 8px;
+  color: var(--soong-muted);
+  font-size: .76rem;
+  letter-spacing: .06em;
+}
+
+#recent-posts .recent-post-info .article-meta-wrap i,
+#recent-posts .recent-post-info .article-meta-label {
+  display: none;
+}
+
+#recent-posts .recent-post-info .article-meta-separator {
+  margin: 0 .5em;
+  color: transparent;
+}
+
+#recent-posts .recent-post-info .article-meta-separator::before {
+  content: "·";
+  margin-right: -.5em;
+  color: var(--soong-muted);
+}
+
+#recent-posts .recent-post-info .article-meta__categories {
+  color: var(--soong-blue);
+  font-weight: 650;
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .article-title {
+  font-size: clamp(1.15rem, 1.8vw, 1.32rem);
+  font-weight: 740;
+  line-height: 1.5;
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .content {
+  margin-top: 10px;
+  color: var(--soong-muted);
+  font-size: .9rem;
+  line-height: 1.75;
+  -webkit-line-clamp: 2;
+}
+
+/* Nav bar: a serif wordmark and quiet, icon-free menu labels.
+   Fonts come from the two @fontsource links in _config.butterfly.yml. */
+:root {
+  --soong-nav-serif: "Cormorant Garamond", "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+}
+
+#nav .nav-site-title .site-name {
+  font-family: var(--soong-nav-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: .015em;
+}
+
+#nav .menus_items .site-page {
+  font-family: var(--soong-nav-serif);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+}
+
+html[data-lang="en"] #nav .menus_items .site-page {
+  font-size: 1.08rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+}
+
+@media (min-width: 769px) {
+  #nav .menus_items .menus_item {
+    padding: 0 .55rem;
+  }
+
+  #nav .menus_items .site-page > i {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  #page-header.full_page #site-info {
+    bottom: 16vh;
+  }
+
+  #page-header.full_page #site-subtitle {
+    font-size: .82rem;
+    letter-spacing: .2em;
+  }
+
+  #recent-posts .recent-post-item {
+    height: auto;
+  }
+
+  #recent-posts .recent-post-item .post_cover {
+    width: 100%;
+    height: 200px;
+  }
+
+  #recent-posts .recent-post-item > .recent-post-info {
+    width: 100%;
+    padding: 20px 22px 24px;
+  }
+}
