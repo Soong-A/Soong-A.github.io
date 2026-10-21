@@ -5782,3 +5782,46 @@ html[data-lang="en"] .coffee-btn[data-lang="en"] {
     justify-content: center;
   }
 }
+/* ---------- Back button in the nav bar (js/site-polish.js) ---------- */
+/* Left of the site name on every page but home. It takes the nav's own
+   colour, so it reads on the transparent bar over a cover and on the
+   solid bar once the page scrolls. */
+#nav .nav-back {
+  display: inline-grid;
+  flex: none;
+  margin-right: 10px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+#nav .nav-back:hover,
+#nav .nav-back:focus-visible {
+  border-color: var(--soong-gold);
+  background: color-mix(in srgb, var(--soong-gold) 22%, transparent);
+  outline: none;
+  transform: translateX(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nav .nav-back { transition: none; }
+  #nav .nav-back:hover,
+  #nav .nav-back:focus-visible { transform: none; }
+}
+
+@media (max-width: 600px) {
+  #nav .nav-back {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+  }
+}

@@ -130,6 +130,35 @@
     update()
   }
 
+  // A back button at the left of the nav bar, on every page but the home
+  // page. It steps back when the reader came from this site; arriving from
+  // elsewhere (a search, a shared link), it goes to the page's parent:
+  // a post to the library, a tag to the constellation, the rest home.
+  // It goes just before #blog-info, not inside: the theme swaps the site name
+  // for the post title by hiding #blog-info's first link.
+  function addBackButton() {
+    const info = document.getElementById('blog-info')
+    const path = location.pathname
+    if (!info || path === '/' || document.querySelector('#nav .nav-back')) return
+
+    const parent = /^\/tags\/.+/.test(path) ? '/tags/'
+      : /^\/\d{4}\/\d{2}\/\d{2}\//.test(path) || /^\/(categories|archives)\/.+/.test(path) ? '/archives/'
+        : '/'
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = 'nav-back'
+    button.title = '返回'
+    button.setAttribute('aria-label', '返回')
+    button.innerHTML = '<i class="fas fa-arrow-left" aria-hidden="true"></i>'
+    button.addEventListener('click', () => {
+      let fromHere = false
+      try { fromHere = new URL(document.referrer).origin === location.origin } catch (e) {}
+      if (fromHere && history.length > 1) history.back()
+      else location.href = parent
+    })
+    info.parentNode.insertBefore(button, info)
+  }
+
   // The slide-out menu's dark-mode button (includes/sidebar.pug) passes the
   // click on to the theme's own #darkmode button.
   function bindMenuDarkmode() {
@@ -152,11 +181,13 @@
     document.addEventListener('DOMContentLoaded', fitStickyAside, { once: true })
     document.addEventListener('DOMContentLoaded', calmRightside, { once: true })
     document.addEventListener('DOMContentLoaded', bindMenuDarkmode, { once: true })
+    document.addEventListener('DOMContentLoaded', addBackButton, { once: true })
   } else {
     enhance()
     fitStickyAside()
     calmRightside()
     bindMenuDarkmode()
+    addBackButton()
   }
 
   document.addEventListener('pjax:complete', enhance)
