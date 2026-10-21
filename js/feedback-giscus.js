@@ -34,6 +34,42 @@
     return;
   }
 
+  // A loading line while giscus starts, and a way to GitHub if it never does.
+  var discussions = "https://github.com/" + cfg.repo + "/discussions";
+  var waiting = document.createElement("p");
+  waiting.className = "px-loading";
+  waiting.innerHTML = siteLang() === "en"
+    ? '<span class="px-spinner" aria-hidden="true"></span>Loading the comments…'
+    : '<span class="px-spinner" aria-hidden="true"></span>留言区加载中……';
+  host.appendChild(waiting);
+  var loaded = false;
+  window.addEventListener("message", function onMessage(event) {
+    if (event.origin !== "https://giscus.app") return;
+    loaded = true;
+    waiting.remove();
+    window.removeEventListener("message", onMessage);
+  });
+  function giveUpLater() {
+    setTimeout(function () {
+      if (loaded) return;
+      waiting.className = "px-loading is-failed";
+      waiting.innerHTML = siteLang() === "en"
+        ? 'The comments are taking a while to load. You can also <a href="' + discussions + '" target="_blank" rel="noopener">leave a message on GitHub Discussions ↗</a>.'
+        : '留言区加载较慢或无法打开。也可以直接<a href="' + discussions + '" target="_blank" rel="noopener">前往 GitHub Discussions 留言 ↗</a>。';
+    }, 12000);
+  }
+  // giscus loads lazily, so only start counting once the box is in view.
+  if ("IntersectionObserver" in window) {
+    var watch = new IntersectionObserver(function (entries) {
+      if (!entries.some(function (e) { return e.isIntersecting; })) return;
+      watch.disconnect();
+      giveUpLater();
+    });
+    watch.observe(host);
+  } else {
+    giveUpLater();
+  }
+
   var s = document.createElement("script");
   s.src = "https://giscus.app/client.js";
   s.async = true;

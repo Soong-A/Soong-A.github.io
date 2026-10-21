@@ -63,25 +63,24 @@
     }, 9000)
   }
 
-  // Phones: the sidebar tag card starts folded and its heading toggles it.
-  // The button is hidden on wider screens (see custom.css).
-  function foldTags() {
-    const card = document.querySelector('#aside-content .card-tags')
+  // Tablets and phones: the sidebar research index starts folded and its
+  // heading toggles it. The button is hidden above 900px (see custom.css).
+  function foldIndex() {
+    const card = document.querySelector('#aside-content .card-index')
     if (!card || card.dataset.foldReady === 'true') return
     const heading = card.querySelector('.item-headline')
-    const cloud = card.querySelector('.card-tag-cloud')
-    if (!heading || !cloud) return
+    const body = card.querySelector('.index-body')
+    if (!heading || !body) return
 
     card.dataset.foldReady = 'true'
     card.classList.add('is-folded')
-    cloud.id = cloud.id || 'card-tag-cloud'
 
     const button = document.createElement('button')
     button.type = 'button'
     button.className = 'card-fold-toggle'
-    button.setAttribute('aria-controls', cloud.id)
+    button.setAttribute('aria-controls', body.id)
     button.setAttribute('aria-expanded', 'false')
-    button.setAttribute('aria-label', '展开或收起标签')
+    button.setAttribute('aria-label', '展开或收起索引')
     button.innerHTML = '<i class="fas fa-chevron-down" aria-hidden="true"></i>'
     button.addEventListener('click', () => {
       const open = card.classList.toggle('is-folded') === false
@@ -90,34 +89,74 @@
     heading.appendChild(button)
   }
 
-  // Home page, desktop: the sidebar group below the author card is sticky
-  // (custom.css). When it is taller than the window it sticks by its bottom
-  // edge, so its last card is never cut off.
+  // Home page, desktop: the sidebar group below the author card is sticky,
+  // 76px from the top (custom.css). In a window too short for that, only its
+  // lower part stays in view: it sticks by its bottom edge, 20px above the
+  // window's, so its last card is never cut off.
   function fitStickyAside() {
     const group = document.querySelector('#content-inner > #aside-content > .sticky_layout')
     if (!group || !document.getElementById('recent-posts')) return
 
+    const TOP = 76
     const fit = () => {
       const room = window.innerHeight - group.offsetHeight - 20
-      group.style.setProperty('--aside-sticky-top', `${Math.min(20, room)}px`)
-      group.style.setProperty('--aside-sticky-top-nav', `${Math.min(70, room)}px`)
+      group.style.setProperty('--aside-sticky-top', `${Math.min(TOP, room)}px`)
     }
     fit()
     window.addEventListener('resize', fit, { passive: true })
     if ('ResizeObserver' in window) new ResizeObserver(fit).observe(group)
   }
 
+  // Tablets and phones: the floating buttons wait until the reader is past
+  // most of the first screen, and fade after a few idle seconds
+  // (is-far / is-idle, styled in custom.css up to 900px).
+  function calmRightside() {
+    const side = document.getElementById('rightside')
+    if (!side) return
+
+    let timer = 0
+    const wake = () => {
+      side.classList.remove('is-idle')
+      window.clearTimeout(timer)
+      timer = window.setTimeout(() => side.classList.add('is-idle'), 2500)
+    }
+    const update = () => {
+      side.classList.toggle('is-far', window.scrollY > window.innerHeight * 0.6)
+      wake()
+    }
+    window.addEventListener('scroll', update, { passive: true })
+    side.addEventListener('pointerdown', wake)
+    side.addEventListener('focusin', wake)
+    update()
+  }
+
+  // The slide-out menu's dark-mode button (includes/sidebar.pug) passes the
+  // click on to the theme's own #darkmode button.
+  function bindMenuDarkmode() {
+    const button = document.querySelector('#sidebar-menus .sidebar-darkmode')
+    const theme = document.getElementById('darkmode')
+    if (!button || !theme) {
+      if (button) button.hidden = true
+      return
+    }
+    button.addEventListener('click', () => theme.click())
+  }
+
   function enhance() {
     counters.forEach(decorateCounter)
-    foldTags()
+    foldIndex()
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', enhance, { once: true })
     document.addEventListener('DOMContentLoaded', fitStickyAside, { once: true })
+    document.addEventListener('DOMContentLoaded', calmRightside, { once: true })
+    document.addEventListener('DOMContentLoaded', bindMenuDarkmode, { once: true })
   } else {
     enhance()
     fitStickyAside()
+    calmRightside()
+    bindMenuDarkmode()
   }
 
   document.addEventListener('pjax:complete', enhance)
