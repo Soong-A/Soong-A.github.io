@@ -101,13 +101,40 @@
     detectApple()
   
     })()
-  </script><script async="async" src="https://www.googletagmanager.com/gtag/js?id=G-EL6GS17XHJ"></script><script>window.dataLayer = window.dataLayer || []
-function gtag(){dataLayer.push(arguments)}
-gtag('js', new Date())
-gtag('config', 'G-EL6GS17XHJ')
-btf.addGlobalFn('pjaxComplete', () => {
-  gtag('config', 'G-EL6GS17XHJ', {'page_path': window.location.pathname})
-}, 'google_analytics')
+  </script><script>(() => {
+  const hostname = window.location.hostname
+  const isLocalPreview = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local')
+
+  window.soongAnalyticsEnabled = !isLocalPreview
+
+  // Keep theme/PJAX integrations safe on localhost without loading or
+  // sending anything to the production Analytics property.
+  if (isLocalPreview) {
+    window.gtag = () => {}
+    return
+  }
+
+  const measurementId = 'G-EL6GS17XHJ'
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(loader)
+
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', measurementId)
+  btf.addGlobalFn('pjaxComplete', () => {
+    window.gtag('config', measurementId, {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    })
+  }, 'google_analytics')
+})()
 </script><script>const GLOBAL_CONFIG = {
   root: '/',
   algolia: undefined,
@@ -232,4 +259,4 @@ btf.addGlobalFn('pjaxComplete', () => {
 
   btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
   window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
-})()</script></div><script defer src="/js/site-polish.js?v=20261021g"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mvilbcg6"></script></body></html>
+})()</script></div><script defer src="/js/site-polish.js?v=20261021g"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/analytics-events.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mviokiz1"></script></body></html>
