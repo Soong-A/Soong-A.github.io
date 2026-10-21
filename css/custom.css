@@ -1786,42 +1786,6 @@ body:has(#page-header.full_page) #web_bg {
   -webkit-line-clamp: 2;
 }
 
-/* Nav bar: a serif wordmark and quiet, icon-free menu labels.
-   Fonts come from the two @fontsource links in _config.butterfly.yml. */
-:root {
-  --soong-nav-serif: "Cormorant Garamond", "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
-}
-
-#nav .nav-site-title .site-name {
-  font-family: var(--soong-nav-serif);
-  font-size: 1.5rem;
-  font-weight: 600;
-  letter-spacing: .015em;
-}
-
-#nav .menus_items .site-page {
-  font-family: var(--soong-nav-serif);
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: .12em;
-}
-
-html[data-lang="en"] #nav .menus_items .site-page {
-  font-size: 1.08rem;
-  font-weight: 600;
-  letter-spacing: .04em;
-}
-
-@media (min-width: 769px) {
-  #nav .menus_items .menus_item {
-    padding: 0 .55rem;
-  }
-
-  #nav .menus_items .site-page > i {
-    display: none;
-  }
-}
-
 @media (max-width: 768px) {
   #page-header.full_page #site-info {
     bottom: 16vh;
