@@ -63,8 +63,36 @@
     }, 9000)
   }
 
+  // Phones: the sidebar tag card starts folded and its heading toggles it.
+  // The button is hidden on wider screens (see custom.css).
+  function foldTags() {
+    const card = document.querySelector('#aside-content .card-tags')
+    if (!card || card.dataset.foldReady === 'true') return
+    const heading = card.querySelector('.item-headline')
+    const cloud = card.querySelector('.card-tag-cloud')
+    if (!heading || !cloud) return
+
+    card.dataset.foldReady = 'true'
+    card.classList.add('is-folded')
+    cloud.id = cloud.id || 'card-tag-cloud'
+
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = 'card-fold-toggle'
+    button.setAttribute('aria-controls', cloud.id)
+    button.setAttribute('aria-expanded', 'false')
+    button.setAttribute('aria-label', '展开或收起标签')
+    button.innerHTML = '<i class="fas fa-chevron-down" aria-hidden="true"></i>'
+    button.addEventListener('click', () => {
+      const open = card.classList.toggle('is-folded') === false
+      button.setAttribute('aria-expanded', String(open))
+    })
+    heading.appendChild(button)
+  }
+
   function enhance() {
     counters.forEach(decorateCounter)
+    foldTags()
   }
 
   if (document.readyState === 'loading') {

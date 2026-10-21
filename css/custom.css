@@ -1773,27 +1773,149 @@ html[data-lang="en"] #page-header.full_page #site-subtitle {
   -webkit-line-clamp: 2;
 }
 
+/* Tag card fold button, added by js/site-polish.js; only used on phones. */
+#aside-content .card-tags .card-fold-toggle {
+  display: none;
+}
+
+/* =========================
+   Phones: a shorter page that is quicker to read.
+   ========================= */
 @media (max-width: 768px) {
+  /* The cat image is about 16:9. A banner a little taller than it is wide
+     shows the whole picture, so both eyes stay in view. */
+  #page-header.full_page {
+    height: 108vw;
+    background-attachment: scroll;
+    background-position: center;
+  }
+
   #page-header.full_page #site-info {
-    bottom: 16vh;
+    bottom: 12px;
+  }
+
+  #page-header.full_page #site-title {
+    font-size: clamp(1.6rem, 8vw, 2.1rem);
   }
 
   #page-header.full_page #site-subtitle {
-    font-size: .82rem;
-    letter-spacing: .2em;
+    font-size: .76rem;
+    letter-spacing: .16em;
+  }
+
+  #page-header.full_page #site-subtitle::before {
+    margin: .45rem auto .55rem;
+  }
+
+  #page-header.full_page #site_social_icons,
+  #page-header.full_page #scroll-down {
+    display: none;
+  }
+
+  .layout {
+    padding-top: 14px;
+  }
+
+  /* Post cards: less vertical room, at most two lines of summary. */
+  #recent-posts .home-list-head {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
   }
 
   #recent-posts .recent-post-item {
     height: auto;
+    margin-bottom: 12px;
   }
 
   #recent-posts .recent-post-item .post_cover {
     width: 100%;
-    height: 200px;
+    height: 150px;
   }
 
   #recent-posts .recent-post-item > .recent-post-info {
     width: 100%;
-    padding: 20px 22px 24px;
+    padding: 14px 16px 16px;
+  }
+
+  #recent-posts .recent-post-item > .recent-post-info > .article-meta-wrap {
+    margin-bottom: 4px;
+  }
+
+  #recent-posts .recent-post-item > .recent-post-info > .article-title {
+    font-size: 1.08rem;
+    line-height: 1.45;
+  }
+
+  #recent-posts .recent-post-item > .recent-post-info > .content {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 6px;
+    font-size: .86rem;
+    line-height: 1.65;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* Sidebar: drop cards that repeat the nav bar or the post list. */
+  #aside-content .card-recent-post,
+  #aside-content .card-categories,
+  #aside-content .card-archives,
+  #aside-content .card-webinfo {
+    display: none;
+  }
+
+  /* A compact author card under the post list. */
+  #aside-content .card-info {
+    padding: 18px 18px 14px;
+  }
+
+  #aside-content .card-info .avatar-img {
+    width: 64px;
+    height: 64px;
+  }
+
+  #aside-content .card-info .site-data-chart,
+  #aside-content .card-info #card-info-btn {
+    display: none;
+  }
+
+  #aside-content .card-info .card-info-social-icons {
+    margin-top: 6px;
+  }
+
+  /* Tags start folded; the whole heading toggles them. */
+  #aside-content .card-tags .item-headline {
+    position: relative;
+  }
+
+  #aside-content .card-tags .card-fold-toggle {
+    position: absolute;
+    inset: -8px -10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    border: 0;
+    background: transparent;
+    color: var(--soong-muted);
+    cursor: pointer;
+  }
+
+  #aside-content .card-tags .card-fold-toggle i {
+    font-size: .8rem;
+    transition: transform .2s ease;
+  }
+
+  #aside-content .card-tags:not(.is-folded) .card-fold-toggle i {
+    transform: rotate(180deg);
+  }
+
+  #aside-content .card-tags.is-folded .item-headline {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  #aside-content .card-tags.is-folded .card-tag-cloud {
+    display: none;
   }
 }
