@@ -90,6 +90,23 @@
     heading.appendChild(button)
   }
 
+  // Home page, desktop: the sidebar group below the author card is sticky
+  // (custom.css). When it is taller than the window it sticks by its bottom
+  // edge, so its last card is never cut off.
+  function fitStickyAside() {
+    const group = document.querySelector('#content-inner > #aside-content > .sticky_layout')
+    if (!group || !document.getElementById('recent-posts')) return
+
+    const fit = () => {
+      const room = window.innerHeight - group.offsetHeight - 20
+      group.style.setProperty('--aside-sticky-top', `${Math.min(20, room)}px`)
+      group.style.setProperty('--aside-sticky-top-nav', `${Math.min(70, room)}px`)
+    }
+    fit()
+    window.addEventListener('resize', fit, { passive: true })
+    if ('ResizeObserver' in window) new ResizeObserver(fit).observe(group)
+  }
+
   function enhance() {
     counters.forEach(decorateCounter)
     foldTags()
@@ -97,8 +114,10 @@
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', enhance, { once: true })
+    document.addEventListener('DOMContentLoaded', fitStickyAside, { once: true })
   } else {
     enhance()
+    fitStickyAside()
   }
 
   document.addEventListener('pjax:complete', enhance)

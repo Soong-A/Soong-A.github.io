@@ -1688,7 +1688,7 @@ html[data-lang="en"] #page-header.full_page #site-subtitle {
   left: 0;
   width: 3px;
   border-radius: 2px;
-  background: var(--soong-pink);
+  background: var(--soong-gold);
 }
 
 #recent-posts .home-list-count {
@@ -1782,16 +1782,21 @@ html[data-lang="en"] #page-header.full_page #site-subtitle {
    Phones: a shorter page that is quicker to read.
    ========================= */
 @media (max-width: 768px) {
-  /* The cat image is about 16:9. A banner a little taller than it is wide
-     shows the whole picture, so both eyes stay in view. */
+  /* The cat gets its own phone size instead of `cover`: 165% of the screen
+     width keeps both eyes (26%–75% of the picture) in view. It sits near the
+     bottom; the flat grey above and black below continue the picture's own
+     colours (#737373 / #000, sampled from index1.webp), so no edge shows.
+     The layer itself is #page-header.full_page::after in the Phones block
+     at the end of this file. */
   #page-header.full_page {
-    height: 108vw;
-    background-attachment: scroll;
-    background-position: center;
+    --cat-gap: 56px;
+    height: 70vh;
+    height: 70svh;
+    min-height: 440px;
   }
 
   #page-header.full_page #site-info {
-    bottom: 12px;
+    bottom: 34px;
   }
 
   #page-header.full_page #site-title {
@@ -1917,5 +1922,317 @@ html[data-lang="en"] #page-header.full_page #site-subtitle {
 
   #aside-content .card-tags.is-folded .card-tag-cloud {
     display: none;
+  }
+}
+
+/* =========================
+   One set of rules for the whole site.
+   Colour roles:
+     gold      (cat's eyes)  current state, key emphasis, selected page
+     blue-grey               links, buttons, information icons
+     soft pink               small decorations and tags
+     ink                     titles and main text
+   Components: cards 12px, small buttons 8px, one border, one card shadow,
+   one hover timing so a card's lift and its image zoom finish together.
+   ========================= */
+:root {
+  --soong-gold: #E2AE45;
+  --soong-gold-soft: rgba(226, 174, 69, .16);
+  --soong-ink: #22303A;
+  --soong-radius-card: 12px;
+  --soong-radius-sm: 8px;
+  --soong-border: rgba(82, 122, 150, .13);
+  --soong-border-hover: rgba(82, 122, 150, .26);
+  --soong-card-shadow: 0 1px 2px rgba(30, 52, 70, .04), 0 12px 30px -22px rgba(30, 52, 70, .42);
+  --soong-card-shadow-hover: 0 1px 2px rgba(30, 52, 70, .05), 0 18px 38px -22px rgba(30, 52, 70, .52);
+  --soong-dur: .32s;
+  --soong-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+[data-theme="dark"] {
+  --soong-gold: #E8BC5A;
+  --soong-gold-soft: rgba(232, 188, 90, .16);
+  --soong-ink: #EAF1F4;
+  --soong-border: rgba(168, 200, 217, .1);
+  --soong-border-hover: rgba(168, 200, 217, .22);
+  --soong-card-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 12px 30px -22px rgba(0, 0, 0, .9);
+  --soong-card-shadow-hover: 0 1px 2px rgba(0, 0, 0, .35), 0 18px 38px -22px rgba(0, 0, 0, .95);
+}
+
+/* ---------- Cards ---------- */
+#recent-posts .recent-post-item,
+#aside-content .card-widget,
+#page,
+#post,
+#archive,
+#tag,
+#category,
+[data-theme="dark"] #recent-posts .recent-post-item,
+[data-theme="dark"] #aside-content .card-widget,
+[data-theme="dark"] #page,
+[data-theme="dark"] #post,
+[data-theme="dark"] #archive,
+[data-theme="dark"] #tag,
+[data-theme="dark"] #category {
+  border: 1px solid var(--soong-border);
+  border-radius: var(--soong-radius-card);
+  box-shadow: var(--soong-card-shadow);
+}
+
+#recent-posts .recent-post-item,
+#aside-content .card-widget {
+  transition:
+    transform var(--soong-dur) var(--soong-ease),
+    box-shadow var(--soong-dur) var(--soong-ease),
+    border-color var(--soong-dur) var(--soong-ease);
+}
+
+#recent-posts .recent-post-item:hover,
+#aside-content .card-widget:hover,
+[data-theme="dark"] #aside-content .card-widget:hover {
+  border-color: var(--soong-border-hover);
+  box-shadow: var(--soong-card-shadow-hover);
+}
+
+#recent-posts .recent-post-item:hover {
+  transform: translateY(-2px);
+}
+
+#recent-posts .recent-post-item .post-bg {
+  transition: transform var(--soong-dur) var(--soong-ease);
+}
+
+#recent-posts .recent-post-item:hover .post-bg {
+  transform: scale(1.04);
+}
+
+.category-lists ul.category-list > li.category-list-item,
+.about-grid .about-card,
+.category-overview,
+#article-container .seo-related {
+  border-radius: var(--soong-radius-card);
+}
+
+/* ---------- Small buttons and pagination ---------- */
+#pagination .page-number,
+#pagination .extend,
+#rightside > div > button,
+#rightside > div > a,
+#aside-content .card-info #card-info-btn {
+  border-radius: var(--soong-radius-sm);
+}
+
+#pagination .page-number,
+#pagination .extend {
+  border: 1px solid var(--soong-border);
+  background: var(--card-bg);
+  color: var(--soong-blue);
+  box-shadow: none;
+  transition:
+    background var(--soong-dur) var(--soong-ease),
+    color var(--soong-dur) var(--soong-ease),
+    border-color var(--soong-dur) var(--soong-ease);
+}
+
+#pagination .page-number.current {
+  border-color: var(--soong-gold);
+  background: var(--soong-gold);
+  color: #2B2D42;
+  font-weight: 700;
+}
+
+/* ---------- Colour roles ---------- */
+/* Current state: the selected language and the active table-of-contents entry. */
+html:not([data-lang="en"]) #nav .lang-toggle [data-l="zh"],
+html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
+  background: var(--soong-gold);
+  color: #2B2D42;
+}
+
+#aside-content #card-toc .toc-content .toc-link.active {
+  background: var(--soong-gold-soft);
+  color: var(--soong-ink);
+  box-shadow: inset 3px 0 0 var(--soong-gold);
+}
+
+/* Information icons are blue-grey; social icons take their colour from
+   _config.butterfly.yml, set to the same blue-grey. */
+#aside-content .item-headline i,
+.article-meta-wrap i {
+  color: var(--soong-blue);
+}
+
+/* Tags are the pink role. */
+#aside-content .card-tags .item-headline i {
+  color: var(--soong-pink);
+}
+
+/* Titles use ink. */
+#recent-posts .recent-post-item > .recent-post-info > .article-title,
+#aside-content .item-headline,
+#recent-posts .home-list-title,
+#article-container h1,
+#article-container h2,
+#article-container h3 {
+  color: var(--soong-ink);
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .article-title:hover {
+  color: var(--soong-blue);
+}
+
+/* ---------- Long titles: balanced lines and an even rhythm ---------- */
+#recent-posts .recent-post-item > .recent-post-info > .article-title,
+#aside-content .aside-list > .aside-list-item .content > .title,
+#post-info .post-title,
+.article-sort-item-title,
+#article-container h1,
+#article-container h2,
+#article-container h3 {
+  text-wrap: balance;
+  /* A little air between Chinese and Latin abbreviations, where supported. */
+  text-autospace: normal;
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .article-title {
+  line-height: 1.45;
+  letter-spacing: .005em;
+}
+
+/* Date and category share one baseline. */
+#recent-posts .recent-post-item > .recent-post-info > .article-meta-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .article-meta-wrap .post-meta-date,
+#recent-posts .recent-post-item > .recent-post-info > .article-meta-wrap .article-meta {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+#recent-posts .recent-post-item > .recent-post-info > .article-meta-wrap time {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Every summary stops at two lines. */
+#recent-posts .recent-post-item > .recent-post-info > .content {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* ---------- Doodle background with a composition ---------- */
+/* Wide screens: the black cats (left) and tuxedo cats (right) sit in the
+   margins beside the content. Narrower screens shift towards the black cats,
+   which are the most legible part of the picture behind the cards. */
+#web_bg {
+  background-position: center 42%;
+}
+
+@media (max-width: 1200px) {
+  #web_bg {
+    background-position: 30% 40%;
+  }
+}
+
+@media (max-width: 768px) {
+  #web_bg {
+    background-position: 14% center;
+  }
+}
+
+/* ---------- Sticky sidebar on the home page (desktop) ---------- */
+/* The author card scrolls away; the group below it stays beside the posts.
+   js/site-polish.js sets --aside-sticky-top so a group taller than the
+   window sticks by its bottom edge instead of being cut off. */
+@media (min-width: 901px) {
+  #content-inner:has(#recent-posts) > #aside-content {
+    align-self: stretch;
+  }
+
+  #content-inner:has(#recent-posts) > #aside-content > .sticky_layout {
+    position: sticky !important;
+    top: var(--aside-sticky-top, 20px);
+    transition: top .3s var(--soong-ease);
+  }
+
+  #page-header.nav-visible:not(.fixed) ~ #content-inner:has(#recent-posts) > #aside-content > .sticky_layout {
+    top: var(--aside-sticky-top-nav, 70px);
+  }
+}
+
+/* ---------- Footer: a clear closing band ---------- */
+#footer {
+  border-top: 1px solid rgba(226, 174, 69, .75);
+  background: rgba(252, 250, 246, .9) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#footer::before {
+  display: none;
+}
+
+#footer .footer-other,
+#footer .footer-other a {
+  color: #4A545C;
+  text-shadow: none;
+}
+
+#footer .footer-other a:hover {
+  color: var(--soong-blue);
+}
+
+#footer .footer-copyright {
+  gap: .4rem;
+  font-size: .86rem;
+  letter-spacing: .02em;
+}
+
+#footer .framework-info {
+  display: inline-flex !important;
+  align-items: baseline;
+  gap: .3rem;
+}
+
+#footer .framework-info .footer-separator {
+  margin: 0 .2rem;
+  color: rgba(74, 84, 92, .45);
+}
+
+[data-theme="dark"] #footer {
+  border-top-color: rgba(232, 188, 90, .55);
+  background: rgba(16, 24, 30, .92) !important;
+}
+
+[data-theme="dark"] #footer .footer-other,
+[data-theme="dark"] #footer .footer-other a {
+  color: #B9C6CD;
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 768px) {
+  /* The phone-sized cat (see the earlier phone block for the numbers) is
+     drawn on its own layer, the same picture as index_img. */
+  #page-header.full_page {
+    background-color: transparent;
+    background-image: none !important;
+  }
+
+  #page-header.full_page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      url("/img/index1.webp") center bottom var(--cat-gap) / 165% auto no-repeat scroll,
+      linear-gradient(#737373 calc(100% - var(--cat-gap) - 10px), #000 0);
+  }
+
+  #recent-posts .recent-post-item > .recent-post-info > .article-title {
+    -webkit-line-clamp: 2;
   }
 }
