@@ -1660,19 +1660,6 @@ html[data-lang="en"] #page-header.full_page #site-subtitle {
   font-size: 16px;
 }
 
-/* A calm surface instead of the doodle background. */
-body:has(#page-header.full_page) {
-  background: #F4F6F7;
-}
-
-body:has(#page-header.full_page) #web_bg {
-  display: none;
-}
-
-[data-theme="dark"] body:has(#page-header.full_page) {
-  background: #0D151B;
-}
-
 /* Section heading above the post list. */
 #recent-posts .home-list-head {
   display: flex;
