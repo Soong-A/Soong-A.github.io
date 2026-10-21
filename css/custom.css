@@ -5477,7 +5477,7 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
    doodles behind them. Latin only, so it is the same in both languages;
    loaded in _config.butterfly.yml. */
 #page-header #site-title,
-#nav .site-name {
+#nav .nav-site-title .site-name {
   font-family: "Caveat Brush", var(--soong-banner);
   font-weight: 400;
   letter-spacing: .01em;
@@ -5489,9 +5489,14 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
   line-height: 1.15;
 }
 
-#nav .site-name {
+#nav .nav-site-title .site-name {
   font-size: 1.75rem;
   line-height: 1;
+}
+
+/* Scrolled down a post, the nav shows its title instead: heading face. */
+#nav .nav-page-title .site-name {
+  font-family: var(--soong-display);
 }
 
 /* Phones: the name stays on one line, below the cat's eyes. */
@@ -5501,7 +5506,7 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
     white-space: nowrap;
   }
 
-  #nav .site-name {
+  #nav .nav-site-title .site-name {
     font-size: 1.5rem;
   }
 
@@ -5519,5 +5524,261 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
 
   #recent-posts .home-list-count {
     display: none;
+  }
+}
+
+/* ---------- Heading sizes: one step down for LXGW WenKai ---------- */
+/* WenKai's characters fill more of their box than the system face, so the
+   same pixel size reads larger. Every heading level drops a notch; the
+   steps between levels stay. */
+#nav .menus_items .menus_item > a {
+  font-size: 14.5px;
+}
+
+#page-header #post-info .post-title {
+  font-size: clamp(1.7rem, 2.6vw, 2.15rem);
+}
+
+#article-container h1 { font-size: clamp(1.55rem, 2.4vw, 1.85rem); }
+#article-container h2 { font-size: clamp(1.3rem, 1.9vw, 1.5rem); }
+#article-container h3 { font-size: clamp(1.1rem, 1.5vw, 1.22rem); }
+#article-container h4 { font-size: 1.05rem; }
+
+#recent-posts .recent-post-item > .recent-post-info > .article-title {
+  font-size: clamp(1.08rem, 1.5vw, 1.22rem);
+}
+
+#recent-posts .home-list-title {
+  font-size: 1.18rem;
+}
+
+#aside-content .card-researcher .author-info-name,
+#aside-content .card-researcher .researcher-stats strong {
+  font-size: 16.5px;
+}
+
+#aside-content .card-widget .item-headline {
+  font-size: 14.5px;
+}
+
+#aside-content .card-index .index-name {
+  font-size: 14px;
+}
+
+#archive .archive-head h1 { font-size: 32px; }
+.archive-month-name { font-size: 20px; }
+.archive-file-title { font-size: 16.5px; }
+.archive-file-name { font-size: 18.5px; }
+
+@media (max-width: 700px) {
+  #archive .archive-head h1 { font-size: 28px; }
+  .archive-month-name { font-size: 19px; }
+  .archive-file-title { font-size: 16px; }
+}
+/* ---------- Coffee card (includes/post/coffee.pug) ---------- */
+/* A quiet "buy me a coffee" at the end of a post: warm paper, a small cup
+   drawn in CSS, one button. Steam on hover, a heart on click. */
+.coffee-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 36px 0 22px;
+  padding: 18px 22px;
+  border: 1px solid rgba(190, 145, 55, .26);
+  border-radius: 12px;
+  background: #FFFDF8;
+  box-shadow: 0 14px 32px -28px rgba(70, 57, 38, .45);
+}
+
+.coffee-card.is-page {
+  max-width: 820px;
+  margin: 28px auto 8px;
+}
+
+/* The cup: a gold body, a handle, a saucer; steam and a heart above. */
+.coffee-cup {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+}
+
+.coffee-body {
+  position: absolute;
+  bottom: 9px;
+  left: 8px;
+  width: 28px;
+  height: 22px;
+  border-radius: 3px 3px 12px 12px;
+  background: var(--soong-gold);
+  box-shadow: inset 0 4px 0 rgba(120, 76, 30, .55);
+}
+
+.coffee-body::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: -9px;
+  width: 9px;
+  height: 11px;
+  border: 3px solid var(--soong-gold);
+  border-left: 0;
+  border-radius: 0 7px 7px 0;
+}
+
+.coffee-saucer {
+  position: absolute;
+  bottom: 4px;
+  left: 2px;
+  width: 42px;
+  height: 5px;
+  border-radius: 5px;
+  background: #C9963A;
+}
+
+.coffee-steam {
+  position: absolute;
+  top: 0;
+  left: 12px;
+  display: flex;
+  gap: 5px;
+}
+
+.coffee-steam i {
+  width: 3px;
+  height: 13px;
+  border-radius: 3px;
+  background: rgba(82, 122, 150, .45);
+  opacity: 0;
+}
+
+.coffee-card:hover .coffee-steam i,
+.coffee-card:focus-within .coffee-steam i {
+  animation: coffee-steam 1.6s ease-in-out infinite;
+}
+
+.coffee-steam i:nth-child(2) { animation-delay: .25s !important; }
+.coffee-steam i:nth-child(3) { animation-delay: .5s !important; }
+
+@keyframes coffee-steam {
+  0% { opacity: 0; transform: translateY(8px) scaleY(.6); }
+  40% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-6px) scaleY(1.1); }
+}
+
+.coffee-heart {
+  position: absolute;
+  top: 2px;
+  left: 16px;
+  color: var(--soong-pink);
+  font-size: 16px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.coffee-card.is-sent .coffee-heart {
+  animation: coffee-heart 1.3s ease-out;
+}
+
+@keyframes coffee-heart {
+  0% { opacity: 0; transform: translateY(6px) scale(.6); }
+  25% { opacity: 1; transform: translateY(-4px) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-30px) scale(1); }
+}
+
+.coffee-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+#article-container ~ .coffee-card p,
+.coffee-card p {
+  margin: 0;
+}
+
+.coffee-title {
+  color: var(--soong-ink);
+  font-family: var(--soong-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.45;
+  -webkit-text-stroke: calc(.3px * var(--soong-hand-stroke)) currentColor;
+}
+
+.coffee-note {
+  margin-top: 2px !important;
+  color: var(--soong-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.coffee-btn.lang-block {
+  flex: none;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: var(--soong-blue);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background .16s ease, transform .16s ease;
+}
+
+html:not([data-lang="en"]) .coffee-btn[data-lang="zh"],
+html[data-lang="en"] .coffee-btn[data-lang="en"] {
+  display: inline-flex;
+}
+
+.coffee-btn:hover,
+.coffee-btn:focus-visible {
+  background: #A37828;
+  color: #fff;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .coffee-card {
+  border-color: rgba(232, 188, 90, .22);
+  background: #1B2730;
+}
+
+[data-theme="dark"] .coffee-steam i {
+  background: rgba(200, 216, 226, .45);
+}
+
+/* The theme's blue turns pale in dark mode; keep white text readable. */
+[data-theme="dark"] .coffee-btn.lang-block {
+  background: #3E6A88;
+}
+
+[data-theme="dark"] .coffee-btn:hover,
+[data-theme="dark"] .coffee-btn:focus-visible {
+  background: #A37828;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coffee-card:hover .coffee-steam i,
+  .coffee-card:focus-within .coffee-steam i,
+  .coffee-card.is-sent .coffee-heart {
+    animation: none;
+  }
+
+  .coffee-btn { transition: none; }
+}
+
+@media (max-width: 600px) {
+  .coffee-card {
+    flex-wrap: wrap;
+    gap: 12px 14px;
+    padding: 16px;
+  }
+
+  .coffee-btn.lang-block {
+    width: 100%;
+    justify-content: center;
   }
 }
