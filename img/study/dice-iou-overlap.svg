@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" role="img" aria-labelledby="dice-title dice-desc">
+  <title id="dice-title">Dice 与 IoU 的重叠关系示意图</title>
+  <desc id="dice-desc">紫色预测区域与绿色真实区域重叠，金色部分为真正例 TP，两侧分别为误报 FP 和漏报 FN；右侧对比 Dice 与 IoU 的公式。</desc>
+  <defs>
+    <filter id="paper" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" seed="8" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="softNoise">
+        <feFuncA type="table" tableValues="0 0.075"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="softNoise" mode="multiply"/>
+    </filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#51493f" flood-opacity="0.16"/>
+    </filter>
+    <path id="prediction-shape" d="M98 273C86 221 110 157 160 128C208 100 273 111 306 151C339 191 341 255 309 299C278 342 217 368 165 350C125 336 106 307 98 273Z"/>
+    <path id="truth-shape" d="M225 151C269 116 337 111 382 140C430 171 450 229 431 281C412 331 360 362 307 353C256 345 219 308 208 259C199 218 199 172 225 151Z"/>
+    <clipPath id="prediction-clip"><use href="#prediction-shape"/></clipPath>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2D783"/>
+      <stop offset="1" stop-color="#D9B350"/>
+    </linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#756f67" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="960" height="500" rx="26" fill="#F6F0E6"/>
+  <rect width="960" height="500" rx="26" fill="url(#grid)"/>
+  <path d="M0 420C126 386 214 467 343 436C474 404 558 373 689 425C789 465 872 448 960 405V500H0Z" fill="#CBDAD5" opacity="0.35"/>
+  <path d="M0 455C152 424 260 493 405 457C567 417 699 478 960 430V500H0Z" fill="#D8CBE6" opacity="0.28"/>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="54" y="55" font-size="14" font-weight="700" letter-spacing="2.6" fill="#A17D31">重叠指标</text>
+    <text x="54" y="88" font-size="27" font-weight="700" fill="#302D2A">重叠度量，看的是哪一块？</text>
+    <text x="54" y="113" font-size="14" fill="#716B64">预测区域 P 与真实标注 G 的交、并关系</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="54" y="139" width="430" height="281" rx="24" fill="#FFFCF7" stroke="#E7DED0"/>
+  </g>
+  <g filter="url(#paper)">
+    <use href="#prediction-shape" fill="#B8A5D7" stroke="#75629C" stroke-width="3"/>
+    <use href="#truth-shape" fill="#9EC6B6" stroke="#4E826F" stroke-width="3"/>
+    <use href="#truth-shape" fill="url(#gold)" clip-path="url(#prediction-clip)"/>
+  </g>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif" text-anchor="middle">
+    <g transform="translate(151 239)">
+      <rect x="-32" y="-24" width="64" height="48" rx="14" fill="#FFFDF9" fill-opacity="0.88"/>
+      <text y="1" font-size="19" font-weight="800" fill="#59447F">FP</text>
+      <text y="18" font-size="11" fill="#756B81">误报</text>
+    </g>
+    <g transform="translate(273 238)">
+      <rect x="-36" y="-27" width="72" height="54" rx="15" fill="#FFF9E8" fill-opacity="0.92" stroke="#D7AE43" stroke-opacity="0.55"/>
+      <text y="0" font-size="20" font-weight="800" fill="#735817">TP</text>
+      <text y="19" font-size="11" fill="#8B702F">交集</text>
+    </g>
+    <g transform="translate(390 239)">
+      <rect x="-32" y="-24" width="64" height="48" rx="14" fill="#FFFDF9" fill-opacity="0.88"/>
+      <text y="1" font-size="19" font-weight="800" fill="#2E6855">FN</text>
+      <text y="18" font-size="11" fill="#5E7A70">漏报</text>
+    </g>
+  </g>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <circle cx="128" cy="387" r="6" fill="#8F7AB6"/>
+    <text x="141" y="392" font-size="13" fill="#5E5862">P · 模型预测</text>
+    <circle cx="270" cy="387" r="6" fill="#6EA28E"/>
+    <text x="283" y="392" font-size="13" fill="#5E5862">G · 真实标注</text>
+    <circle cx="404" cy="387" r="6" fill="#DFB84E"/>
+    <text x="417" y="392" font-size="13" fill="#5E5862">TP · 重合区域</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="518" y="139" width="388" height="128" rx="22" fill="#FFFDF9" stroke="#E6DDD0"/>
+    <rect x="518" y="286" width="388" height="134" rx="22" fill="#FFFDF9" stroke="#E6DDD0"/>
+  </g>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <rect x="542" y="162" width="68" height="30" rx="15" fill="#EEE6F7"/>
+    <text x="576" y="182" text-anchor="middle" font-size="14" font-weight="800" fill="#65508C">Dice</text>
+    <text x="542" y="222" font-family="Georgia,'Times New Roman',serif" font-size="22" font-weight="700" fill="#302D2A">2·TP / (2·TP + FP + FN)</text>
+    <text x="542" y="248" font-size="13" fill="#746E68">交集计算两次，通常数值更高</text>
+
+    <rect x="542" y="309" width="68" height="30" rx="15" fill="#E2F0EA"/>
+    <text x="576" y="329" text-anchor="middle" font-size="14" font-weight="800" fill="#376E5B">IoU</text>
+    <text x="542" y="369" font-family="Georgia,'Times New Roman',serif" font-size="22" font-weight="700" fill="#302D2A">TP / (TP + FP + FN)</text>
+    <text x="542" y="397" font-size="13" fill="#746E68">分母就是预测与标注的并集</text>
+  </g>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <path d="M562 449H862" stroke="#C8BFAA" stroke-width="1.5" stroke-dasharray="4 7"/>
+    <circle cx="562" cy="449" r="4" fill="#D7B253"/>
+    <circle cx="862" cy="449" r="4" fill="#D7B253"/>
+    <rect x="600" y="432" width="226" height="34" rx="17" fill="#EFE5CA"/>
+    <text x="713" y="454" text-anchor="middle" font-size="13" font-weight="700" fill="#715A25">Dice = 2·IoU / (1 + IoU)</text>
+  </g>
+</svg>

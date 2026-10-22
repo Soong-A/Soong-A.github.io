@@ -1,0 +1,418 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>MM-UNet 论文精读专题：前列腺 MRI 分割架构阅读路线 | Soong AI Notes</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F8FBFC"><meta name="description" content="MM-UNet 是用于 3D 前列腺 MRI 分割的 U 形网络。本专题按阅读顺序梳理背景、整体架构、Res2Net 编码器，以及 AFFM、GCM、MACM 三个模块。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MM-UNet 论文精读专题：前列腺 MRI 分割架构阅读路线">
+<meta property="og:url" content="https://soong-a.github.io/series/mm-unet/">
+<meta property="og:site_name" content="Soong AI Notes">
+<meta property="og:description" content="MM-UNet 是用于 3D 前列腺 MRI 分割的 U 形网络。本专题按阅读顺序梳理背景、整体架构、Res2Net 编码器，以及 AFFM、GCM、MACM 三个模块。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-10-22T11:30:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T16:06:41.535Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="机器学习, 深度学习, 计算机视觉, 医学影像, 医学图像分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/avatar.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/series/mm-unet/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#101722')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F8FBFC')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(() => {
+  const hostname = window.location.hostname
+  const isLocalPreview = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local')
+
+  window.soongAnalyticsEnabled = !isLocalPreview
+
+  // Keep theme/PJAX integrations safe on localhost without loading or
+  // sending anything to the production Analytics property.
+  if (isLocalPreview) {
+    window.gtag = () => {}
+    return
+  }
+
+  const measurementId = 'G-EL6GS17XHJ'
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(loader)
+
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', measurementId)
+  btf.addGlobalFn('pjaxComplete', () => {
+    window.gtag('config', measurementId, {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    })
+  }, 'google_analytics')
+})()
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'MM-UNet 论文精读专题：前列腺 MRI 分割架构阅读路线',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/caveat-brush@5.1.0/index.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/custom.css?v=20261021ap"><link rel="stylesheet" href="/css/pixel.css?v=20261021c"><link rel="preload" as="image" href="/img/index1.webp"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><script src="/js/card-transition.js?v=20261021a"></script><meta name="generator" content="Hexo 7.3.0"><script>(function(){try{var p=new URLSearchParams(location.search).get("lang");var l=p||localStorage.getItem("site-lang");if(l==="en")document.documentElement.setAttribute("data-lang","en")}catch(e){}})()</script><style>html:not([data-lang="en"]) .lang-block[data-lang="en"],html[data-lang="en"] .lang-block[data-lang="zh"],html:not([data-lang="en"]) #card-toc li[data-lang="en"],html[data-lang="en"] #card-toc li[data-lang="zh"]{display:none!important}</style></head><body><div id="web_bg" style="background-image: url(/img/index-soft.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-author"><div class="sidebar-author-name">Soong</div><div class="sidebar-author-role">AI × Medical Imaging</div><div class="sidebar-author-desc">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="sidebar-author-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub ↗</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email ↗</span></a></div></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/archives/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><button class="sidebar-darkmode" type="button"><i class="fas fa-adjust" aria-hidden="true"></i><span>切换夜间模式</span></button></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong AI Notes</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">MM-UNet 论文精读专题：前列腺 MRI 分割架构阅读路线</h1></header><main class="layout" id="content-inner"><div id="page"><div class="page-title">MM-UNet 论文精读专题：前列腺 MRI 分割架构阅读路线</div><div class="container" id="article-container"><div class="lang-block" data-lang="zh">
+
+<p class="series-intro">MM-UNet（A mixed Mamba U-net for prostate segmentation in MR images）是一个用于 3D 前列腺 MRI 分割的 U 形网络。它在经典 U-Net 骨架上做了三处改动：用 <strong>AFFM</strong> 筛选跳跃连接里的噪声，用 <strong>GCM</strong>（Mamba）在瓶颈处引入全局上下文，用 <strong>MACM</strong> 适应各向异性的 3D 分辨率。这个专题把相关笔记按阅读顺序串起来。</p>
+
+<h2 id="MM-UNet-解决什么问题"><a href="#MM-UNet-解决什么问题" class="headerlink" title="MM-UNet 解决什么问题"></a>MM-UNet 解决什么问题</h2><table>
+<thead>
+<tr>
+<th align="left">难题</th>
+<th align="left">具体表现</th>
+<th align="left">对应模块</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">噪声与融合</td>
+<td align="left">低层特征细节多，但背景噪声也多，直接拼接会把噪声带进解码器</td>
+<td align="left">AFFM</td>
+</tr>
+<tr>
+<td align="left">全局关系</td>
+<td align="left">CNN 的感受野有限，Transformer 的计算量随尺寸平方增长</td>
+<td align="left">GCM</td>
+</tr>
+<tr>
+<td align="left">各向异性</td>
+<td align="left">层内分辨率高、层间分辨率低，标准 3x3x3 卷积不匹配</td>
+<td align="left">MACM</td>
+</tr>
+</tbody></table>
+<h2 id="完整架构图"><a href="#完整架构图" class="headerlink" title="完整架构图"></a>完整架构图</h2><p><img src="/img/study/mm-unet-architecture.svg" alt="MM-UNet 完整架构图：3D Res2Net 编码器、瓶颈处的 GCM、解码器每一级的 AFFM 与 MACM，金色虚线是跳跃连接"></p>
+<p>信息流可以概括为：<strong>编码器逐级提取多尺度特征 → GCM 在最深层补上全局上下文 → 解码器每一级先用 AFFM 融合高低层特征，再用 MACM 做多尺度各向异性卷积 → 输出分割掩膜</strong>。</p>
+<h2 id="前置知识"><a href="#前置知识" class="headerlink" title="前置知识"></a>前置知识</h2><table>
+<thead>
+<tr>
+<th align="left">如果你不熟悉</th>
+<th align="left">先读</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">U-Net 与跳跃连接</td>
+<td align="left"><a href="/2026/10/22/unet-architecture/">U-Net 结构详解</a></td>
+</tr>
+<tr>
+<td align="left">通道注意力（AFFM 的基础）</td>
+<td align="left"><a href="/2025/11/27/SENet/">SENet 通道注意力详解</a></td>
+</tr>
+<tr>
+<td align="left">特征拼接与参数效率</td>
+<td align="left"><a href="/2025/11/26/DenseNet/">DenseNet 网络详解</a></td>
+</tr>
+<tr>
+<td align="left">参数量与计算量的估算</td>
+<td align="left"><a href="/2025/12/16/parameter-count/">参数量怎么计算</a>、<a href="/2025/12/16/GFLOPs/">GFLOPs 怎么计算</a></td>
+</tr>
+</tbody></table>
+<h2 id="推荐阅读顺序"><a href="#推荐阅读顺序" class="headerlink" title="推荐阅读顺序"></a>推荐阅读顺序</h2><ol class="series-path">
+<li><a href="/2025/11/11/mm-unet-background/">前列腺 MRI 分割为什么难？CNN、Transformer 与 MM-UNet 对比</a><p>研究脉络：CNN 视野有限，Transformer 计算量高，中间留下了什么缺口。</p></li>
+<li><a href="/2025/11/12/mm-unet-overview/">MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</a><p>先看全局：三个创新点分别解决什么，信息怎样在网络里流动。</p></li>
+<li><a href="/2025/11/12/mm-unet-res2net/">MM-UNet 3D Res2Net 编码器详解</a><p>编码器：为什么选 Res2Net，2D 权重怎样扩展成 3D。</p></li>
+<li><a href="/2025/11/12/mm-unet-affm/">MM-UNet AFFM 模块详解</a><p>自适应特征融合：用通道权重筛选低层细节，抑制背景噪声。</p></li>
+<li><a href="/2025/11/13/mm-unet-gcm/">MM-UNet GCM 模块详解</a><p>把 3D 特征展开成序列，用 Mamba 以线性复杂度建模全局上下文。</p></li>
+<li><a href="/2025/11/13/mm-unet-macm/">MM-UNet MACM 模块详解</a><p>四个尺度的各向异性卷积分支，兼顾切片内结构与切片间连续性。</p></li>
+</ol>
+
+<h2 id="总结：怎样选择"><a href="#总结：怎样选择" class="headerlink" title="总结：怎样选择"></a>总结：怎样选择</h2><table>
+<thead>
+<tr>
+<th align="left">你的数据与目标</th>
+<th align="left">值得借鉴的部分</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">跳跃连接里背景噪声明显</td>
+<td align="left">AFFM 式的通道加权融合</td>
+</tr>
+<tr>
+<td align="left">目标需要大范围上下文，显存有限</td>
+<td align="left">GCM：用状态空间模型替代全局注意力</td>
+</tr>
+<tr>
+<td align="left">3D 数据层间分辨率明显低于层内</td>
+<td align="left">MACM：分解式、各向异性卷积</td>
+</tr>
+<tr>
+<td align="left">只想要一个可靠基线</td>
+<td align="left">先用调好的 <a href="/2026/10/22/unet-architecture/">U-Net &#x2F; nnU-Net</a>，再判断是否需要这些模块</td>
+</tr>
+</tbody></table>
+<h2 id="下一步阅读"><a href="#下一步阅读" class="headerlink" title="下一步阅读"></a>下一步阅读</h2><ul>
+<li>想了解训练目标：<a href="/2026/10/22/dice-loss/">Dice Loss 公式、代码与常见错误</a></li>
+<li>想知道怎样评价结果：<a href="/2026/10/22/segmentation-metrics/">Dice、IoU、HD95 评价指标详解</a></li>
+<li>想看更大的图景：<a href="/2025/11/19/medical-imaging-model-map/">医学影像深度学习模型全景</a></li>
+</ul>
+<p>资料来源：<a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41598-024-71045-7">A mixed Mamba U-net for prostate segmentation in MR images</a></p>
+</div>
+<div class="lang-block" data-lang="en" lang="en">
+
+<p class="series-intro">MM-UNet (A mixed Mamba U-net for prostate segmentation in MR images) is a U-shaped network for 3D prostate MRI segmentation. It changes the classic U-Net in three places: <strong>AFFM</strong> filters the noise in skip connections, <strong>GCM</strong> (Mamba) brings global context into the bottleneck, and <strong>MACM</strong> fits the anisotropic 3D resolution. This series strings the related notes together in reading order.</p>
+
+<h2 id="What-problem-does-MM-UNet-solve"><a href="#What-problem-does-MM-UNet-solve" class="headerlink" title="What problem does MM-UNet solve"></a>What problem does MM-UNet solve</h2><table>
+<thead>
+<tr>
+<th align="left">Difficulty</th>
+<th align="left">What it looks like</th>
+<th align="left">Module</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Noise and fusion</td>
+<td align="left">Low-level features have detail but also background noise; plain concatenation passes it on to the decoder</td>
+<td align="left">AFFM</td>
+</tr>
+<tr>
+<td align="left">Global relations</td>
+<td align="left">A CNN’s receptive field is limited, and a Transformer’s cost grows with the square of the size</td>
+<td align="left">GCM</td>
+</tr>
+<tr>
+<td align="left">Anisotropy</td>
+<td align="left">High in-plane but low through-plane resolution; a standard 3x3x3 kernel does not fit</td>
+<td align="left">MACM</td>
+</tr>
+</tbody></table>
+<h2 id="Full-architecture"><a href="#Full-architecture" class="headerlink" title="Full architecture"></a>Full architecture</h2><p><img src="/img/study/mm-unet-architecture.svg" alt="MM-UNet architecture: 3D Res2Net encoder, GCM at the bottleneck, AFFM and MACM at every decoder stage; gold dashed lines are skip connections"></p>
+<p>In one line: <strong>the encoder extracts multi-scale features → GCM adds global context at the deepest level → at each decoder stage AFFM fuses high- and low-level features, then MACM applies multi-scale anisotropic convolutions → a segmentation mask comes out</strong>.</p>
+<h2 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h2><table>
+<thead>
+<tr>
+<th align="left">If you are not familiar with</th>
+<th align="left">Read first</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">U-Net and skip connections</td>
+<td align="left"><a href="/2026/10/22/unet-architecture/">U-Net explained</a></td>
+</tr>
+<tr>
+<td align="left">Channel attention (the basis of AFFM)</td>
+<td align="left"><a href="/2025/11/27/SENet/">SENet explained</a></td>
+</tr>
+<tr>
+<td align="left">Concatenation and parameter efficiency</td>
+<td align="left"><a href="/2025/11/26/DenseNet/">DenseNet explained</a></td>
+</tr>
+<tr>
+<td align="left">Estimating parameters and compute</td>
+<td align="left"><a href="/2025/12/16/parameter-count/">Parameter count</a>, <a href="/2025/12/16/GFLOPs/">GFLOPs</a></td>
+</tr>
+</tbody></table>
+<h2 id="Recommended-reading-order"><a href="#Recommended-reading-order" class="headerlink" title="Recommended reading order"></a>Recommended reading order</h2><ol class="series-path">
+<li><a href="/2025/11/11/mm-unet-background/">Why is prostate MRI segmentation hard? CNN, Transformer and MM-UNet</a><p>The research thread: CNNs see too little, Transformers cost too much, and the gap in between.</p></li>
+<li><a href="/2025/11/12/mm-unet-overview/">MM-UNet overview: 3D MRI segmentation with AFFM, GCM and MACM</a><p>The whole picture first: what each of the three ideas solves and how information flows.</p></li>
+<li><a href="/2025/11/12/mm-unet-res2net/">MM-UNet 3D Res2Net encoder</a><p>The encoder: why Res2Net, and how 2D weights are extended to 3D.</p></li>
+<li><a href="/2025/11/12/mm-unet-affm/">MM-UNet AFFM module</a><p>Adaptive feature fusion: channel weights keep useful low-level detail and suppress background noise.</p></li>
+<li><a href="/2025/11/13/mm-unet-gcm/">MM-UNet GCM module</a><p>Unfold 3D features into a sequence and model global context with Mamba at linear cost.</p></li>
+<li><a href="/2025/11/13/mm-unet-macm/">MM-UNet MACM module</a><p>Four scales of anisotropic convolution, covering in-slice structure and between-slice continuity.</p></li>
+</ol>
+
+<h2 id="Summary-what-to-borrow"><a href="#Summary-what-to-borrow" class="headerlink" title="Summary: what to borrow"></a>Summary: what to borrow</h2><table>
+<thead>
+<tr>
+<th align="left">Your data and goal</th>
+<th align="left">What is worth borrowing</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Background noise is obvious in skip connections</td>
+<td align="left">AFFM-style channel-weighted fusion</td>
+</tr>
+<tr>
+<td align="left">The target needs wide context and memory is tight</td>
+<td align="left">GCM: a state space model instead of global attention</td>
+</tr>
+<tr>
+<td align="left">Through-plane resolution is much lower than in-plane</td>
+<td align="left">MACM: factorised, anisotropic convolutions</td>
+</tr>
+<tr>
+<td align="left">You just need a dependable baseline</td>
+<td align="left">Start with a tuned <a href="/2026/10/22/unet-architecture/">U-Net &#x2F; nnU-Net</a>, then decide whether these modules are needed</td>
+</tr>
+</tbody></table>
+<h2 id="Where-to-go-next"><a href="#Where-to-go-next" class="headerlink" title="Where to go next"></a>Where to go next</h2><ul>
+<li>The training objective: <a href="/2026/10/22/dice-loss/">Dice Loss: formula, code and common mistakes</a></li>
+<li>How to evaluate results: <a href="/2026/10/22/segmentation-metrics/">Dice, IoU and HD95 explained</a></li>
+<li>The bigger picture: <a href="/2025/11/19/medical-imaging-model-map/">Deep learning models for medical imaging</a></li>
+</ul>
+<p>Source: <a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41598-024-71045-7">A mixed Mamba U-net for prostate segmentation in MR images</a></p>
+</div>
+</div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info card-researcher is-compact"><div class="researcher-head"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="researcher-id"><div class="researcher-name-row"><div class="author-info-name">Soong</div><span class="researcher-status" title="持续记录中"><span class="researcher-status-dot" aria-hidden="true"></span><span class="researcher-status-text">持续记录中</span></span></div><div class="researcher-role">AI × Medical Imaging</div></div></div><div class="author-info-description">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="researcher-stats"><a href="/archives/"><strong>18</strong><span class="lang-block" data-lang="zh">文章</span><span class="lang-block" data-lang="en" lang="en">Articles</span></a><a href="/archives/"><strong>5</strong><span class="lang-block" data-lang="zh">主题</span><span class="lang-block" data-lang="en" lang="en">Topics</span></a><a href="/tags/"><strong>31</strong><span class="lang-block" data-lang="zh">标签</span><span class="lang-block" data-lang="en" lang="en">Tags</span></a></div><div class="researcher-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a></div></div><div class="sticky_layout"><div class="card-widget card-index"><div class="item-headline"><i class="fas fa-compass"></i><span>研究索引</span></div><div class="index-body" id="card-index-body"><div class="index-section"><div class="index-kicker">分类</div><ul class="index-categories"><li><a href="/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/"><span class="index-name">MM-UNet 论文精读</span><span class="index-count">6</span></a></li><li><a href="/categories/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/"><span class="index-name">医学影像</span><span class="index-count">4</span></a></li><li><a href="/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/"><span class="index-name">课程笔记</span><span class="index-count">3</span></a></li><li><a href="/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"><span class="index-name">基础概念</span><span class="index-count">3</span></a></li><li><a href="/categories/%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/"><span class="index-name">经典网络</span><span class="index-count">2</span></a></li></ul></div><div class="index-section"><div class="index-kicker">最新笔记</div><ul class="index-posts"><li><a href="/2026/10/22/segmentation-metrics/"><span class="index-title">Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区</span><time datetime="2026-10-22T11:20:00.000Z">2026-10-22</time></a></li><li><a href="/2026/10/22/dice-loss/"><span class="index-title">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</span><time datetime="2026-10-22T11:10:00.000Z">2026-10-22</time></a></li><li><a href="/2026/10/22/unet-architecture/"><span class="index-title">U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割</span><time datetime="2026-10-22T11:00:00.000Z">2026-10-22</time></a></li></ul></div><div class="index-section"><div class="index-kicker">核心标签</div><div class="index-tags"><a href="/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</a><a href="/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</a><a href="/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</a><a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</a><a href="/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</a><a href="/tags/MM-UNet/">MM-UNet</a></div></div><div class="index-foot"><a class="index-map" href="/tags/"><i class="fas fa-diagram-project"></i><span>在主题星座中查看</span></a><span class="index-updated"><span>最后更新</span><time datetime="2026-10-22T19:02:42.381Z">2026-10-22</time></span></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer src="/js/site-polish.js?v=20261021g"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/analytics-events.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mvjwrpfc"></script></body></html>

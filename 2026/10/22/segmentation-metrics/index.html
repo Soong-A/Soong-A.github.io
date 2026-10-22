@@ -1,0 +1,439 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区 | Soong AI Notes</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F8FBFC"><meta name="description" content="Dice、IoU、精确率、召回率与 HD95 分别衡量什么，如何用 Python 计算，以及体素间距、空预测、2D 与 3D 平均这些最容易出错的细节。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区">
+<meta property="og:url" content="https://soong-a.github.io/2026/10/22/segmentation-metrics/">
+<meta property="og:site_name" content="Soong AI Notes">
+<meta property="og:description" content="Dice、IoU、精确率、召回率与 HD95 分别衡量什么，如何用 Python 计算，以及体素间距、空预测、2D 与 3D 平均这些最容易出错的细节。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/study/segmentation-metrics.webp">
+<meta property="article:published_time" content="2026-10-22T11:20:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T18:22:26.852Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="医学影像">
+<meta property="article:tag" content="医学图像分割">
+<meta property="article:tag" content="评价指标">
+<meta property="article:tag" content="HD95">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/study/segmentation-metrics.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://soong-a.github.io/2026/10/22/segmentation-metrics/#article",
+      "headline": "Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区",
+      "description": "Dice、IoU、精确率、召回率与 HD95 分别衡量什么，如何用 Python 计算，以及体素间距、空预测、2D 与 3D 平均这些最容易出错的细节。",
+      "url": "https://soong-a.github.io/2026/10/22/segmentation-metrics/",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://soong-a.github.io/2026/10/22/segmentation-metrics/"
+      },
+      "image": [
+        "https://soong-a.github.io/img/study/segmentation-metrics.webp"
+      ],
+      "datePublished": "2026-10-22T11:20:00.000Z",
+      "dateModified": "2026-10-22T18:22:26.852Z",
+      "inLanguage": "zh-CN",
+      "keywords": "医学影像, 医学图像分割, 评价指标, HD95",
+      "author": {
+        "@type": "Person",
+        "name": "Soong",
+        "url": "https://soong-a.github.io"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Soong",
+        "url": "https://soong-a.github.io/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://soong-a.github.io/2026/10/22/segmentation-metrics/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Soong AI Notes",
+          "item": "https://soong-a.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "医学影像",
+          "item": "https://soong-a.github.io/categories/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区",
+          "item": "https://soong-a.github.io/2026/10/22/segmentation-metrics/"
+        }
+      ]
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2026/10/22/segmentation-metrics/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#101722')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F8FBFC')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(() => {
+  const hostname = window.location.hostname
+  const isLocalPreview = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local')
+
+  window.soongAnalyticsEnabled = !isLocalPreview
+
+  // Keep theme/PJAX integrations safe on localhost without loading or
+  // sending anything to the production Analytics property.
+  if (isLocalPreview) {
+    window.gtag = () => {}
+    return
+  }
+
+  const measurementId = 'G-EL6GS17XHJ'
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(loader)
+
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', measurementId)
+  btf.addGlobalFn('pjaxComplete', () => {
+    window.gtag('config', measurementId, {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    })
+  }, 'google_analytics')
+})()
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/caveat-brush@5.1.0/index.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/custom.css?v=20261021ap"><link rel="stylesheet" href="/css/pixel.css?v=20261021c"><link rel="preload" as="image" href="/img/index1.webp"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><script src="/js/card-transition.js?v=20261021a"></script><meta name="generator" content="Hexo 7.3.0"><script>(function(){try{var p=new URLSearchParams(location.search).get("lang");var l=p||localStorage.getItem("site-lang");if(l==="en")document.documentElement.setAttribute("data-lang","en")}catch(e){}})()</script><style>html:not([data-lang="en"]) .lang-block[data-lang="en"],html[data-lang="en"] .lang-block[data-lang="zh"],html:not([data-lang="en"]) #card-toc li[data-lang="en"],html[data-lang="en"] #card-toc li[data-lang="zh"]{display:none!important}</style></head><body><div id="web_bg" style="background-image: url(/img/index-soft.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-author"><div class="sidebar-author-name">Soong</div><div class="sidebar-author-role">AI × Medical Imaging</div><div class="sidebar-author-desc">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="sidebar-author-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub ↗</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email ↗</span></a></div></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/archives/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><button class="sidebar-darkmode" type="button"><i class="fas fa-adjust" aria-hidden="true"></i><span>切换夜间模式</span></button></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/study/segmentation-metrics-header.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong AI Notes</span></a><a class="nav-page-title" href="/"><span class="site-name">Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-22T11:20:00.000Z" title="发表于 2026-10-22 12:20:00">2026-10-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-22T18:22:26.852Z" title="更新于 2026-10-22 19:22:26">2026-10-22</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div class="lang-block" data-lang="zh"><p><em>阅读约 7 分钟</em></p>
+<p>读论文时，分割结果几乎都是用 Dice 和 HD95 汇报。两个数字看起来简单，但”怎么算”里藏着很多细节，不同实现可能差好几个点。这篇笔记把常用指标的含义、公式和最容易出错的地方整理在一起。</p>
+<h2 id="先分清两类指标"><a href="#先分清两类指标" class="headerlink" title="先分清两类指标"></a>先分清两类指标</h2><pre><code class="highlight mermaid">flowchart TD
+  A[分割评价指标] --&gt; B[重叠类：衡量区域有多少重合]
+  A --&gt; C[距离类：衡量边界差多远]
+  B --&gt; D[Dice]
+  B --&gt; E[IoU]
+  B --&gt; F[精确率 / 召回率]
+  C --&gt; G[HD / HD95]
+  C --&gt; H[平均表面距离 ASSD]</code></pre>
+
+<ul>
+<li><strong>重叠类</strong>回答”区域对了多少”，但对边界的细小偏差不敏感。</li>
+<li><strong>距离类</strong>回答”边界偏了多远”，但容易被孤立的错误点影响。</li>
+</ul>
+<p>只报一类会漏掉信息，所以论文通常两类都给。</p>
+<h2 id="重叠类指标"><a href="#重叠类指标" class="headerlink" title="重叠类指标"></a>重叠类指标</h2><p>以混淆矩阵的 TP（预测与真实都是前景）、FP（误报）、FN（漏报）表示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Dice      = 2·TP / (2·TP + FP + FN)</span><br><span class="line">IoU       = TP / (TP + FP + FN)</span><br><span class="line">Precision = TP / (TP + FP)      # 预测为前景的里，有多少是对的</span><br><span class="line">Recall    = TP / (TP + FN)      # 真实前景里，有多少被找到了</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/study/dice-iou-overlap.svg" alt="Dice 与 IoU 的重叠示意图"></p>
+<p>几个关系值得记住：</p>
+<ul>
+<li>Dice 与 IoU 是单调关系：<code>Dice = 2·IoU / (1 + IoU)</code>。所以 Dice 为 0.9 对应 IoU 约 0.82，同一个模型的排序在两者之间不会反转。</li>
+<li>Dice 实际上是 Precision 和 Recall 的调和平均（即 F1）。</li>
+<li>用于对比模型时，Precision 和 Recall 能告诉你模型是偏保守还是偏激进：Precision 低说明误报多，Recall 低说明漏掉了目标。</li>
+</ul>
+<h2 id="距离类指标：HD95"><a href="#距离类指标：HD95" class="headerlink" title="距离类指标：HD95"></a>距离类指标：HD95</h2><p><img src="/img/study/hd95-boundary.svg" alt="HD95 边界距离示意图：孤立错误点会让 HD 很大，HD95 对它更稳健"></p>
+<p>Hausdorff 距离（HD）取预测边界与真实边界之间所有点距离的<strong>最大值</strong>。一个孤立的错误点就能让它变得很大，所以实践中更常用 <strong>HD95</strong>：取第 95 百分位，忽略最差的 5%。</p>
+<p>HD95 的单位是体素或毫米，<strong>越小越好</strong>。要用毫米报告，必须传入体素间距；尤其在层间距明显大于层内分辨率的各向异性数据上，忽略 spacing 会让不同方向的距离失去统一的物理意义。相关背景可以参见 <a href="/2025/11/13/mm-unet-macm/">MACM 的动机</a>。</p>
+<h2 id="Python-计算"><a href="#Python-计算" class="headerlink" title="Python 计算"></a>Python 计算</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> ndimage <span class="keyword">as</span> ndi</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dice</span>(<span class="params">pred, gt, eps=<span class="number">1e-8</span></span>):</span><br><span class="line">    pred, gt = pred.astype(<span class="built_in">bool</span>), gt.astype(<span class="built_in">bool</span>)</span><br><span class="line">    inter = np.logical_and(pred, gt).<span class="built_in">sum</span>()</span><br><span class="line">    <span class="keyword">return</span> (<span class="number">2</span> * inter + eps) / (pred.<span class="built_in">sum</span>() + gt.<span class="built_in">sum</span>() + eps)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">iou</span>(<span class="params">pred, gt, eps=<span class="number">1e-8</span></span>):</span><br><span class="line">    pred, gt = pred.astype(<span class="built_in">bool</span>), gt.astype(<span class="built_in">bool</span>)</span><br><span class="line">    inter = np.logical_and(pred, gt).<span class="built_in">sum</span>()</span><br><span class="line">    union = np.logical_or(pred, gt).<span class="built_in">sum</span>()</span><br><span class="line">    <span class="keyword">return</span> (inter + eps) / (union + eps)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">surface</span>(<span class="params">mask</span>):</span><br><span class="line">    <span class="keyword">return</span> mask &amp; ~ndi.binary_erosion(mask)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">hd95</span>(<span class="params">pred, gt, spacing=(<span class="params"><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span></span>)</span>):</span><br><span class="line">    pred, gt = pred.astype(<span class="built_in">bool</span>), gt.astype(<span class="built_in">bool</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> pred.<span class="built_in">any</span>() <span class="keyword">or</span> <span class="keyword">not</span> gt.<span class="built_in">any</span>():</span><br><span class="line">        <span class="keyword">return</span> np.nan                       <span class="comment"># 空预测或空标注：距离未定义</span></span><br><span class="line">    sp, sg = surface(pred), surface(gt)</span><br><span class="line">    to_gt = ndi.distance_transform_edt(~sg, sampling=spacing)</span><br><span class="line">    to_pred = ndi.distance_transform_edt(~sp, sampling=spacing)</span><br><span class="line">    d = np.concatenate([to_gt[sp], to_pred[sg]])</span><br><span class="line">    <span class="keyword">return</span> np.percentile(d, <span class="number">95</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="六个最容易出错的细节"><a href="#六个最容易出错的细节" class="headerlink" title="六个最容易出错的细节"></a>六个最容易出错的细节</h2><ol>
+<li><strong>2D 切片平均 vs 3D 体积</strong>：对每张切片算 Dice 再平均，和对整个体积算一次 Dice，结果可能差很多，因为含很少目标的切片会被同等对待。要说明采用哪种。</li>
+<li><strong>空预测或空标注</strong>：Dice 在两者都为空时是 0&#x2F;0；HD95 在任一为空时未定义。要明确用 NaN、跳过，还是赋默认值，并在论文里写明。</li>
+<li><strong>体素间距</strong>：HD95 必须乘上真实间距，否则数值的单位不统一。</li>
+<li><strong>预处理不一致</strong>：评估时必须把预测重采样回原始空间，在原始分辨率上算指标，而不是在裁剪、缩放后的图上算。</li>
+<li><strong>多类别</strong>：逐类报告，不要把背景算进平均（原因与 <a href="/2026/10/22/dice-loss/">Dice Loss 里的情况</a> 相同）。</li>
+<li><strong>只报告平均值</strong>：分割表现常常有几个失败病例拖累。至少同时给出标准差、中位数或箱线图，对比两个模型时用配对检验（如 Wilcoxon 符号秩检验）。</li>
+</ol>
+<h2 id="怎样选择报告哪些指标"><a href="#怎样选择报告哪些指标" class="headerlink" title="怎样选择报告哪些指标"></a>怎样选择报告哪些指标</h2><table>
+<thead>
+<tr>
+<th align="left">场景</th>
+<th align="left">推荐</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">通用分割对比</td>
+<td align="left">Dice + HD95</td>
+</tr>
+<tr>
+<td align="left">关心误报和漏报的平衡</td>
+<td align="left">再加 Precision 和 Recall</td>
+</tr>
+<tr>
+<td align="left">小目标（病灶）</td>
+<td align="left">Dice 会很不稳定，补充 HD95 和逐病例结果</td>
+</tr>
+<tr>
+<td align="left">临床勾画、放疗计划</td>
+<td align="left">补充距离类指标，直接表达边界偏差的毫米数</td>
+</tr>
+</tbody></table>
+<p>指标和训练目标不必一致，但要知道它们的盲区：<a href="/2026/10/22/dice-loss/">Dice Loss</a> 优化重叠，不直接约束边界；改进特征融合（例如 <a href="/2025/11/12/mm-unet-affm/">AFFM</a> 抑制背景噪声）可能改善 HD95，但仍需用实验单独验证。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ul>
+<li>Dice 和 IoU 回答”重合了多少”，HD95 回答”边界偏了多远”。</li>
+<li>同一个模型，换一种平均方式或忽略体素间距，数字就会变。</li>
+<li>对比论文数字之前，先确认它们的口径一致。</li>
+</ul>
+<p>相关阅读：<a href="/2026/10/22/unet-architecture/">U-Net 结构详解</a>，<a href="/2025/11/19/medical-imaging-model-map/">医学影像深度学习模型全景</a>。</p>
+<aside class="seo-related" aria-label="相关阅读"><h2>相关阅读</h2><ul><li><a href="/2026/10/22/dice-loss/">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</a></li><li><a href="/2026/10/22/unet-architecture/">U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割</a></li><li><a href="/2025/11/19/medical-imaging-model-map/">医学影像深度学习模型全景：CNN、U-Net、Transformer 与基础模型</a></li></ul></aside></div><div class="lang-block" data-lang="en" lang="en"><p><em>7 min read</em></p>
+<p>Segmentation papers almost always report Dice and HD95. The two numbers look simple, but how they are computed hides many details, and different implementations can differ by several points. These notes collect what the common metrics mean, their formulas, and where people trip.</p>
+<h2 id="en-Two-families-of-metrics"><a href="#en-Two-families-of-metrics" class="headerlink" title="Two families of metrics"></a>Two families of metrics</h2><pre><code class="highlight mermaid">flowchart TD
+  A[Segmentation metrics] --&gt; B[Overlap: how much the regions coincide]
+  A --&gt; C[Distance: how far the boundaries are apart]
+  B --&gt; D[Dice]
+  B --&gt; E[IoU]
+  B --&gt; F[Precision / recall]
+  C --&gt; G[HD / HD95]
+  C --&gt; H[Average surface distance ASSD]</code></pre>
+
+<ul>
+<li><strong>Overlap</strong> answers “how much of the region is right” but barely notices small boundary errors.</li>
+<li><strong>Distance</strong> answers “how far off is the boundary” but is easily swayed by isolated bad points.</li>
+</ul>
+<p>Reporting only one family loses information, so papers usually give both.</p>
+<h2 id="en-Overlap-metrics"><a href="#en-Overlap-metrics" class="headerlink" title="Overlap metrics"></a>Overlap metrics</h2><p>Using TP (foreground in both), FP (false alarm) and FN (miss):</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Dice      = 2·TP / (2·TP + FP + FN)</span><br><span class="line">IoU       = TP / (TP + FP + FN)</span><br><span class="line">Precision = TP / (TP + FP)      # of what you predicted, how much is right</span><br><span class="line">Recall    = TP / (TP + FN)      # of the true foreground, how much you found</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/study/dice-iou-overlap-en.svg" alt="Dice and IoU overlap"></p>
+<p>Worth remembering:</p>
+<ul>
+<li>Dice and IoU are monotonically related: <code>Dice = 2·IoU / (1 + IoU)</code>. A Dice of 0.9 is an IoU of about 0.82, and model rankings do not flip between them.</li>
+<li>Dice is the harmonic mean of precision and recall (that is, F1).</li>
+<li>Precision and recall show whether a model is conservative or aggressive: low precision means many false alarms, low recall means missed targets.</li>
+</ul>
+<h2 id="en-Distance-metric-HD95"><a href="#en-Distance-metric-HD95" class="headerlink" title="Distance metric: HD95"></a>Distance metric: HD95</h2><p><img src="/img/study/hd95-boundary-en.svg" alt="HD95 boundary distance: one isolated error makes HD large, HD95 is more robust"></p>
+<p>The Hausdorff distance (HD) is the <strong>maximum</strong> distance between predicted and true boundary points. One isolated bad point can make it huge, so <strong>HD95</strong> — the 95th percentile, ignoring the worst 5% — is more common.</p>
+<p>HD95 is in voxels or millimetres, and <strong>lower is better</strong>. To report millimetres you must pass the voxel spacing; on anisotropic data (such as prostate MR with 3 mm slices and 0.5 mm in-plane, the motivation for <a href="/2025/11/13/mm-unet-macm/">MACM</a>) numbers without spacing have no physical meaning.</p>
+<h2 id="en-Python"><a href="#en-Python" class="headerlink" title="Python"></a>Python</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> ndimage <span class="keyword">as</span> ndi</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dice</span>(<span class="params">pred, gt, eps=<span class="number">1e-8</span></span>):</span><br><span class="line">    pred, gt = pred.astype(<span class="built_in">bool</span>), gt.astype(<span class="built_in">bool</span>)</span><br><span class="line">    inter = np.logical_and(pred, gt).<span class="built_in">sum</span>()</span><br><span class="line">    <span class="keyword">return</span> (<span class="number">2</span> * inter + eps) / (pred.<span class="built_in">sum</span>() + gt.<span class="built_in">sum</span>() + eps)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">iou</span>(<span class="params">pred, gt, eps=<span class="number">1e-8</span></span>):</span><br><span class="line">    pred, gt = pred.astype(<span class="built_in">bool</span>), gt.astype(<span class="built_in">bool</span>)</span><br><span class="line">    inter = np.logical_and(pred, gt).<span class="built_in">sum</span>()</span><br><span class="line">    union = np.logical_or(pred, gt).<span class="built_in">sum</span>()</span><br><span class="line">    <span class="keyword">return</span> (inter + eps) / (union + eps)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">surface</span>(<span class="params">mask</span>):</span><br><span class="line">    <span class="keyword">return</span> mask &amp; ~ndi.binary_erosion(mask)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">hd95</span>(<span class="params">pred, gt, spacing=(<span class="params"><span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span></span>)</span>):</span><br><span class="line">    pred, gt = pred.astype(<span class="built_in">bool</span>), gt.astype(<span class="built_in">bool</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> pred.<span class="built_in">any</span>() <span class="keyword">or</span> <span class="keyword">not</span> gt.<span class="built_in">any</span>():</span><br><span class="line">        <span class="keyword">return</span> np.nan                       <span class="comment"># empty prediction or mask: undefined</span></span><br><span class="line">    sp, sg = surface(pred), surface(gt)</span><br><span class="line">    to_gt = ndi.distance_transform_edt(~sg, sampling=spacing)</span><br><span class="line">    to_pred = ndi.distance_transform_edt(~sp, sampling=spacing)</span><br><span class="line">    d = np.concatenate([to_gt[sp], to_pred[sg]])</span><br><span class="line">    <span class="keyword">return</span> np.percentile(d, <span class="number">95</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="en-Six-details-that-go-wrong"><a href="#en-Six-details-that-go-wrong" class="headerlink" title="Six details that go wrong"></a>Six details that go wrong</h2><ol>
+<li><strong>2D slice average vs 3D volume</strong> — averaging per-slice Dice and computing one Dice on the volume can differ a lot, since slices with little target count equally. State which one you use.</li>
+<li><strong>Empty prediction or mask</strong> — Dice is 0&#x2F;0 when both are empty; HD95 is undefined when either is. Decide between NaN, skipping, or a default, and say so.</li>
+<li><strong>Voxel spacing</strong> — HD95 must use the real spacing, or units are inconsistent.</li>
+<li><strong>Inconsistent preprocessing</strong> — resample predictions back to the original space and compute metrics at original resolution, not on cropped or rescaled images.</li>
+<li><strong>Multi-class</strong> — report per class, and keep background out of the average (the same reason as in <a href="/2026/10/22/dice-loss/">Dice Loss</a>).</li>
+<li><strong>Mean only</strong> — a few failed cases often drag the result. Give the standard deviation, median or a box plot, and compare two models with a paired test such as Wilcoxon signed-rank.</li>
+</ol>
+<h2 id="en-Which-metrics-to-report"><a href="#en-Which-metrics-to-report" class="headerlink" title="Which metrics to report"></a>Which metrics to report</h2><table>
+<thead>
+<tr>
+<th align="left">Setting</th>
+<th align="left">Recommended</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">General model comparison</td>
+<td align="left">Dice + HD95</td>
+</tr>
+<tr>
+<td align="left">Balance of false alarms and misses</td>
+<td align="left">Add precision and recall</td>
+</tr>
+<tr>
+<td align="left">Small targets (lesions)</td>
+<td align="left">Dice is unstable; add HD95 and per-case results</td>
+</tr>
+<tr>
+<td align="left">Clinical contouring, radiotherapy planning</td>
+<td align="left">Distance metrics are closer to what matters; a few mm of boundary error counts more than overlap</td>
+</tr>
+</tbody></table>
+<p>Metrics need not match the training objective, but know their blind spots: <a href="/2026/10/22/dice-loss/">Dice Loss</a> optimises overlap and does not constrain the boundary directly, which is why improvements such as <a href="/2025/11/12/mm-unet-affm/">AFFM</a> suppressing background noise often show up in HD95.</p>
+<h2 id="en-Summary"><a href="#en-Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>Dice and IoU say how much overlaps; HD95 says how far the boundary is off.</li>
+<li>For the same model, a different averaging scheme or ignoring spacing changes the number.</li>
+<li>Before comparing with a paper’s numbers, confirm the conventions match.</li>
+</ul>
+<p>Related: <a href="/2026/10/22/unet-architecture/">U-Net explained</a>, <a href="/2025/11/19/medical-imaging-model-map/">Deep learning models for medical imaging</a>.</p>
+<aside class="seo-related" aria-label="Related reading"><h2>Related reading</h2><ul><li><a href="/2026/10/22/dice-loss/">Dice Loss: Formula, Code and Common Mistakes in Medical Image Segmentation</a></li><li><a href="/2026/10/22/unet-architecture/">U-Net Explained: Encoder, Skip Connections and Decoder for Medical Image Segmentation</a></li><li><a href="/2025/11/19/medical-imaging-model-map/">Deep Learning Models for Medical Imaging: CNNs, U-Net, Transformers, and Foundation Models</a></li></ul></aside></div></article><aside class="coffee-card"><div class="coffee-cup" aria-hidden="true"><span class="coffee-steam"><i></i><i></i><i></i></span><span class="coffee-body"></span><span class="coffee-saucer"></span><span class="coffee-heart">♥</span></div><div class="coffee-copy"><p class="coffee-title"><span class="lang-block" data-lang="zh">这篇笔记有帮到你吗？</span><span class="lang-block" data-lang="en" lang="en">Did this note help?</span></p><p class="coffee-note"><span class="lang-block" data-lang="zh">可以请 Soong 喝杯咖啡。</span><span class="lang-block" data-lang="en" lang="en">You could buy Soong a coffee.</span></p></div><a class="coffee-btn lang-block" data-lang="zh" href="https://ifdian.net/a/Soong" target="_blank" rel="noopener">请我喝咖啡</a><a class="coffee-btn lang-block" data-lang="en" lang="en" href="https://ko-fi.com/soonga" target="_blank" rel="noopener">Buy me a coffee</a></aside><script>(function () {
+  var card = document.currentScript.previousElementSibling;
+  card.querySelectorAll('.coffee-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      card.classList.remove('is-sent');
+      void card.offsetWidth;
+      card.classList.add('is-sent');
+      setTimeout(function () { card.classList.remove('is-sent'); }, 1400);
+    });
+  });
+})();</script><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2026/10/22/segmentation-metrics/">https://soong-a.github.io/2026/10/22/segmentation-metrics/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong AI Notes</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</a><a class="post-meta__tags" href="/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</a><a class="post-meta__tags" href="/tags/%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87/">评价指标</a><a class="post-meta__tags" href="/tags/HD95/">HD95</a></div><div class="post-share"><div class="social-share" data-image="/img/study/segmentation-metrics.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/10/22/dice-loss/" title="Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解" data-article-nav="next"><img class="cover" src="/img/study/dice-loss.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</div></div><div class="info-2"><div class="info-item-1">Dice Loss 的公式推导、PyTorch 实现，以及 5 个最常见的错误：先阈值再求损失、batch 级与样本级混用、空标注除零、多分类含背景。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/10/22/dice-loss/" title="Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解"><img class="cover" src="/img/study/dice-loss.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-22</div><div class="info-item-2">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</div></div><div class="info-2"><div class="info-item-1">Dice Loss 的公式推导、PyTorch 实现，以及 5 个最常见的错误：先阈值再求损失、batch 级与样本级混用、空标注除零、多分类含背景。</div></div></div></a><a class="pagination-related" href="/2025/11/19/medical-imaging-model-map/" title="医学影像深度学习模型全景：CNN、U-Net、Transformer 与基础模型"><img class="cover" src="/img/study/medical-imaging-model-map.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-19</div><div class="info-item-2">医学影像深度学习模型全景：CNN、U-Net、Transformer 与基础模型</div></div><div class="info-2"><div class="info-item-1">从骨干网络到分割、检测、生成与基础模型——一张医学影像深度学习的全景地图与发展时间线。</div></div></div></a><a class="pagination-related" href="/2025/11/12/mm-unet-overview/" title="MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块"><img class="cover" src="/img/study/mm-unet-overview.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</div></div><div class="info-2"><div class="info-item-1">MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</div></div></div></a><a class="pagination-related" href="/2026/10/22/unet-architecture/" title="U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割"><img class="cover" src="/img/study/unet-architecture.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-22</div><div class="info-item-2">U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割</div></div><div class="info-2"><div class="info-item-1">U-Net 为什么是医学图像分割的起点：编码器压缩语义、解码器恢复分辨率，跳跃连接把边界细节送回来，以及 3D U-Net 与 nnU-Net 的演化。</div></div></div></a><a class="pagination-related" href="/2025/11/12/mm-unet-affm/" title="MM-UNet AFFM 模块详解：自适应特征融合如何抑制背景噪声"><img class="cover" src="/img/study/mm-unet-affm.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet AFFM 模块详解：自适应特征融合如何抑制背景噪声</div></div><div class="info-2"><div class="info-item-1">自适应特征融合模块用通道注意力筛选低层细节，再与已经对齐的高层语义特征相加。</div></div></div></a><a class="pagination-related" href="/2025/11/13/mm-unet-macm/" title="MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征"><img class="cover" src="/img/study/mm-unet-macm.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征</div></div><div class="info-2"><div class="info-item-1">用四个尺度的各向异性卷积分支，同时理解切片内结构与切片间连续性，并控制大卷积核的成本。</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info card-researcher is-compact"><div class="researcher-head"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="researcher-id"><div class="researcher-name-row"><div class="author-info-name">Soong</div><span class="researcher-status" title="持续记录中"><span class="researcher-status-dot" aria-hidden="true"></span><span class="researcher-status-text">持续记录中</span></span></div><div class="researcher-role">AI × Medical Imaging</div></div></div><div class="author-info-description">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="researcher-stats"><a href="/archives/"><strong>18</strong><span class="lang-block" data-lang="zh">文章</span><span class="lang-block" data-lang="en" lang="en">Articles</span></a><a href="/archives/"><strong>5</strong><span class="lang-block" data-lang="zh">主题</span><span class="lang-block" data-lang="en" lang="en">Topics</span></a><a href="/tags/"><strong>31</strong><span class="lang-block" data-lang="zh">标签</span><span class="lang-block" data-lang="en" lang="en">Tags</span></a></div><div class="researcher-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%88%E5%88%86%E6%B8%85%E4%B8%A4%E7%B1%BB%E6%8C%87%E6%A0%87"><span class="toc-number">1.</span> <span class="toc-text">先分清两类指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%87%8D%E5%8F%A0%E7%B1%BB%E6%8C%87%E6%A0%87"><span class="toc-number">2.</span> <span class="toc-text">重叠类指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%9D%E7%A6%BB%E7%B1%BB%E6%8C%87%E6%A0%87%EF%BC%9AHD95"><span class="toc-number">3.</span> <span class="toc-text">距离类指标：HD95</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Python-%E8%AE%A1%E7%AE%97"><span class="toc-number">4.</span> <span class="toc-text">Python 计算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E4%B8%AA%E6%9C%80%E5%AE%B9%E6%98%93%E5%87%BA%E9%94%99%E7%9A%84%E7%BB%86%E8%8A%82"><span class="toc-number">5.</span> <span class="toc-text">六个最容易出错的细节</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%8E%E6%A0%B7%E9%80%89%E6%8B%A9%E6%8A%A5%E5%91%8A%E5%93%AA%E4%BA%9B%E6%8C%87%E6%A0%87"><span class="toc-number">6.</span> <span class="toc-text">怎样选择报告哪些指标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">8.</span> <span class="toc-text">相关阅读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Two-families-of-metrics"><span class="toc-number">9.</span> <span class="toc-text">Two families of metrics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Overlap-metrics"><span class="toc-number">10.</span> <span class="toc-text">Overlap metrics</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Distance-metric-HD95"><span class="toc-number">11.</span> <span class="toc-text">Distance metric: HD95</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Python"><span class="toc-number">12.</span> <span class="toc-text">Python</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Six-details-that-go-wrong"><span class="toc-number">13.</span> <span class="toc-text">Six details that go wrong</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Which-metrics-to-report"><span class="toc-number">14.</span> <span class="toc-text">Which metrics to report</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Summary"><span class="toc-number">15.</span> <span class="toc-text">Summary</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">16.</span> <span class="toc-text">Related reading</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer src="/js/site-polish.js?v=20261021g"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/analytics-events.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mvjwrpfc"></script></body></html>

@@ -17,7 +17,7 @@
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/11/mm-unet-background/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/11/thresholding-edges-and-learning/</loc>
@@ -25,23 +25,23 @@
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/12/mm-unet-affm/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/12/mm-unet-overview/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/12/mm-unet-res2net/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/13/mm-unet-gcm/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/13/mm-unet-macm/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-22</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/19/medical-imaging-model-map/</loc>
@@ -64,6 +64,18 @@
     <lastmod>2026-10-21</lastmod>
   </url>
   <url>
+    <loc>https://soong-a.github.io/2026/10/22/dice-loss/</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
+    <loc>https://soong-a.github.io/2026/10/22/segmentation-metrics/</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
+    <loc>https://soong-a.github.io/2026/10/22/unet-architecture/</loc>
+    <lastmod>2026-10-22</lastmod>
+  </url>
+  <url>
     <loc>https://soong-a.github.io/about/</loc>
     <lastmod>2026-10-21</lastmod>
   </url>
@@ -73,5 +85,9 @@
   <url>
     <loc>https://soong-a.github.io/explore/</loc>
     <lastmod>2026-10-21</lastmod>
+  </url>
+  <url>
+    <loc>https://soong-a.github.io/series/mm-unet/</loc>
+    <lastmod>2026-10-22</lastmod>
   </url>
 </urlset>

@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" role="img" aria-labelledby="hd-title hd-desc">
+  <title id="hd-title">HD 与 HD95 边界距离示意图</title>
+  <desc id="hd-desc">绿色真实边界和紫色预测边界大部分距离很短，但预测边界有一个孤立错误点。HD 取最大距离，HD95 取第九十五百分位，因此对孤立异常点更稳健。</desc>
+  <defs>
+    <filter id="paper-hd" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" seed="11" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono" result="softNoise"><feFuncA type="table" tableValues="0 0.075"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" in2="softNoise" mode="multiply"/>
+    </filter>
+    <filter id="shadow-hd" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="7" stdDeviation="7" flood-color="#51493f" flood-opacity="0.16"/>
+    </filter>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#B95A55"/>
+    </marker>
+    <marker id="arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10Z" fill="#C3A34F"/>
+    </marker>
+    <pattern id="grid-hd" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#756f67" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="960" height="500" rx="26" fill="#F6F0E6"/>
+  <rect width="960" height="500" rx="26" fill="url(#grid-hd)"/>
+  <path d="M0 428C129 386 235 474 357 434C474 395 582 386 701 429C811 469 887 446 960 413V500H0Z" fill="#D8CBE6" opacity="0.24"/>
+  <path d="M0 457C146 424 277 492 416 458C578 418 719 477 960 435V500H0Z" fill="#CBDAD5" opacity="0.34"/>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="54" y="55" font-size="14" font-weight="700" letter-spacing="2.6" fill="#A17D31">边界距离</text>
+    <text x="54" y="88" font-size="27" font-weight="700" fill="#302D2A">边界偏了多远？</text>
+    <text x="54" y="113" font-size="14" fill="#716B64">重叠看面积，HD95 看最难对齐的那部分边界</text>
+  </g>
+
+  <g filter="url(#shadow-hd)">
+    <rect x="54" y="139" width="486" height="281" rx="24" fill="#FFFCF7" stroke="#E7DED0"/>
+  </g>
+
+  <g transform="translate(65 130)" filter="url(#paper-hd)">
+    <path d="M88 154C91 92 143 49 213 48C280 47 338 85 351 142C365 199 329 252 267 269C204 286 129 265 101 217C90 197 86 176 88 154Z" fill="#BFD8CD" fill-opacity="0.52" stroke="#4E826F" stroke-width="4"/>
+    <path d="M82 158C88 99 137 61 204 57C242 55 265 35 274 -20C279 35 302 73 342 92C371 106 381 155 363 199C340 253 273 278 207 267C141 257 91 217 82 158Z" fill="#CFC2E2" fill-opacity="0.43" stroke="#75629C" stroke-width="4" stroke-dasharray="10 7" stroke-linecap="round"/>
+
+    <g stroke="#C3A34F" stroke-width="2" marker-start="url(#arrow-gold)" marker-end="url(#arrow-gold)" opacity="0.92">
+      <path d="M107 113L118 120"/>
+      <path d="M154 70L159 82"/>
+      <path d="M321 91L310 103"/>
+      <path d="M354 176L339 174"/>
+      <path d="M289 251L280 237"/>
+      <path d="M143 236L151 221"/>
+    </g>
+    <g fill="#C3A34F">
+      <circle cx="107" cy="113" r="3"/><circle cx="118" cy="120" r="3"/>
+      <circle cx="154" cy="70" r="3"/><circle cx="159" cy="82" r="3"/>
+      <circle cx="321" cy="91" r="3"/><circle cx="310" cy="103" r="3"/>
+      <circle cx="354" cy="176" r="3"/><circle cx="339" cy="174" r="3"/>
+      <circle cx="289" cy="251" r="3"/><circle cx="280" cy="237" r="3"/>
+      <circle cx="143" cy="236" r="3"/><circle cx="151" cy="221" r="3"/>
+    </g>
+
+    <path d="M274 -13L274 50" stroke="#B95A55" stroke-width="3" marker-start="url(#arrow-red)" marker-end="url(#arrow-red)"/>
+    <circle cx="274" cy="-18" r="7" fill="#B95A55"/>
+    <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+      <rect x="297" y="-10" width="112" height="38" rx="12" fill="#FFF8F5" stroke="#E4BBB5"/>
+      <text x="353" y="6" text-anchor="middle" font-size="12" font-weight="700" fill="#984B47">孤立错误点</text>
+      <text x="353" y="21" text-anchor="middle" font-size="10" fill="#9B6B67">距离异常大</text>
+    </g>
+  </g>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <path d="M88 388H112" stroke="#4E826F" stroke-width="4" stroke-linecap="round"/>
+    <text x="121" y="393" font-size="13" fill="#5E5862">真实边界 G</text>
+    <path d="M226 388H250" stroke="#75629C" stroke-width="4" stroke-dasharray="7 5" stroke-linecap="round"/>
+    <text x="260" y="393" font-size="13" fill="#5E5862">预测边界 P</text>
+    <path d="M370 388H394" stroke="#C3A34F" stroke-width="2"/>
+    <text x="403" y="393" font-size="13" fill="#5E5862">点到边界距离</text>
+  </g>
+
+  <g filter="url(#shadow-hd)">
+    <rect x="576" y="139" width="330" height="126" rx="22" fill="#FFFDF9" stroke="#E6DDD0"/>
+    <rect x="576" y="286" width="330" height="134" rx="22" fill="#FFFDF9" stroke="#E6DDD0"/>
+  </g>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <rect x="600" y="162" width="54" height="30" rx="15" fill="#F5DFDC"/>
+    <text x="627" y="182" text-anchor="middle" font-size="14" font-weight="800" fill="#984B47">HD</text>
+    <text x="600" y="220" font-size="20" font-weight="700" fill="#302D2A">取最大距离</text>
+    <text x="600" y="246" font-size="13" fill="#746E68">一个离群点就可能主导结果</text>
+
+    <rect x="600" y="309" width="66" height="30" rx="15" fill="#EEE6F7"/>
+    <text x="633" y="329" text-anchor="middle" font-size="14" font-weight="800" fill="#65508C">HD95</text>
+    <text x="600" y="369" font-size="20" font-weight="700" fill="#302D2A">取第 95 百分位</text>
+    <text x="600" y="395" font-size="13" fill="#746E68">减弱极少数异常距离的影响</text>
+  </g>
+
+  <g transform="translate(710 172)">
+    <path d="M0 27H156" stroke="#D8CFC1" stroke-width="2"/>
+    <g fill="#C3A34F">
+      <circle cx="8" cy="25" r="4"/><circle cx="20" cy="24" r="4"/><circle cx="32" cy="25" r="4"/><circle cx="44" cy="22" r="4"/>
+      <circle cx="56" cy="24" r="4"/><circle cx="68" cy="20" r="4"/><circle cx="80" cy="23" r="4"/><circle cx="92" cy="18" r="4"/>
+      <circle cx="104" cy="20" r="4"/><circle cx="116" cy="15" r="4"/><circle cx="128" cy="17" r="4"/>
+    </g>
+    <circle cx="153" cy="2" r="6" fill="#B95A55"/>
+  </g>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <path d="M612 452H870" stroke="#C8BFAA" stroke-width="1.5" stroke-dasharray="4 7"/>
+    <rect x="618" y="435" width="246" height="34" rx="17" fill="#E5EEE8"/>
+    <text x="741" y="457" text-anchor="middle" font-size="13" font-weight="700" fill="#466F60">单位：体素或毫米 · 越小越好</text>
+  </g>
+</svg>

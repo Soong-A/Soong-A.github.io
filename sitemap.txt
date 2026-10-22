@@ -14,6 +14,10 @@ https://soong-a.github.io/2025/11/26/DenseNet/
 https://soong-a.github.io/2025/11/27/SENet/
 https://soong-a.github.io/2025/12/16/GFLOPs/
 https://soong-a.github.io/2025/12/16/parameter-count/
+https://soong-a.github.io/2026/10/22/dice-loss/
+https://soong-a.github.io/2026/10/22/segmentation-metrics/
+https://soong-a.github.io/2026/10/22/unet-architecture/
 https://soong-a.github.io/about/
 https://soong-a.github.io/archives/
 https://soong-a.github.io/explore/
+https://soong-a.github.io/series/mm-unet/

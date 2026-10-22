@@ -1,0 +1,435 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割 | Soong AI Notes</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F8FBFC"><meta name="description" content="U-Net 为什么是医学图像分割的起点：编码器压缩语义、解码器恢复分辨率，跳跃连接把边界细节送回来，以及 3D U-Net 与 nnU-Net 的演化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割">
+<meta property="og:url" content="https://soong-a.github.io/2026/10/22/unet-architecture/">
+<meta property="og:site_name" content="Soong AI Notes">
+<meta property="og:description" content="U-Net 为什么是医学图像分割的起点：编码器压缩语义、解码器恢复分辨率，跳跃连接把边界细节送回来，以及 3D U-Net 与 nnU-Net 的演化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/study/unet-architecture.webp">
+<meta property="article:published_time" content="2026-10-22T11:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T18:40:10.998Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="卷积神经网络">
+<meta property="article:tag" content="医学影像">
+<meta property="article:tag" content="医学图像分割">
+<meta property="article:tag" content="U-Net">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/study/unet-architecture.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://soong-a.github.io/2026/10/22/unet-architecture/#article",
+      "headline": "U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割",
+      "description": "U-Net 为什么是医学图像分割的起点：编码器压缩语义、解码器恢复分辨率，跳跃连接把边界细节送回来，以及 3D U-Net 与 nnU-Net 的演化。",
+      "url": "https://soong-a.github.io/2026/10/22/unet-architecture/",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://soong-a.github.io/2026/10/22/unet-architecture/"
+      },
+      "image": [
+        "https://soong-a.github.io/img/study/unet-architecture.webp"
+      ],
+      "datePublished": "2026-10-22T11:00:00.000Z",
+      "dateModified": "2026-10-22T18:40:10.998Z",
+      "inLanguage": "zh-CN",
+      "keywords": "卷积神经网络, 医学影像, 医学图像分割, U-Net",
+      "author": {
+        "@type": "Person",
+        "name": "Soong",
+        "url": "https://soong-a.github.io"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Soong",
+        "url": "https://soong-a.github.io/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://soong-a.github.io/2026/10/22/unet-architecture/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Soong AI Notes",
+          "item": "https://soong-a.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "医学影像",
+          "item": "https://soong-a.github.io/categories/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割",
+          "item": "https://soong-a.github.io/2026/10/22/unet-architecture/"
+        }
+      ]
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2026/10/22/unet-architecture/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#101722')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F8FBFC')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(() => {
+  const hostname = window.location.hostname
+  const isLocalPreview = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local')
+
+  window.soongAnalyticsEnabled = !isLocalPreview
+
+  // Keep theme/PJAX integrations safe on localhost without loading or
+  // sending anything to the production Analytics property.
+  if (isLocalPreview) {
+    window.gtag = () => {}
+    return
+  }
+
+  const measurementId = 'G-EL6GS17XHJ'
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(loader)
+
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', measurementId)
+  btf.addGlobalFn('pjaxComplete', () => {
+    window.gtag('config', measurementId, {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    })
+  }, 'google_analytics')
+})()
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/caveat-brush@5.1.0/index.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/custom.css?v=20261021ap"><link rel="stylesheet" href="/css/pixel.css?v=20261021c"><link rel="preload" as="image" href="/img/index1.webp"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><script src="/js/card-transition.js?v=20261021a"></script><meta name="generator" content="Hexo 7.3.0"><script>(function(){try{var p=new URLSearchParams(location.search).get("lang");var l=p||localStorage.getItem("site-lang");if(l==="en")document.documentElement.setAttribute("data-lang","en")}catch(e){}})()</script><style>html:not([data-lang="en"]) .lang-block[data-lang="en"],html[data-lang="en"] .lang-block[data-lang="zh"],html:not([data-lang="en"]) #card-toc li[data-lang="en"],html[data-lang="en"] #card-toc li[data-lang="zh"]{display:none!important}</style></head><body><div id="web_bg" style="background-image: url(/img/index-soft.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-author"><div class="sidebar-author-name">Soong</div><div class="sidebar-author-role">AI × Medical Imaging</div><div class="sidebar-author-desc">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="sidebar-author-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub ↗</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email ↗</span></a></div></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">18</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">31</div></a><a href="/archives/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><button class="sidebar-darkmode" type="button"><i class="fas fa-adjust" aria-hidden="true"></i><span>切换夜间模式</span></button></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/study/unet-architecture-header.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong AI Notes</span></a><a class="nav-page-title" href="/"><span class="site-name">U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">U-Net 结构详解：编码器、跳跃连接与解码器如何做医学图像分割</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-22T11:00:00.000Z" title="发表于 2026-10-22 12:00:00">2026-10-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-22T18:40:10.998Z" title="更新于 2026-10-22 19:40:10">2026-10-22</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div class="lang-block" data-lang="zh"><p><em>阅读约 7 分钟</em></p>
+<p>做医学图像分割，几乎绕不开 U-Net。它用对称的编码器—解码器和跳跃连接，把全局语义与像素级定位结合起来，后来成为医学图像分割最具代表性的基础架构之一。<a href="/2025/11/12/mm-unet-overview/">MM-UNet</a> 以及许多 CNN、Transformer 分割模型，都沿用了或改造了这种 U 形思路。</p>
+<h2 id="它要解决什么问题"><a href="#它要解决什么问题" class="headerlink" title="它要解决什么问题"></a>它要解决什么问题</h2><p>分割要求为每个像素输出类别，需要同时满足两件互相冲突的事：</p>
+<ol>
+<li><strong>知道这是什么</strong>：需要深层的、感受野很大的抽象语义特征。</li>
+<li><strong>知道边界在哪</strong>：需要浅层的、分辨率很高的细节特征。</li>
+</ol>
+<p>分类网络一路下采样，丢掉了位置细节；只用高分辨率特征，又看不到整体。U-Net 的答案是：先压缩拿语义，再放大恢复分辨率，并且把压缩之前的细节通过”捷径”直接送回来。</p>
+<h2 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h2><p><img src="/img/study/unet-architecture.svg" alt="U-Net 结构示意图：左侧编码器下采样，底部瓶颈层，右侧解码器上采样，金色虚线是同层跳跃连接"></p>
+<p><em>紫色路径压缩空间并提取语义，绿色路径恢复分辨率；金色连线把同尺度的边界细节直接送入解码器。</em></p>
+<h2 id="三个部分"><a href="#三个部分" class="headerlink" title="三个部分"></a>三个部分</h2><h3 id="编码器（收缩路径）"><a href="#编码器（收缩路径）" class="headerlink" title="编码器（收缩路径）"></a>编码器（收缩路径）</h3><p>每一级由两个 3x3 卷积加 ReLU 组成，随后用 2x2 最大池化把空间尺寸减半，同时把通道数翻倍。原论文图 1 明确给出了 64、128、256、512、1024 五级通道数，也就是连续下采样 4 次。</p>
+<p>随着分辨率下降，每个位置的感受野越来越大，表达的信息也从边缘、纹理逐渐变成器官和区域。</p>
+<h3 id="解码器（扩张路径）"><a href="#解码器（扩张路径）" class="headerlink" title="解码器（扩张路径）"></a>解码器（扩张路径）</h3><p>每一级先用上采样（原论文是 2x2 转置卷积）把分辨率翻倍、通道数减半，再和编码器同尺度特征拼接，最后经过两个 3x3 卷积。</p>
+<h3 id="跳跃连接"><a href="#跳跃连接" class="headerlink" title="跳跃连接"></a>跳跃连接</h3><p>这是 U-Net 最关键的设计。编码器第 k 级的输出，不仅送给下一级继续压缩，也直接送到解码器同尺度的位置，沿通道维度拼接：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decoder_input = concat( upsample(deeper_feature), encoder_feature_k )</span><br></pre></td></tr></table></figure>
+
+<p>上采样得到的特征语义强但边界模糊，编码器特征边界精细但语义弱，拼接之后，后面的卷积就能同时参考两者。</p>
+<h2 id="为什么小数据集也能训练"><a href="#为什么小数据集也能训练" class="headerlink" title="为什么小数据集也能训练"></a>为什么小数据集也能训练</h2><p>原论文的电子显微镜实验只有 30 张完整标注的训练图像。它主要依靠两点提高数据利用率：</p>
+<ul>
+<li><strong>强数据增强</strong>：尤其是弹性形变，模拟组织的自然变形，让网络从很少的图像里学到更多变化。</li>
+<li><strong>密集的像素级监督</strong>：每张标注图像都提供整幅分割图上的监督信号；这些像素并非彼此独立，但信息密度仍高于只给一个图像级标签。</li>
+</ul>
+<h2 id="跳跃连接的局限，以及后续改进"><a href="#跳跃连接的局限，以及后续改进" class="headerlink" title="跳跃连接的局限，以及后续改进"></a>跳跃连接的局限，以及后续改进</h2><p>跳跃连接也有代价：编码器的浅层特征里混有大量背景噪声，直接拼接会把噪声一起送进解码器。</p>
+<p>后续工作大多围绕这里展开：</p>
+<table>
+<thead>
+<tr>
+<th align="left">改进方向</th>
+<th align="left">代表思路</th>
+<th align="left">对应内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">筛选跳跃特征</td>
+<td align="left">先用通道注意力给低层特征打权重再融合</td>
+<td align="left"><a href="/2025/11/12/mm-unet-affm/">MM-UNet 的 AFFM</a>，原理同 <a href="/2025/11/27/SENet/">SENet</a></td>
+</tr>
+<tr>
+<td align="left">更密集的连接</td>
+<td align="left">让特征在多级之间复用</td>
+<td align="left"><a href="/2025/11/26/DenseNet/">DenseNet</a> 的拼接思想</td>
+</tr>
+<tr>
+<td align="left">更强的全局建模</td>
+<td align="left">在瓶颈处加入 Transformer 或 Mamba</td>
+<td align="left"><a href="/2025/11/13/mm-unet-gcm/">MM-UNet 的 GCM</a></td>
+</tr>
+<tr>
+<td align="left">适配 3D 数据</td>
+<td align="left">3D 卷积，或各向异性卷积</td>
+<td align="left"><a href="/2025/11/13/mm-unet-macm/">MACM</a></td>
+</tr>
+</tbody></table>
+<h2 id="从-2D-到-3D，再到-nnU-Net"><a href="#从-2D-到-3D，再到-nnU-Net" class="headerlink" title="从 2D 到 3D，再到 nnU-Net"></a>从 2D 到 3D，再到 nnU-Net</h2><ul>
+<li><strong>3D U-Net</strong>：把 2D 卷积和池化换成 3D 版本，直接处理 CT、MRI 体数据。代价是显存和参数量上升很快，可以对照 <a href="/2025/12/16/parameter-count/">参数量</a> 与 <a href="/2025/12/16/GFLOPs/">GFLOPs</a> 估算。</li>
+<li><strong>nnU-Net</strong>：它的主要贡献不是新模块，而是一套能根据数据集自动确定预处理、网络深度、patch 大小和训练策略的流程。在很多医学分割基准上，一个调得好的 U-Net 仍是很强的基线。</li>
+</ul>
+<h2 id="实现时容易出错的地方"><a href="#实现时容易出错的地方" class="headerlink" title="实现时容易出错的地方"></a>实现时容易出错的地方</h2><ol>
+<li><strong>拼接前尺寸不一致</strong>：卷积不加 padding 时，编码器特征比解码器大，需要裁剪；现代实现通常用 same padding 避免这件事。</li>
+<li><strong>通道数写错</strong>：拼接后通道数是两者之和，下一个卷积的输入通道要相应修改。</li>
+<li><strong>归一化选择不合适</strong>：原论文没有 BatchNorm；现代实现常加入 BatchNorm 或 InstanceNorm，小 batch 的 3D 任务通常更适合考虑 InstanceNorm。</li>
+<li><strong>损失函数选择</strong>：前景占比很小时，单独的交叉熵容易被背景主导，通常配合 <a href="/2026/10/22/dice-loss/">Dice Loss</a>。</li>
+<li><strong>只看 Dice 就下结论</strong>：边界质量需要用 <a href="/2026/10/22/segmentation-metrics/">HD95 等指标</a> 补充。</li>
+</ol>
+<blockquote>
+<p>U-Net 的价值在于一种思路：先压缩得到理解，再把压缩前的细节带回来。后来大多数分割网络，都是在回答”带回来的细节该怎么挑”。</p>
+</blockquote>
+<p>资料来源：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1505.04597">U-Net 原论文（含图 1 的通道数与结构）</a> · <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1606.06650">3D U-Net 原论文</a> · <a target="_blank" rel="noopener" href="https://www.nature.com/articles/s41592-020-01008-z">nnU-Net 论文</a> · <a target="_blank" rel="noopener" href="https://github.com/MIC-DKFZ/nnUNet">nnU-Net 官方实现</a></p>
+<aside class="seo-related" aria-label="相关阅读"><h2>相关阅读</h2><ul><li><a href="/2025/11/12/mm-unet-overview/">MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</a></li><li><a href="/2026/10/22/dice-loss/">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</a></li><li><a href="/2026/10/22/segmentation-metrics/">Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区</a></li><li><a href="/2025/11/26/DenseNet/">DenseNet 网络详解：密集连接、Growth Rate 与参数效率</a></li></ul></aside></div><div class="lang-block" data-lang="en" lang="en"><p><em>7 min read</em></p>
+<p>Almost every medical segmentation paper starts from U-Net. It was not the first fully convolutional segmentation network, but it made pixel-accurate boundaries from a small dataset an ordinary thing. <a href="/2025/11/12/mm-unet-overview/">MM-UNet</a> and most Transformer-based segmenters are this U-shaped skeleton with one part replaced or strengthened.</p>
+<h2 id="en-The-problem-it-solves"><a href="#en-The-problem-it-solves" class="headerlink" title="The problem it solves"></a>The problem it solves</h2><p>Segmentation labels every pixel, and that needs two things that pull against each other:</p>
+<ol>
+<li><strong>Knowing what it is</strong> — deep features with a large receptive field.</li>
+<li><strong>Knowing where the boundary is</strong> — shallow, high-resolution features.</li>
+</ol>
+<p>A classifier keeps downsampling and loses position. High-resolution features alone cannot see the whole object. U-Net’s answer: compress to gain meaning, expand to restore resolution, and send the pre-compression detail back through shortcuts.</p>
+<h2 id="en-Overall-structure"><a href="#en-Overall-structure" class="headerlink" title="Overall structure"></a>Overall structure</h2><p><img src="/img/study/unet-architecture-en.svg" alt="U-Net: encoder downsamples on the left, bottleneck at the bottom, decoder upsamples on the right; gold dashed lines are skip connections"></p>
+<p><em>The lavender path compresses space and learns semantics; the sage path restores resolution, while gold links return same-scale boundary detail to the decoder.</em></p>
+<h2 id="en-The-three-parts"><a href="#en-The-three-parts" class="headerlink" title="The three parts"></a>The three parts</h2><h3 id="en-Encoder-contracting-path"><a href="#en-Encoder-contracting-path" class="headerlink" title="Encoder (contracting path)"></a>Encoder (contracting path)</h3><p>Each level has two 3x3 convolutions with ReLU, then 2x2 max pooling halves the spatial size while the channel count doubles. In the original paper channels grow from 64 to 1024 over four downsamplings.</p>
+<p>As resolution drops, each position sees more of the image, and what it represents shifts from edges and texture to organs and regions.</p>
+<h3 id="en-Decoder-expanding-path"><a href="#en-Decoder-expanding-path" class="headerlink" title="Decoder (expanding path)"></a>Decoder (expanding path)</h3><p>Each level upsamples (a 2x2 transposed convolution in the paper) to double the resolution and halve the channels, concatenates the encoder features of the same scale, and applies two 3x3 convolutions.</p>
+<h3 id="en-Skip-connections"><a href="#en-Skip-connections" class="headerlink" title="Skip connections"></a>Skip connections</h3><p>This is the key design. The output of encoder level k goes both to the next level and directly to the decoder at the same scale, joined along the channel axis:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">decoder_input = concat( upsample(deeper_feature), encoder_feature_k )</span><br></pre></td></tr></table></figure>
+
+<p>Upsampled features are semantically strong but blurry at the edges; encoder features have sharp edges but little semantics. After concatenation the following convolutions can use both.</p>
+<h2 id="en-Why-it-trains-on-tiny-datasets"><a href="#en-Why-it-trains-on-tiny-datasets" class="headerlink" title="Why it trains on tiny datasets"></a>Why it trains on tiny datasets</h2><p>The original paper had only a few dozen annotated images. It leaned on two things:</p>
+<ul>
+<li><strong>Heavy augmentation</strong>, especially elastic deformation, which mimics natural tissue deformation and squeezes more variety out of few images.</li>
+<li><strong>Every pixel is a training sample</strong>, so supervision per image is far denser than for image-level classification.</li>
+</ul>
+<h2 id="en-Limits-of-skip-connections-and-what-followed"><a href="#en-Limits-of-skip-connections-and-what-followed" class="headerlink" title="Limits of skip connections, and what followed"></a>Limits of skip connections, and what followed</h2><p>Shallow encoder features carry a lot of background noise, and concatenating them passes that noise on to the decoder.</p>
+<p>Most later work targets exactly this:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Direction</th>
+<th align="left">Idea</th>
+<th align="left">See</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Filter the skip features</td>
+<td align="left">Weight low-level features with channel attention before fusing</td>
+<td align="left"><a href="/2025/11/12/mm-unet-affm/">AFFM in MM-UNet</a>, same principle as <a href="/2025/11/27/SENet/">SENet</a></td>
+</tr>
+<tr>
+<td align="left">Denser connections</td>
+<td align="left">Reuse features across many levels</td>
+<td align="left">the concatenation idea in <a href="/2025/11/26/DenseNet/">DenseNet</a></td>
+</tr>
+<tr>
+<td align="left">Stronger global modelling</td>
+<td align="left">Put a Transformer or Mamba at the bottleneck</td>
+<td align="left"><a href="/2025/11/13/mm-unet-gcm/">GCM in MM-UNet</a></td>
+</tr>
+<tr>
+<td align="left">Fit 3D data</td>
+<td align="left">3D convolutions or anisotropic ones</td>
+<td align="left"><a href="/2025/11/13/mm-unet-macm/">MACM</a></td>
+</tr>
+</tbody></table>
+<h2 id="en-From-2D-to-3D-and-nnU-Net"><a href="#en-From-2D-to-3D-and-nnU-Net" class="headerlink" title="From 2D to 3D, and nnU-Net"></a>From 2D to 3D, and nnU-Net</h2><ul>
+<li><strong>3D U-Net</strong> swaps 2D convolutions and pooling for 3D ones and works directly on CT and MRI volumes. Memory and parameters grow fast; compare <a href="/2025/12/16/parameter-count/">parameter count</a> and <a href="/2025/12/16/GFLOPs/">GFLOPs</a> to estimate the cost.</li>
+<li><strong>nnU-Net</strong>‘s main contribution is not a new block but a pipeline that configures preprocessing, depth, patch size and training from the dataset itself. On many medical benchmarks a well-tuned U-Net is still a very strong baseline.</li>
+</ul>
+<h2 id="en-Where-implementations-go-wrong"><a href="#en-Where-implementations-go-wrong" class="headerlink" title="Where implementations go wrong"></a>Where implementations go wrong</h2><ol>
+<li><strong>Mismatched sizes before concatenation</strong> — without padding the encoder map is larger than the decoder’s and must be cropped; modern code uses same-padding to avoid this.</li>
+<li><strong>Wrong channel counts</strong> — after concatenation the channels are the sum of both inputs, so the next convolution’s input must change.</li>
+<li><strong>Forgetting normalisation</strong> — the paper had no BatchNorm; practical implementations add BatchNorm or, for small-batch 3D work, InstanceNorm.</li>
+<li><strong>Choice of loss</strong> — with a small foreground, plain cross-entropy is dominated by background; it is usually paired with <a href="/2026/10/22/dice-loss/">Dice Loss</a>.</li>
+<li><strong>Judging by Dice alone</strong> — boundary quality needs <a href="/2026/10/22/segmentation-metrics/">metrics such as HD95</a>.</li>
+</ol>
+<blockquote>
+<p>U-Net’s value is an idea: compress to understand, then bring back the detail you compressed away. Most later segmentation networks are answers to “which detail should come back?”</p>
+</blockquote>
+<p>Source: <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1505.04597">U-Net: Convolutional Networks for Biomedical Image Segmentation</a></p>
+<aside class="seo-related" aria-label="Related reading"><h2>Related reading</h2><ul><li><a href="/2025/11/12/mm-unet-overview/">MM-UNet Explained: 3D MRI Segmentation with AFFM, GCM, and MACM</a></li><li><a href="/2026/10/22/dice-loss/">Dice Loss: Formula, Code and Common Mistakes in Medical Image Segmentation</a></li><li><a href="/2026/10/22/segmentation-metrics/">Dice, IoU and HD95: Medical Segmentation Metrics Explained with Formulas and Code</a></li><li><a href="/2025/11/26/DenseNet/">DenseNet Explained: Dense Connections, Growth Rate, and Parameter Efficiency</a></li></ul></aside></div></article><aside class="coffee-card"><div class="coffee-cup" aria-hidden="true"><span class="coffee-steam"><i></i><i></i><i></i></span><span class="coffee-body"></span><span class="coffee-saucer"></span><span class="coffee-heart">♥</span></div><div class="coffee-copy"><p class="coffee-title"><span class="lang-block" data-lang="zh">这篇笔记有帮到你吗？</span><span class="lang-block" data-lang="en" lang="en">Did this note help?</span></p><p class="coffee-note"><span class="lang-block" data-lang="zh">可以请 Soong 喝杯咖啡。</span><span class="lang-block" data-lang="en" lang="en">You could buy Soong a coffee.</span></p></div><a class="coffee-btn lang-block" data-lang="zh" href="https://ifdian.net/a/Soong" target="_blank" rel="noopener">请我喝咖啡</a><a class="coffee-btn lang-block" data-lang="en" lang="en" href="https://ko-fi.com/soonga" target="_blank" rel="noopener">Buy me a coffee</a></aside><script>(function () {
+  var card = document.currentScript.previousElementSibling;
+  card.querySelectorAll('.coffee-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      card.classList.remove('is-sent');
+      void card.offsetWidth;
+      card.classList.add('is-sent');
+      setTimeout(function () { card.classList.remove('is-sent'); }, 1400);
+    });
+  });
+})();</script><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2026/10/22/unet-architecture/">https://soong-a.github.io/2026/10/22/unet-architecture/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong AI Notes</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</a><a class="post-meta__tags" href="/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</a><a class="post-meta__tags" href="/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</a><a class="post-meta__tags" href="/tags/U-Net/">U-Net</a></div><div class="post-share"><div class="social-share" data-image="/img/study/unet-architecture.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/10/22/dice-loss/" title="Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解" data-article-nav="prev"><img class="cover" src="/img/study/dice-loss.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</div></div><div class="info-2"><div class="info-item-1">Dice Loss 的公式推导、PyTorch 实现，以及 5 个最常见的错误：先阈值再求损失、batch 级与样本级混用、空标注除零、多分类含背景。</div></div></div></a><a class="pagination-related" href="/2025/12/16/parameter-count/" title="深度学习模型参数量怎么计算？卷积层与全连接层公式详解" data-article-nav="next"><img class="cover" src="/img/study/parameter-count.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">深度学习模型参数量怎么计算？卷积层与全连接层公式详解</div></div><div class="info-2"><div class="info-item-1">逐层拆解参数量的计算方式，并解释卷积的参数共享为什么让它比全连接层轻得多。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/11/19/medical-imaging-model-map/" title="医学影像深度学习模型全景：CNN、U-Net、Transformer 与基础模型"><img class="cover" src="/img/study/medical-imaging-model-map.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-19</div><div class="info-item-2">医学影像深度学习模型全景：CNN、U-Net、Transformer 与基础模型</div></div><div class="info-2"><div class="info-item-1">从骨干网络到分割、检测、生成与基础模型——一张医学影像深度学习的全景地图与发展时间线。</div></div></div></a><a class="pagination-related" href="/2025/11/13/mm-unet-macm/" title="MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征"><img class="cover" src="/img/study/mm-unet-macm.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征</div></div><div class="info-2"><div class="info-item-1">用四个尺度的各向异性卷积分支，同时理解切片内结构与切片间连续性，并控制大卷积核的成本。</div></div></div></a><a class="pagination-related" href="/2025/11/12/mm-unet-res2net/" title="MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取"><img class="cover" src="/img/study/mm-unet-res2net.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取</div></div><div class="info-2"><div class="info-item-1">编码器细节：为什么选 Res2Net、2D 权重怎样改造成 3D，以及通道数增长背后的取舍。</div></div></div></a><a class="pagination-related" href="/2026/10/22/dice-loss/" title="Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解"><img class="cover" src="/img/study/dice-loss.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-22</div><div class="info-item-2">Dice Loss 公式、代码与常见错误：医学图像分割损失函数详解</div></div><div class="info-2"><div class="info-item-1">Dice Loss 的公式推导、PyTorch 实现，以及 5 个最常见的错误：先阈值再求损失、batch 级与样本级混用、空标注除零、多分类含背景。</div></div></div></a><a class="pagination-related" href="/2025/11/12/mm-unet-overview/" title="MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块"><img class="cover" src="/img/study/mm-unet-overview.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-12</div><div class="info-item-2">MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</div></div><div class="info-2"><div class="info-item-1">MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</div></div></div></a><a class="pagination-related" href="/2026/10/22/segmentation-metrics/" title="Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区"><img class="cover" src="/img/study/segmentation-metrics.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-22</div><div class="info-item-2">Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区</div></div><div class="info-2"><div class="info-item-1">Dice、IoU、精确率、召回率与 HD95 分别衡量什么，如何用 Python 计算，以及体素间距、空预测、2D 与 3D 平均这些最容易出错的细节。</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info card-researcher is-compact"><div class="researcher-head"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="researcher-id"><div class="researcher-name-row"><div class="author-info-name">Soong</div><span class="researcher-status" title="持续记录中"><span class="researcher-status-dot" aria-hidden="true"></span><span class="researcher-status-text">持续记录中</span></span></div><div class="researcher-role">AI × Medical Imaging</div></div></div><div class="author-info-description">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="researcher-stats"><a href="/archives/"><strong>18</strong><span class="lang-block" data-lang="zh">文章</span><span class="lang-block" data-lang="en" lang="en">Articles</span></a><a href="/archives/"><strong>5</strong><span class="lang-block" data-lang="zh">主题</span><span class="lang-block" data-lang="en" lang="en">Topics</span></a><a href="/tags/"><strong>31</strong><span class="lang-block" data-lang="zh">标签</span><span class="lang-block" data-lang="en" lang="en">Tags</span></a></div><div class="researcher-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%83%E8%A6%81%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text">它要解决什么问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">整体结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E4%B8%AA%E9%83%A8%E5%88%86"><span class="toc-number">3.</span> <span class="toc-text">三个部分</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E7%A0%81%E5%99%A8%EF%BC%88%E6%94%B6%E7%BC%A9%E8%B7%AF%E5%BE%84%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">编码器（收缩路径）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E7%A0%81%E5%99%A8%EF%BC%88%E6%89%A9%E5%BC%A0%E8%B7%AF%E5%BE%84%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">解码器（扩张路径）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B7%B3%E8%B7%83%E8%BF%9E%E6%8E%A5"><span class="toc-number">3.3.</span> <span class="toc-text">跳跃连接</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B0%8F%E6%95%B0%E6%8D%AE%E9%9B%86%E4%B9%9F%E8%83%BD%E8%AE%AD%E7%BB%83"><span class="toc-number">4.</span> <span class="toc-text">为什么小数据集也能训练</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B7%B3%E8%B7%83%E8%BF%9E%E6%8E%A5%E7%9A%84%E5%B1%80%E9%99%90%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%90%8E%E7%BB%AD%E6%94%B9%E8%BF%9B"><span class="toc-number">5.</span> <span class="toc-text">跳跃连接的局限，以及后续改进</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%8E-2D-%E5%88%B0-3D%EF%BC%8C%E5%86%8D%E5%88%B0-nnU-Net"><span class="toc-number">6.</span> <span class="toc-text">从 2D 到 3D，再到 nnU-Net</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%97%B6%E5%AE%B9%E6%98%93%E5%87%BA%E9%94%99%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="toc-number">7.</span> <span class="toc-text">实现时容易出错的地方</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">8.</span> <span class="toc-text">相关阅读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-The-problem-it-solves"><span class="toc-number">9.</span> <span class="toc-text">The problem it solves</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Overall-structure"><span class="toc-number">10.</span> <span class="toc-text">Overall structure</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-The-three-parts"><span class="toc-number">11.</span> <span class="toc-text">The three parts</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Encoder-contracting-path"><span class="toc-number">11.1.</span> <span class="toc-text">Encoder (contracting path)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Decoder-expanding-path"><span class="toc-number">11.2.</span> <span class="toc-text">Decoder (expanding path)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Skip-connections"><span class="toc-number">11.3.</span> <span class="toc-text">Skip connections</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Why-it-trains-on-tiny-datasets"><span class="toc-number">12.</span> <span class="toc-text">Why it trains on tiny datasets</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Limits-of-skip-connections-and-what-followed"><span class="toc-number">13.</span> <span class="toc-text">Limits of skip connections, and what followed</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-From-2D-to-3D-and-nnU-Net"><span class="toc-number">14.</span> <span class="toc-text">From 2D to 3D, and nnU-Net</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Where-implementations-go-wrong"><span class="toc-number">15.</span> <span class="toc-text">Where implementations go wrong</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">16.</span> <span class="toc-text">Related reading</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer src="/js/site-polish.js?v=20261021g"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/analytics-events.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mvjwrpfc"></script></body></html>
