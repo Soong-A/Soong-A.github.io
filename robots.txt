@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://soong-a.github.io/sitemap-pages.xml
+Sitemap: https://soong-a.github.io/sitemap.txt
