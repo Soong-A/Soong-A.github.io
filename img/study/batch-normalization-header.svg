@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">BatchNorm 的三个动作：统计、标准化、可学习缩放平移</title>
+  <desc id="desc">一组分散且偏移的特征值先计算均值方差，再被标准化为零均值单位方差，最后通过gamma和beta得到模型需要的分布。</desc>
+  <defs>
+    <radialGradient id="bg" cx="42%" cy="45%" r="88%"><stop offset="0" stop-color="#122944"/><stop offset=".5" stop-color="#0A1728"/><stop offset="1" stop-color="#060C17"/></radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#AFC2DD" opacity=".12"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000" flood-opacity=".36"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#6B7C93"/></marker>
+  </defs>
+  <rect width="1600" height="500" fill="url(#bg)"/><rect width="1600" height="500" fill="url(#dots)"/>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="70" y="48" font-size="22" font-weight="800" letter-spacing="2" fill="#C8C1FF">BATCH NORMALIZATION · 三步读图</text>
+
+    <!-- step 1 scatter -->
+    <g transform="translate(70 68) scale(.72)" filter="url(#shadow)">
+      <rect width="360" height="254" rx="26" fill="#101D30" stroke="#2B405B"/>
+      <g transform="translate(26 24)"><rect width="106" height="30" rx="15" fill="#302B59"/><text x="53" y="21" text-anchor="middle" font-size="15" font-weight="700" fill="#BEB5FF">① 当前通道</text></g>
+      <line x1="40" y1="196" x2="324" y2="196" stroke="#51657F" stroke-width="2"/>
+      <line x1="258" y1="78" x2="258" y2="210" stroke="#FF718B" stroke-width="2" stroke-dasharray="7 6"/>
+      <g fill="#FF718B"><circle cx="72" cy="176" r="9"/><circle cx="112" cy="152" r="9"/><circle cx="148" cy="184" r="9"/><circle cx="196" cy="126" r="9"/><circle cx="234" cy="166" r="9"/><circle cx="278" cy="102" r="9"/><circle cx="306" cy="144" r="9"/></g>
+      <text x="258" y="73" text-anchor="middle" font-size="15" font-weight="700" fill="#FF9AAF">μ</text>
+      <text x="180" y="232" text-anchor="middle" font-size="16" fill="#A7B6CA">位置偏移 · 尺度不一</text>
+    </g>
+
+    <path d="M348 160H448" stroke="#6B7C93" stroke-width="3" marker-end="url(#arr)"/>
+
+    <!-- step 2 normalized -->
+    <g transform="translate(470 68) scale(.72)" filter="url(#shadow)">
+      <rect width="360" height="254" rx="26" fill="#101D30" stroke="#22D3B6" stroke-opacity=".55"/>
+      <g transform="translate(26 24)"><rect width="106" height="30" rx="15" fill="#123A3A"/><text x="53" y="21" text-anchor="middle" font-size="15" font-weight="700" fill="#70F1DC">② 标准化</text></g>
+      <path d="M54 190C102 188 122 170 144 126C158 98 171 76 180 76C189 76 202 98 216 126C238 170 258 188 306 190Z" fill="#22D3B6" fill-opacity=".25" stroke="#2DD4BF" stroke-width="3"/>
+      <line x1="38" y1="190" x2="322" y2="190" stroke="#51657F" stroke-width="2"/>
+      <line x1="180" y1="66" x2="180" y2="207" stroke="#2DD4BF" stroke-width="2" stroke-dasharray="7 6"/>
+      <circle cx="180" cy="190" r="7" fill="#2DD4BF" filter="url(#glow)"/>
+      <text x="180" y="225" text-anchor="middle" font-size="17" font-weight="700" fill="#70F1DC">均值 0 · 方差 1</text>
+    </g>
+
+    <path d="M748 160H848" stroke="#6B7C93" stroke-width="3" marker-end="url(#arr)"/>
+
+    <!-- step 3 affine -->
+    <g transform="translate(870 68) scale(.72)" filter="url(#shadow)">
+      <rect width="440" height="254" rx="26" fill="#101D30" stroke="#F6C85F" stroke-opacity=".55"/>
+      <g transform="translate(26 24)"><rect width="150" height="30" rx="15" fill="#3C2D16"/><text x="75" y="21" text-anchor="middle" font-size="15" font-weight="700" fill="#FFE092">③ γ / β 学习</text></g>
+      <g transform="translate(62 94)"><path d="M0 92C28 90 43 78 58 50C71 25 81 10 95 10C109 10 119 25 132 50C147 78 162 90 190 92Z" fill="#8B7CFF" fill-opacity=".28" stroke="#9C90FF" stroke-width="3"/><line y1="92" x2="198" y2="92" stroke="#51657F" stroke-width="2"/></g>
+      <g transform="translate(278 96)"><path d="M0 90C22 88 30 71 40 51C51 28 65 6 78 6C91 6 105 28 116 51C126 71 134 88 156 90Z" fill="#F6C85F" fill-opacity=".22" stroke="#F6C85F" stroke-width="3"/><line y1="90" x2="162" y2="90" stroke="#51657F" stroke-width="2"/></g>
+      <path d="M257 140H300" stroke="#F6C85F" stroke-width="3" marker-end="url(#arr)"/>
+      <text x="220" y="224" text-anchor="middle" font-size="16" fill="#FFD782">缩放 γ · 平移 β · 表达力不丢</text>
+    </g>
+
+    <g transform="translate(1220 72)"><text x="0" y="35" font-size="24" font-weight="800" fill="#70F1DC">x_hat = (x − μ) / √(σ² + ε)</text><text x="82" y="74" font-size="25" font-weight="800" fill="#FFD782">y = γ·x_hat + β</text></g>
+  </g>
+</svg>

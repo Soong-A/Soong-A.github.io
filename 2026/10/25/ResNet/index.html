@@ -1,0 +1,1132 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck | Soong AI Notes</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F8FBFC"><meta name="description" content="从零理解 ResNet：为什么网络加深后训练误差反而升高，残差 F(x)+x 如何让恒等映射和梯度传播变容易，以及 BasicBlock、Bottleneck、投影捷径与 ResNet-18&#x2F;50 的结构差异。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck">
+<meta property="og:url" content="https://soong-a.github.io/2026/10/25/ResNet/">
+<meta property="og:site_name" content="Soong AI Notes">
+<meta property="og:description" content="从零理解 ResNet：为什么网络加深后训练误差反而升高，残差 F(x)+x 如何让恒等映射和梯度传播变容易，以及 BasicBlock、Bottleneck、投影捷径与 ResNet-18&#x2F;50 的结构差异。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/study/resnet-cover.webp">
+<meta property="article:published_time" content="2026-10-25T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-25T20:10:36.010Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="计算机视觉">
+<meta property="article:tag" content="卷积神经网络">
+<meta property="article:tag" content="论文与综述">
+<meta property="article:tag" content="经典网络">
+<meta property="article:tag" content="残差网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/study/resnet-cover.webp"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": "https://soong-a.github.io/2026/10/25/ResNet/#article",
+      "headline": "ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck",
+      "description": "从零理解 ResNet：为什么网络加深后训练误差反而升高，残差 F(x)+x 如何让恒等映射和梯度传播变容易，以及 BasicBlock、Bottleneck、投影捷径与 ResNet-18/50 的结构差异。",
+      "url": "https://soong-a.github.io/2026/10/25/ResNet/",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://soong-a.github.io/2026/10/25/ResNet/"
+      },
+      "image": [
+        "https://soong-a.github.io/img/study/resnet-cover.webp"
+      ],
+      "datePublished": "2026-10-25T12:00:00.000Z",
+      "dateModified": "2026-10-25T20:10:36.010Z",
+      "inLanguage": "zh-CN",
+      "keywords": "计算机视觉, 卷积神经网络, 论文与综述, 经典网络, 残差网络",
+      "author": {
+        "@type": "Person",
+        "name": "Soong",
+        "url": "https://soong-a.github.io"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Soong",
+        "url": "https://soong-a.github.io/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://soong-a.github.io/2026/10/25/ResNet/#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Soong AI Notes",
+          "item": "https://soong-a.github.io/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "经典网络",
+          "item": "https://soong-a.github.io/categories/%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck",
+          "item": "https://soong-a.github.io/2026/10/25/ResNet/"
+        }
+      ]
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/2026/10/25/ResNet/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#101722')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F8FBFC')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(() => {
+  const hostname = window.location.hostname
+  const isLocalPreview = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local')
+
+  window.soongAnalyticsEnabled = !isLocalPreview
+
+  // Keep theme/PJAX integrations safe on localhost without loading or
+  // sending anything to the production Analytics property.
+  if (isLocalPreview) {
+    window.gtag = () => {}
+    return
+  }
+
+  const measurementId = 'G-EL6GS17XHJ'
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(loader)
+
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', measurementId)
+  btf.addGlobalFn('pjaxComplete', () => {
+    window.gtag('config', measurementId, {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    })
+  }, 'google_analytics')
+})()
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/caveat-brush@5.1.0/index.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/custom.css?v=20261025a"><link rel="stylesheet" href="/css/pixel.css?v=20261023b"><link rel="preload" as="image" href="/img/index1.webp"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><script src="/js/card-transition.js?v=20261021a"></script><meta name="generator" content="Hexo 7.3.0"><script>(function(){try{var p=new URLSearchParams(location.search).get("lang");var l=p||localStorage.getItem("site-lang");if(l==="en")document.documentElement.setAttribute("data-lang","en")}catch(e){}})()</script><style>html:not([data-lang="en"]) .lang-block[data-lang="en"],html[data-lang="en"] .lang-block[data-lang="zh"],html:not([data-lang="en"]) #card-toc li[data-lang="en"],html[data-lang="en"] #card-toc li[data-lang="zh"]{display:none!important}</style></head><body><div id="web_bg" style="background-image: url(/img/index-soft.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-author"><div class="sidebar-author-name">Soong</div><div class="sidebar-author-role">AI × Medical Imaging</div><div class="sidebar-author-desc">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="sidebar-author-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub ↗</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email ↗</span></a></div></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">21</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">35</div></a><a href="/archives/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><button class="sidebar-darkmode" type="button"><i class="fas fa-adjust" aria-hidden="true"></i><span>切换夜间模式</span></button></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/img/study/resnet-header.webp);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong AI Notes</span></a><a class="nav-page-title" href="/"><span class="site-name">ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">ResNet 残差网络超详细入门：从退化问题到 BasicBlock 与 Bottleneck</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-25T12:00:00.000Z" title="发表于 2026-10-25 12:00:00">2026-10-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-10-25T20:10:36.010Z" title="更新于 2026-10-25 20:10:36">2026-10-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/">经典网络</a></span></div><div class="meta-secondline"></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><div class="lang-block" data-lang="zh"><p><em>阅读约 22 分钟 · 建议边看图边手算</em></p>
+<p>如果只记一句话，可以先记住：<strong>ResNet 给信息修了一条“直达电梯”</strong>。普通网络要求每一层都重新加工输入；ResNet 允许输入绕过若干层，直接送到后面，再和新学到的变化量相加。</p>
+<p>这条看起来只是“一根线”的结构，解决了深层网络很难优化的问题。后来的 <a href="/2025/11/26/DenseNet/">DenseNet</a>、<a href="/2025/11/27/SENet/">SENet</a>、<a href="/2025/11/12/mm-unet-res2net/">Res2Net</a> 以及大量医学图像分割网络，都在它的思想上继续发展。</p>
+<h2 id="阅读前只需要知道三件事"><a href="#阅读前只需要知道三件事" class="headerlink" title="阅读前只需要知道三件事"></a>阅读前只需要知道三件事</h2><p>不熟悉下面的词也没关系，先用最朴素的理解即可：</p>
+<ul>
+<li><strong>卷积层（Conv）：</strong> 用许多小滤镜提取边缘、纹理、形状等特征。</li>
+<li><strong>特征图（feature map）：</strong> 一层网络处理后的数据。它不一定是能直接看懂的图片，但仍然有高度、宽度和通道数。</li>
+<li><strong>反向传播：</strong> 模型算错后，把“错了多少”从输出往输入方向传，用它更新每一层的参数。</li>
+</ul>
+<p>本文会频繁出现 $N \times C \times H \times W$：$N$ 是一批图片的数量，$C$ 是通道数，$H$ 和 $W$ 是高与宽。</p>
+<h2 id="论文名片"><a href="#论文名片" class="headerlink" title="论文名片"></a>论文名片</h2><ul>
+<li><strong>论文：</strong> <em>Deep Residual Learning for Image Recognition</em></li>
+<li><strong>作者：</strong> Kaiming He、Xiangyu Zhang、Shaoqing Ren、Jian Sun（MSRA）</li>
+<li><strong>会议：</strong> CVPR 2016</li>
+<li><strong>论文地址：</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1512.03385">arXiv:1512.03385</a></li>
+<li><strong>核心贡献：</strong> 用残差连接稳定训练非常深的卷积网络，并构建了最高 152 层的 ImageNet 模型。</li>
+</ul>
+<hr>
+<h2 id="一、为什么当年大家想把网络做深"><a href="#一、为什么当年大家想把网络做深" class="headerlink" title="一、为什么当年大家想把网络做深"></a>一、为什么当年大家想把网络做深</h2><p>一张图片进入卷积网络后，浅层通常学习简单特征，深层逐步组合出复杂概念：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">像素亮暗</span><br><span class="line">  ↓</span><br><span class="line">边缘和方向</span><br><span class="line">  ↓</span><br><span class="line">纹理与局部形状</span><br><span class="line">  ↓</span><br><span class="line">眼睛、轮子、器官边界</span><br><span class="line">  ↓</span><br><span class="line">猫、汽车、前列腺等完整语义</span><br></pre></td></tr></table></figure>
+
+<p>直觉上，层数越多，模型能完成的加工步骤越多，应该更容易表达复杂函数。但“能表达”不等于“能训练出来”。在 ResNet 之前，人们发现普通网络加深到一定程度后，效果反而变差。</p>
+<h3 id="1-先区分三个容易混淆的问题"><a href="#1-先区分三个容易混淆的问题" class="headerlink" title="1. 先区分三个容易混淆的问题"></a>1. 先区分三个容易混淆的问题</h3><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>训练集误差</th>
+<th>测试集误差</th>
+<th>直观解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>过拟合</td>
+<td>很低</td>
+<td>很高</td>
+<td>训练题背得太熟，换题不会</td>
+</tr>
+<tr>
+<td>梯度消失 &#x2F; 爆炸</td>
+<td>可能降不动</td>
+<td>通常也差</td>
+<td>误差信号传不到前层，或数值失控</td>
+</tr>
+<tr>
+<td>退化问题</td>
+<td>深网比浅网更高</td>
+<td>深网也更高</td>
+<td>深网理论上更强，却连浅网的解都学不到</td>
+</tr>
+</tbody></table>
+<p>ResNet 论文强调的是第三种：<strong>退化问题（degradation problem）</strong>。</p>
+<p>论文在 CIFAR-10 上比较了 20 层和 56 层的普通卷积网络。56 层网络不仅测试误差更高，连训练误差都更高。因此不能把原因简单归结为过拟合。</p>
+<p><img src="/img/study/resnet-degradation.svg" alt="普通网络加深后出现退化，而残差网络能从更深结构中受益的概念图"></p>
+<blockquote>
+<p>图中是帮助理解的概念曲线，不是论文实验数据的逐点复刻。重点是看“训练误差”的相对关系。</p>
+</blockquote>
+<h3 id="2-一个看似简单、实际上很关键的逻辑"><a href="#2-一个看似简单、实际上很关键的逻辑" class="headerlink" title="2. 一个看似简单、实际上很关键的逻辑"></a>2. 一个看似简单、实际上很关键的逻辑</h3><p>假设已经有一个训练好的 20 层网络。现在给它再加 36 层，要得到一个 56 层网络。新加的 36 层什么都不改变，只把输入原样输出，不就至少能保持 20 层网络的效果吗？</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">前 20 层：完成原来的计算</span><br><span class="line">后 36 层：输入什么，就输出什么</span><br><span class="line">最终结果：应当不比 20 层网络差</span><br></pre></td></tr></table></figure>
+
+<p>“输入什么就输出什么”叫做<strong>恒等映射（identity mapping）</strong>：</p>
+<p>$$H(x) &#x3D; x$$</p>
+<p>从函数表达能力看，56 层网络确实包含这个解。问题是：让几十个“卷积 + 非线性激活”层共同精确拼出 $H(x)&#x3D;x$，对优化器并不容易。</p>
+<p>这就是 ResNet 的出发点：<strong>既然深层网络很难自己学会“什么也别做”，那就把“什么也别做”直接写进结构里。</strong></p>
+<hr>
+<h2 id="二、残差学习到底在学什么"><a href="#二、残差学习到底在学什么" class="headerlink" title="二、残差学习到底在学什么"></a>二、残差学习到底在学什么</h2><p>先把字母解释清楚：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x$</td>
+<td>残差块的输入</td>
+</tr>
+<tr>
+<td>$H(x)$</td>
+<td>希望这个块最终得到的理想输出</td>
+</tr>
+<tr>
+<td>$F(x)$</td>
+<td>主分支真正需要学习的“变化量”</td>
+</tr>
+<tr>
+<td>$y$</td>
+<td>残差块的实际输出</td>
+</tr>
+</tbody></table>
+<p>普通网络直接学习：</p>
+<p>$$y &#x3D; H(x)$$</p>
+<p>ResNet 改成：</p>
+<p>$$\begin{aligned} F(x) &amp;&#x3D; H(x) - x \cr y &amp;&#x3D; F(x) + x \end{aligned}$$</p>
+<p>这里的“残差”就是“目标与输入之间还差多少”。</p>
+<p><img src="/img/study/resnet-plain-vs-residual.svg" alt="普通块直接学习目标映射，残差块只学习相对输入的变化量"></p>
+<h3 id="1-用修图来理解残差"><a href="#1-用修图来理解残差" class="headerlink" title="1. 用修图来理解残差"></a>1. 用修图来理解残差</h3><p>假设输入 $x$ 是一张曝光稍暗的照片，理想输出 $H(x)$ 是调整好的照片。</p>
+<p>普通网络的任务是：<strong>从头生成整张调整后的照片。</strong></p>
+<p>残差网络的任务是：<strong>只生成“哪里提亮多少、哪里增加多少对比度”这张修改清单</strong>，然后把修改清单加回原图。</p>
+<p>如果原图已经很好：</p>
+<p>$$H(x) \approx x \quad \Longrightarrow \quad F(x) &#x3D; H(x) - x \approx 0$$</p>
+<p>模型只要把主分支学到接近 0，就能保留输入。让若干层输出接近 0，通常比让它们共同精确复现 $x$ 容易。</p>
+<h3 id="2-用一个只有数字的例子理解"><a href="#2-用一个只有数字的例子理解" class="headerlink" title="2. 用一个只有数字的例子理解"></a>2. 用一个只有数字的例子理解</h3><p>假设某个特征是 $x &#x3D; 10$，理想输出是 $H(x) &#x3D; 10.5$。</p>
+<ul>
+<li><strong>普通学习：</strong> 直接把 10 变成 10.5。</li>
+<li><strong>残差学习：</strong> 只学习 $F(x) &#x3D; 10.5 - 10 &#x3D; 0.5$，最后 $0.5 + 10 &#x3D; 10.5$。</li>
+</ul>
+<p>如果理想输出正好是 10：</p>
+<ul>
+<li><strong>普通学习：</strong> 一串层必须共同实现 $H(10) &#x3D; 10$。</li>
+<li><strong>残差学习：</strong> 主分支输出 $F(10) &#x3D; 0$ 即可。</li>
+</ul>
+<p>注意，残差不是“预测误差”或“损失值”。它是<strong>特征变换前后的差值</strong>，在网络内部被主动学习。</p>
+<hr>
+<h2 id="三、那条捷径为什么能帮助梯度传播"><a href="#三、那条捷径为什么能帮助梯度传播" class="headerlink" title="三、那条捷径为什么能帮助梯度传播"></a>三、那条捷径为什么能帮助梯度传播</h2><p>残差块有两条路：</p>
+<ol>
+<li><strong>主分支：</strong> 经过卷积、BN、ReLU，得到 $F(x)$；</li>
+<li><strong>捷径分支：</strong> 输入 $x$ 原样绕过去。</li>
+</ol>
+<p>最后把两路按元素相加：</p>
+<p>$$y &#x3D; F(x) + x$$</p>
+<p><img src="/img/study/resnet.svg" alt="残差块结构示意图：主分支学习 F(x)，捷径分支直接传递 x，相加后得到输出"></p>
+<p>这里的“相加”要求两边形状完全相同。例如主分支和捷径都必须是 $N \times 64 \times 56 \times 56$。如果形状不同，后面会讲怎么处理。</p>
+<h3 id="1-先理解普通深层网络的梯度"><a href="#1-先理解普通深层网络的梯度" class="headerlink" title="1. 先理解普通深层网络的梯度"></a>1. 先理解普通深层网络的梯度</h3><p>反向传播依赖链式法则。把很多层串在一起时，梯度会不断相乘：</p>
+<p>$$\frac{\partial L}{\partial x_0} &#x3D; g_1 \cdot g_2 \cdots g_n &#x3D; \prod_{i&#x3D;1}^{n} g_i$$</p>
+<p>其中 $g_i$ 是第 $i$ 段的局部梯度。</p>
+<p>如果每一段大约是 $0.8$，连续乘 20 次：</p>
+<p>$$0.8^{20} \approx 0.0115$$</p>
+<p>传到前面的信号已经很小。如果每一段都大于 1，又可能越乘越大。这只是直觉示例，真实网络中的梯度是张量而不是单个数字，但问题本质相似。</p>
+<h3 id="2-残差块多出来一个“1”"><a href="#2-残差块多出来一个“1”" class="headerlink" title="2. 残差块多出来一个“1”"></a>2. 残差块多出来一个“1”</h3><p>对 $y &#x3D; F(x) + x$ 求导，可写成：</p>
+<p>$$\frac{\partial y}{\partial x} &#x3D; \frac{\partial F(x)}{\partial x} + 1$$</p>
+<p>因此：</p>
+<p>$$\frac{\partial L}{\partial x} &#x3D; \frac{\partial L}{\partial y} \cdot \left( \frac{\partial F(x)}{\partial x} + 1 \right)$$</p>
+<p>这个 $1$ 来自捷径上的 $x$。即使主分支的局部梯度很小，仍有一部分梯度可以沿着捷径直接向前传播。</p>
+<p><img src="/img/study/resnet-gradient-path.svg" alt="前向信息与反向梯度都可以沿恒等捷径跨过复杂主分支"></p>
+<p>更完整地说，跨过多个残差块后，浅层特征不仅通过层层变换传播，还能通过一连串加法路径抵达后层。ResNet 不是让梯度永远不会消失，而是显著改善了深层网络的优化条件。</p>
+<h3 id="3-为什么要“相加”，而不是“拼接”"><a href="#3-为什么要“相加”，而不是“拼接”" class="headerlink" title="3. 为什么要“相加”，而不是“拼接”"></a>3. 为什么要“相加”，而不是“拼接”</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">相加 add：     两个 C 通道张量 → 仍是 C 通道</span><br><span class="line">拼接 concat：  两个 C 通道张量 → 变成 2C 通道</span><br></pre></td></tr></table></figure>
+
+<p>ResNet 使用相加，所以通道数不膨胀，计算量容易控制；而 <a href="/2025/11/26/DenseNet/">DenseNet</a> 使用通道拼接，让后层显式看到之前所有层的特征。二者都是捷径，但信息融合方式不同。</p>
+<hr>
+<h2 id="四、BasicBlock：ResNet-18-和-ResNet-34-的积木"><a href="#四、BasicBlock：ResNet-18-和-ResNet-34-的积木" class="headerlink" title="四、BasicBlock：ResNet-18 和 ResNet-34 的积木"></a>四、BasicBlock：ResNet-18 和 ResNet-34 的积木</h2><p>原始 ResNet v1 的 BasicBlock 主分支包含两个 3×3 卷积：</p>
+<pre><code class="highlight mermaid">flowchart LR
+  X[&quot;输入 x&quot;] --&gt; C1[&quot;3×3 Conv&quot;]
+  C1 --&gt; B1[&quot;BN&quot;] --&gt; R1[&quot;ReLU&quot;]
+  R1 --&gt; C2[&quot;3×3 Conv&quot;] --&gt; B2[&quot;BN&quot;]
+  B2 --&gt; ADD((&quot;逐元素相加&quot;))
+  X -- &quot;恒等捷径&quot; --&gt; ADD
+  ADD --&gt; R2[&quot;ReLU&quot;] --&gt; Y[&quot;输出 y&quot;]</code></pre>
+
+<p>把顺序背成一句话：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Conv → BN → ReLU → Conv → BN → Add → ReLU</span><br></pre></td></tr></table></figure>
+
+<p>第二个 BN 后面不能先做 ReLU。主分支必须保留正值和负值，再与 $x$ 相加；否则主分支就不能自由地“增加或抵消”输入。</p>
+<h3 id="手工跟踪一次形状"><a href="#手工跟踪一次形状" class="headerlink" title="手工跟踪一次形状"></a>手工跟踪一次形状</h3><p>假设输入形状是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x: (N=8, C=64, H=56, W=56)</span><br></pre></td></tr></table></figure>
+
+<p>两个卷积都是 <code>kernel=3, stride=1, padding=1</code>，所以高宽不变，通道也保持 64：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主分支 F(x): (8, 64, 56, 56)</span><br><span class="line">捷径 x:      (8, 64, 56, 56)</span><br><span class="line">相加后 y:    (8, 64, 56, 56)</span><br></pre></td></tr></table></figure>
+
+<p>这里不是把所有数加成一个数，而是对应位置逐个相加：</p>
+<p>$$y_{n,c,h,w} &#x3D; F_{n,c,h,w} + x_{n,c,h,w}$$</p>
+<p>其中 $F$ 是主分支的输出 $F(x)$。</p>
+<hr>
+<h2 id="五、维度不一样时，捷径怎么办"><a href="#五、维度不一样时，捷径怎么办" class="headerlink" title="五、维度不一样时，捷径怎么办"></a>五、维度不一样时，捷径怎么办</h2><p>网络进入新的 stage 时，常做两件事：</p>
+<ul>
+<li>高和宽减半，例如 <code>56×56 → 28×28</code>；</li>
+<li>通道增加，例如 <code>64 → 128</code>。</li>
+</ul>
+<p>此时：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">主分支：N × 128 × 28 × 28</span><br><span class="line">捷径：  N ×  64 × 56 × 56</span><br></pre></td></tr></table></figure>
+
+<p>形状不同，不能相加。解决办法是在捷径上放一个 <code>1×1</code> 卷积，并使用 <code>stride=2</code>：</p>
+<pre><code class="highlight mermaid">flowchart LR
+  X[&quot;x: 64×56×56&quot;] --&gt; MAIN[&quot;主分支&lt;br/&gt;3×3 Conv, stride=2&quot;]
+  MAIN --&gt; FM[&quot;F(x): 128×28×28&quot;] --&gt; ADD((&quot;+&quot;))
+  X --&gt; PROJ[&quot;捷径&lt;br/&gt;1×1 Conv, stride=2&quot;]
+  PROJ --&gt; ID[&quot;投影后: 128×28×28&quot;] --&gt; ADD
+  ADD --&gt; Y[&quot;y: 128×28×28&quot;]</code></pre>
+
+<p>这个 1×1 卷积叫<strong>投影捷径（projection shortcut）</strong>。它同时完成：</p>
+<ol>
+<li>用 stride 2 缩小空间尺寸；</li>
+<li>用不同数量的卷积核改变通道数；</li>
+<li>让主分支和捷径能够相加。</li>
+</ol>
+<p>论文还讨论了补零扩通道等方案。工程里最常见的是：<strong>只有尺寸或通道变化时才用 1×1 投影，其他块保留无参数的恒等捷径。</strong></p>
+<hr>
+<h2 id="六、Bottleneck：ResNet-50-101-152-为什么不直接堆-3×3"><a href="#六、Bottleneck：ResNet-50-101-152-为什么不直接堆-3×3" class="headerlink" title="六、Bottleneck：ResNet-50&#x2F;101&#x2F;152 为什么不直接堆 3×3"></a>六、Bottleneck：ResNet-50&#x2F;101&#x2F;152 为什么不直接堆 3×3</h2><p>通道很多时，两个 3×3 卷积非常昂贵。Bottleneck（瓶颈块）用三个卷积：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1×1 降通道 → 3×3 处理 → 1×1 升通道</span><br></pre></td></tr></table></figure>
+
+<p>典型例子：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">输入 256 通道</span><br><span class="line">  ↓ 1×1</span><br><span class="line">降到 64 通道</span><br><span class="line">  ↓ 3×3</span><br><span class="line">保持 64 通道</span><br><span class="line">  ↓ 1×1</span><br><span class="line">升回 256 通道</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/study/resnet-block-types.svg" alt="BasicBlock 与 Bottleneck 的结构、通道变化和适用模型对比"></p>
+<p>“瓶颈”不是说信息一定被严重丢失，而是中间通道数像瓶子中间一样变窄，从而把最贵的 3×3 卷积放在较少的通道上。</p>
+<h3 id="1-为什么-1×1-卷积能改变通道"><a href="#1-为什么-1×1-卷积能改变通道" class="headerlink" title="1. 为什么 1×1 卷积能改变通道"></a>1. 为什么 1×1 卷积能改变通道</h3><p>一个 1×1 卷积核只看同一空间位置，但会同时读取所有输入通道。若输入有 256 个通道，准备 64 个 1×1 卷积核，就能在每个像素位置把 256 维信息混合成 64 维。</p>
+<p>它不负责看邻居，主要负责<strong>通道混合与升降维</strong>。</p>
+<h3 id="2-参数量手算"><a href="#2-参数量手算" class="headerlink" title="2. 参数量手算"></a>2. 参数量手算</h3><p>卷积参数量（忽略偏置）是：</p>
+<p>$$\text{params} &#x3D; k_h \times k_w \times C_{\text{in}} \times C_{\text{out}}$$</p>
+<p>如果始终在 256 通道上做两个 3×3：</p>
+<p>$$2 \times (3 \times 3 \times 256 \times 256) &#x3D; 1{,}179{,}648$$</p>
+<p>Bottleneck 的主分支：</p>
+<table>
+<thead>
+<tr>
+<th>卷积</th>
+<th>参数量计算</th>
+<th>参数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1×1 降维</td>
+<td>$1 \times 1 \times 256 \times 64$</td>
+<td>16,384</td>
+</tr>
+<tr>
+<td>3×3 处理</td>
+<td>$3 \times 3 \times 64 \times 64$</td>
+<td>36,864</td>
+</tr>
+<tr>
+<td>1×1 升维</td>
+<td>$1 \times 1 \times 64 \times 256$</td>
+<td>16,384</td>
+</tr>
+<tr>
+<td><strong>合计</strong></td>
+<td></td>
+<td><strong>69,632</strong></td>
+</tr>
+</tbody></table>
+<p>这个对比是在说明“通道压缩为什么省参数”，不是说两种块的层数完全相同。Bottleneck 有 3 个卷积层，BasicBlock 有 2 个。</p>
+<h3 id="3-expansion-4-是什么意思"><a href="#3-expansion-4-是什么意思" class="headerlink" title="3. expansion &#x3D; 4 是什么意思"></a>3. expansion &#x3D; 4 是什么意思</h3><p>标准 Bottleneck 的最后输出通道是中间通道的 4 倍：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">中间 64  → 输出 256</span><br><span class="line">中间 128 → 输出 512</span><br><span class="line">中间 256 → 输出 1024</span><br><span class="line">中间 512 → 输出 2048</span><br></pre></td></tr></table></figure>
+
+<p>所以 PyTorch 实现里会看到 <code>expansion = 4</code>。ResNet-50 最后一个 stage 的输出是 2048 通道，而 ResNet-18 最后是 512 通道。</p>
+<hr>
+<h2 id="七、从一个块拼成完整-ResNet"><a href="#七、从一个块拼成完整-ResNet" class="headerlink" title="七、从一个块拼成完整 ResNet"></a>七、从一个块拼成完整 ResNet</h2><p>标准 ImageNet ResNet 可以看成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入 224×224</span><br><span class="line">  ↓ 7×7 Conv, stride=2</span><br><span class="line">112×112</span><br><span class="line">  ↓ 3×3 MaxPool, stride=2</span><br><span class="line">56×56</span><br><span class="line">  ↓ stage 1</span><br><span class="line">56×56</span><br><span class="line">  ↓ stage 2（第一次块下采样）</span><br><span class="line">28×28</span><br><span class="line">  ↓ stage 3</span><br><span class="line">14×14</span><br><span class="line">  ↓ stage 4</span><br><span class="line">7×7</span><br><span class="line">  ↓ Global Average Pooling</span><br><span class="line">每通道一个数</span><br><span class="line">  ↓ 全连接层</span><br><span class="line">类别分数</span><br></pre></td></tr></table></figure>
+
+<p>各型号的差异主要是“用什么块”和“每个 stage 重复几次”：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>块类型</th>
+<th>四个 stage 的块数</th>
+<th>卷积层计数直觉</th>
+<th>约参数量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ResNet-18</td>
+<td>BasicBlock</td>
+<td>2, 2, 2, 2</td>
+<td><code>8×2 + 首层 + FC</code></td>
+<td>11.7 M</td>
+</tr>
+<tr>
+<td>ResNet-34</td>
+<td>BasicBlock</td>
+<td>3, 4, 6, 3</td>
+<td><code>16×2 + 首层 + FC</code></td>
+<td>21.8 M</td>
+</tr>
+<tr>
+<td>ResNet-50</td>
+<td>Bottleneck</td>
+<td>3, 4, 6, 3</td>
+<td><code>16×3 + 首层 + FC</code></td>
+<td>25.6 M</td>
+</tr>
+<tr>
+<td>ResNet-101</td>
+<td>Bottleneck</td>
+<td>3, 4, 23, 3</td>
+<td>中间 stage 大幅加深</td>
+<td>44.5 M</td>
+</tr>
+<tr>
+<td>ResNet-152</td>
+<td>Bottleneck</td>
+<td>3, 8, 36, 3</td>
+<td>更深的第三 stage</td>
+<td>60.2 M</td>
+</tr>
+</tbody></table>
+<p>层数统计通常只数带权重的卷积层和最后全连接层，不数 BN、ReLU、池化和逐元素相加。所以一个 BasicBlock 虽然流程里有很多算子，只贡献 2 个“层数”。</p>
+<h3 id="为什么-ResNet-50-和-ResNet-34-的块数相同，名字却不同"><a href="#为什么-ResNet-50-和-ResNet-34-的块数相同，名字却不同" class="headerlink" title="为什么 ResNet-50 和 ResNet-34 的块数相同，名字却不同"></a>为什么 ResNet-50 和 ResNet-34 的块数相同，名字却不同</h3><p>两者都是 <code>[3, 4, 6, 3]</code>，合计 16 个块：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ResNet-34：16 个块 × 每块 2 个卷积 + 开头 1 个卷积 + FC = 34</span><br><span class="line">ResNet-50：16 个块 × 每块 3 个卷积 + 开头 1 个卷积 + FC = 50</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="八、ResNet-v1-与-v2：ReLU-放在哪里很重要"><a href="#八、ResNet-v1-与-v2：ReLU-放在哪里很重要" class="headerlink" title="八、ResNet v1 与 v2：ReLU 放在哪里很重要"></a>八、ResNet v1 与 v2：ReLU 放在哪里很重要</h2><p>原始 ResNet v1：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x → Conv → BN → ReLU → Conv → BN → Add → ReLU</span><br><span class="line">└──────────────────────────────→ Add</span><br></pre></td></tr></table></figure>
+
+<p>后续论文 <em>Identity Mappings in Deep Residual Networks</em> 提出预激活 ResNet v2：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x → BN → ReLU → Conv → BN → ReLU → Conv → Add</span><br><span class="line">└──────────────────────────────────────→ Add</span><br></pre></td></tr></table></figure>
+
+<p>v2 把 BN 和 ReLU 放到卷积前，相加之后不立刻激活。这样多个块串起来时，捷径主干上更接近纯粹的恒等映射，信息和梯度传播更直接。</p>
+<p>不要把 v1&#x2F;v2 与“BasicBlock&#x2F;Bottleneck”混为一谈：</p>
+<ul>
+<li>v1&#x2F;v2 描述算子的<strong>排列方式</strong>；</li>
+<li>BasicBlock&#x2F;Bottleneck 描述主分支的<strong>卷积结构</strong>。</li>
+</ul>
+<hr>
+<h2 id="九、一步步读懂-PyTorch-的-BasicBlock"><a href="#九、一步步读懂-PyTorch-的-BasicBlock" class="headerlink" title="九、一步步读懂 PyTorch 的 BasicBlock"></a>九、一步步读懂 PyTorch 的 BasicBlock</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BasicBlock</span>(nn.Module):</span><br><span class="line">    expansion = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_ch, out_ch, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 主分支第 1 层：可能负责下采样</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(</span><br><span class="line">            in_ch, out_ch,</span><br><span class="line">            kernel_size=<span class="number">3</span>,</span><br><span class="line">            stride=stride,</span><br><span class="line">            padding=<span class="number">1</span>,</span><br><span class="line">            bias=<span class="literal">False</span>,</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_ch)</span><br><span class="line">        <span class="variable language_">self</span>.relu = nn.ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 主分支第 2 层：保持当前尺寸</span></span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(</span><br><span class="line">            out_ch, out_ch,</span><br><span class="line">            kernel_size=<span class="number">3</span>,</span><br><span class="line">            stride=<span class="number">1</span>,</span><br><span class="line">            padding=<span class="number">1</span>,</span><br><span class="line">            bias=<span class="literal">False</span>,</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_ch)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 只有形状变化时，捷径才需要投影</span></span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_ch != out_ch:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(</span><br><span class="line">                    in_ch, out_ch,</span><br><span class="line">                    kernel_size=<span class="number">1</span>,</span><br><span class="line">                    stride=stride,</span><br><span class="line">                    bias=<span class="literal">False</span>,</span><br><span class="line">                ),</span><br><span class="line">                nn.BatchNorm2d(out_ch),</span><br><span class="line">            )</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Identity()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        identity = <span class="variable language_">self</span>.shortcut(x)       <span class="comment"># 捷径分支</span></span><br><span class="line"></span><br><span class="line">        out = <span class="variable language_">self</span>.conv1(x)               <span class="comment"># 主分支</span></span><br><span class="line">        out = <span class="variable language_">self</span>.bn1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.relu(out)</span><br><span class="line"></span><br><span class="line">        out = <span class="variable language_">self</span>.conv2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.bn2(out)</span><br><span class="line"></span><br><span class="line">        out = out + identity              <span class="comment"># 先相加</span></span><br><span class="line">        out = <span class="variable language_">self</span>.relu(out)               <span class="comment"># 再激活（v1）</span></span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<h3 id="代码里五个常见疑问"><a href="#代码里五个常见疑问" class="headerlink" title="代码里五个常见疑问"></a>代码里五个常见疑问</h3><p><strong>1. 为什么卷积写 <code>bias=False</code>？</strong> 之后的 <a href="/2026/10/25/BatchNorm/">BatchNorm</a> 自带可学习偏移 <code>beta</code>，卷积偏置会被 BN 的减均值操作抵消，保留它通常是冗余的。</p>
+<p><strong>2. 为什么第一个卷积用 <code>stride</code>，第二个固定为 1？</strong> 每个 stage 只需下采样一次。第一层先把尺寸对齐，后续计算都在较小特征图上完成。</p>
+<p><strong>3. 为什么是 <code>out + identity</code>，不是拼接？</strong> 残差公式就是逐元素相加，并且相加不会增加通道数。</p>
+<p><strong>4. 为什么不推荐 <code>out += identity</code>？</strong> 原地修改可能覆盖自动求导仍需使用的中间值。普通加法更稳妥。</p>
+<p><strong>5. <code>nn.Identity()</code> 有什么用？</strong> 它原样返回输入，使代码不必在 <code>forward</code> 里写两套分支。</p>
+<p>可以用一段小实验验证形状：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">x = torch.randn(<span class="number">2</span>, <span class="number">64</span>, <span class="number">56</span>, <span class="number">56</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 不改变形状</span></span><br><span class="line">block1 = BasicBlock(<span class="number">64</span>, <span class="number">64</span>, stride=<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(block1(x).shape)       <span class="comment"># torch.Size([2, 64, 56, 56])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 高宽减半、通道翻倍，捷径自动使用 1×1 投影</span></span><br><span class="line">block2 = BasicBlock(<span class="number">64</span>, <span class="number">128</span>, stride=<span class="number">2</span>)</span><br><span class="line"><span class="built_in">print</span>(block2(x).shape)       <span class="comment"># torch.Size([2, 128, 28, 28])</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十、初学者最容易犯的七个错误"><a href="#十、初学者最容易犯的七个错误" class="headerlink" title="十、初学者最容易犯的七个错误"></a>十、初学者最容易犯的七个错误</h2><h3 id="错误-1：把-residual-当成分类误差"><a href="#错误-1：把-residual-当成分类误差" class="headerlink" title="错误 1：把 residual 当成分类误差"></a>错误 1：把 residual 当成分类误差</h3><p>$F(x)&#x3D;H(x)-x$ 是块内部的特征差值；训练损失则比较最终预测和标签。它们不是一回事。</p>
+<h3 id="错误-2：认为捷径完全没有计算"><a href="#错误-2：认为捷径完全没有计算" class="headerlink" title="错误 2：认为捷径完全没有计算"></a>错误 2：认为捷径完全没有计算</h3><p>形状不变时捷径是 <code>Identity</code>；形状变化时通常有 1×1 卷积和 BN。</p>
+<h3 id="错误-3：把相加写成通道拼接"><a href="#错误-3：把相加写成通道拼接" class="headerlink" title="错误 3：把相加写成通道拼接"></a>错误 3：把相加写成通道拼接</h3><p><code>torch.cat([out, identity], dim=1)</code> 会把通道翻倍，这更像 DenseNet&#x2F;U-Net 的连接方式，不是标准 ResNet。</p>
+<h3 id="错误-4：两路形状不一致就相加"><a href="#错误-4：两路形状不一致就相加" class="headerlink" title="错误 4：两路形状不一致就相加"></a>错误 4：两路形状不一致就相加</h3><p>看到 “The size of tensor a must match…” 一类报错，先打印两路的 <code>shape</code>，检查通道、stride 和 padding。</p>
+<h3 id="错误-5：把-ResNet-理解为只解决梯度消失"><a href="#错误-5：把-ResNet-理解为只解决梯度消失" class="headerlink" title="错误 5：把 ResNet 理解为只解决梯度消失"></a>错误 5：把 ResNet 理解为只解决梯度消失</h3><p>它确实改善梯度传播，但原论文更直接瞄准的是深层普通网络的<strong>优化退化</strong>。BN、合理初始化等手段已经缓解了朴素的梯度爆炸&#x2F;消失，残差结构进一步让深网更易优化。</p>
+<h3 id="错误-6：认为层数越深一定越适合自己的任务"><a href="#错误-6：认为层数越深一定越适合自己的任务" class="headerlink" title="错误 6：认为层数越深一定越适合自己的任务"></a>错误 6：认为层数越深一定越适合自己的任务</h3><p>深网计算更慢、显存更大，也更依赖数据量和训练策略。小数据任务上，预训练 ResNet-18&#x2F;34 有时比从头训练 ResNet-101 更可靠。</p>
+<h3 id="错误-7：忘记输入通道数"><a href="#错误-7：忘记输入通道数" class="headerlink" title="错误 7：忘记输入通道数"></a>错误 7：忘记输入通道数</h3><p>ImageNet 预训练模型通常接收 RGB 三通道。灰度医学图像要么复制为三通道，要么改第一层卷积，并考虑预训练权重如何迁移。</p>
+<hr>
+<h2 id="十一、在医学图像分割里怎样使用-ResNet"><a href="#十一、在医学图像分割里怎样使用-ResNet" class="headerlink" title="十一、在医学图像分割里怎样使用 ResNet"></a>十一、在医学图像分割里怎样使用 ResNet</h2><p>U-Net 的编码器本质上负责不断下采样并提取多尺度特征，因此常把普通卷积编码器替换成预训练 ResNet：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ResNet stage 1（1/4 尺寸） ───────────┐</span><br><span class="line">ResNet stage 2（1/8 尺寸） ───────┐   │</span><br><span class="line">ResNet stage 3（1/16 尺寸） ──┐  │   │  跳跃连接到解码器</span><br><span class="line">ResNet stage 4（1/32 尺寸）   │  │   │</span><br></pre></td></tr></table></figure>
+
+<p>这样做有两个常见收益：</p>
+<ul>
+<li>ImageNet 预训练权重能提供稳定的边缘、纹理等低层特征，对标注稀缺的医学数据很有价值；</li>
+<li>残差连接让编码器加深时仍较容易训练。</li>
+</ul>
+<p>但要留意输出步长。分类 ResNet 最深特征通常只有输入的 $1&#x2F;32$，小病灶可能被下采样得过狠。分割模型经常取消后面一次下采样、改用空洞卷积，或依赖强解码器与高分辨率跳跃连接。</p>
+<hr>
+<h2 id="十二、从-ResNet-看懂后来的网络"><a href="#十二、从-ResNet-看懂后来的网络" class="headerlink" title="十二、从 ResNet 看懂后来的网络"></a>十二、从 ResNet 看懂后来的网络</h2><p>把一个残差块拆成“主分支、捷径、融合方式”三部分，许多后续工作就很好理解：</p>
+<table>
+<thead>
+<tr>
+<th>工作</th>
+<th>改了哪里</th>
+<th>一句话理解</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="/2025/11/26/DenseNet/">DenseNet</a></td>
+<td>融合方式</td>
+<td>相加改成通道拼接，保留所有旧特征</td>
+</tr>
+<tr>
+<td><a href="/2025/11/27/SENet/">SENet</a></td>
+<td>主分支出口</td>
+<td>相加前为不同通道学习重要性权重</td>
+</tr>
+<tr>
+<td><a href="/2025/11/12/mm-unet-res2net/">Res2Net</a></td>
+<td>主分支内部</td>
+<td>在一个块内制造多尺度层级残差</td>
+</tr>
+<tr>
+<td>ResNeXt</td>
+<td>主分支内部</td>
+<td>用并行分组变换增加“基数”</td>
+</tr>
+<tr>
+<td>ResNet v2</td>
+<td>算子顺序</td>
+<td>预激活让恒等捷径更干净</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="十三、三道自测题"><a href="#十三、三道自测题" class="headerlink" title="十三、三道自测题"></a>十三、三道自测题</h2><p>先自己回答，再展开答案。</p>
+<details class="toggle" ><summary class="toggle-button" style="">1. 如果残差块最理想的行为是什么都不改变，主分支应该学到什么？</summary><div class="toggle-content"><p>应该学到 $F(x)&#x3D;0$，这样 $y&#x3D;F(x)+x&#x3D;x$。</p>
+</div></details>
+
+<details class="toggle" ><summary class="toggle-button" style="">2. 输入是 64×56×56，主分支输出是 128×28×28，为什么不能直接相加？</summary><div class="toggle-content"><p>逐元素相加要求通道、高、宽完全一致。应在捷径上用带 <code>stride=2</code> 的 1×1 卷积，把输入投影成 128×28×28。</p>
+</div></details>
+
+<details class="toggle" ><summary class="toggle-button" style="">3. ResNet-50 为什么用 Bottleneck 而不是 BasicBlock？</summary><div class="toggle-content"><p>深层 stage 的通道数很大。Bottleneck 先用 1×1 降通道，让昂贵的 3×3 卷积在窄通道上计算，再升回输出通道，能以可控的参数量和计算量堆得更深。</p>
+</div></details>
+
+<h2 id="最后用一张清单复习"><a href="#最后用一张清单复习" class="headerlink" title="最后用一张清单复习"></a>最后用一张清单复习</h2><ul>
+<li>ResNet 要解决的是：普通深层网络出现<strong>训练退化</strong>，不是单纯过拟合。</li>
+<li>普通块直接学 $H(x)$；残差块学习 $F(x)&#x3D;H(x)-x$，输出是 $F(x)+x$。</li>
+<li>当理想映射接近恒等时，学习 $F(x)\approx0$ 更容易。</li>
+<li>捷径为前向信息和反向梯度提供了直接路径。</li>
+<li>BasicBlock 用两个 3×3，服务于 ResNet-18&#x2F;34。</li>
+<li>Bottleneck 用 <code>1×1 → 3×3 → 1×1</code>，服务于 ResNet-50&#x2F;101&#x2F;152。</li>
+<li>两路形状不一致时，用 1×1 投影捷径对齐。</li>
+<li>“残差相加”与 U-Net&#x2F;DenseNet 的“通道拼接”不是同一件事。</li>
+</ul>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ul>
+<li>He et al., <em>Deep Residual Learning for Image Recognition</em>, CVPR 2016, <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1512.03385">arXiv:1512.03385</a></li>
+<li>He et al., <em>Identity Mappings in Deep Residual Networks</em>, ECCV 2016, <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1603.05027">arXiv:1603.05027</a></li>
+<li>Xie et al., <em>Aggregated Residual Transformations for Deep Neural Networks</em>, CVPR 2017, <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1611.05431">arXiv:1611.05431</a></li>
+<li>PyTorch, <a target="_blank" rel="noopener" href="https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py">torchvision.models.resnet 源码</a></li>
+</ul>
+<aside class="seo-related" aria-label="相关阅读"><h2>相关阅读</h2><ul><li><a href="/2025/11/26/DenseNet/">DenseNet 网络详解：密集连接、Growth Rate 与参数效率</a></li><li><a href="/2025/11/27/SENet/">SENet 通道注意力详解：Squeeze-and-Excitation 原理与计算过程</a></li><li><a href="/2026/10/25/BatchNorm/">BatchNorm 超详细入门：手算公式、训练与推理差异，以及 BN/LN/IN/GN 怎么选</a></li><li><a href="/2025/11/12/mm-unet-res2net/">MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取</a></li></ul></aside></div><div class="lang-block" data-lang="en" lang="en"><p><em>About 22 minutes · Best read with the diagrams and a few calculations on paper</em></p>
+<p>If you remember only one sentence, remember this: <strong>ResNet gives information a direct elevator</strong>. A plain network asks every layer to process its input again. ResNet lets the input bypass several layers, travel straight to the other side, and then adds it to the newly learned change.</p>
+<p>That structure looks like “just one extra line”, but it made very deep networks much easier to optimise. Later models such as <a href="/2025/11/26/DenseNet/">DenseNet</a>, <a href="/2025/11/27/SENet/">SENet</a>, <a href="/2025/11/12/mm-unet-res2net/">Res2Net</a> and many medical-image segmentation networks all develop this idea further.</p>
+<h2 id="en-Three-things-to-know-before-reading"><a href="#en-Three-things-to-know-before-reading" class="headerlink" title="Three things to know before reading"></a>Three things to know before reading</h2><p>It is fine if these terms are new. Start with their simplest meanings:</p>
+<ul>
+<li><strong>Convolutional layer (Conv):</strong> uses many small filters to extract edges, textures, shapes and other features.</li>
+<li><strong>Feature map:</strong> the data produced by a layer. It may not look like an ordinary image, but it still has height, width and channels.</li>
+<li><strong>Backpropagation:</strong> after the model makes an error, it sends information about that error from the output towards the input and uses it to update every layer.</li>
+</ul>
+<p>This article repeatedly uses $N \times C \times H \times W$: $N$ is the number of images in a batch, $C$ the number of channels, and $H$ and $W$ the height and width.</p>
+<h2 id="en-Paper-at-a-glance"><a href="#en-Paper-at-a-glance" class="headerlink" title="Paper at a glance"></a>Paper at a glance</h2><ul>
+<li><strong>Paper:</strong> <em>Deep Residual Learning for Image Recognition</em></li>
+<li><strong>Authors:</strong> Kaiming He, Xiangyu Zhang, Shaoqing Ren and Jian Sun (MSRA)</li>
+<li><strong>Venue:</strong> CVPR 2016</li>
+<li><strong>Paper:</strong> <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1512.03385">arXiv:1512.03385</a></li>
+<li><strong>Main contribution:</strong> residual connections made very deep convolutional networks stable to train and enabled ImageNet models as deep as 152 layers.</li>
+</ul>
+<hr>
+<h2 id="en-1-Why-did-researchers-want-deeper-networks"><a href="#en-1-Why-did-researchers-want-deeper-networks" class="headerlink" title="1. Why did researchers want deeper networks?"></a>1. Why did researchers want deeper networks?</h2><p>When an image enters a convolutional network, early layers usually learn simple features and deeper layers combine them into more complex concepts:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">pixel intensity</span><br><span class="line">  ↓</span><br><span class="line">edges and directions</span><br><span class="line">  ↓</span><br><span class="line">textures and local shapes</span><br><span class="line">  ↓</span><br><span class="line">eyes, wheels or organ boundaries</span><br><span class="line">  ↓</span><br><span class="line">complete semantics such as a cat, a car or a prostate</span><br></pre></td></tr></table></figure>
+
+<p>More layers provide more processing steps, so a deeper model should be able to represent more complex functions. But being able to represent a function is not the same as being able to learn it. Before ResNet, researchers found that a plain network often became worse after it passed a certain depth.</p>
+<h3 id="en-1-1-Separate-three-easily-confused-problems"><a href="#en-1-1-Separate-three-easily-confused-problems" class="headerlink" title="1.1 Separate three easily confused problems"></a>1.1 Separate three easily confused problems</h3><table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>Training error</th>
+<th>Test error</th>
+<th>Intuition</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Overfitting</td>
+<td>very low</td>
+<td>high</td>
+<td>memorises the exercises but fails on new ones</td>
+</tr>
+<tr>
+<td>Vanishing&#x2F;exploding gradients</td>
+<td>may barely decrease</td>
+<td>usually poor</td>
+<td>the error signal cannot reach early layers, or its magnitude becomes unstable</td>
+</tr>
+<tr>
+<td>Degradation</td>
+<td>a deep network is worse than a shallow one</td>
+<td>also worse</td>
+<td>the deep model is more expressive in theory but cannot even learn the shallow model’s solution</td>
+</tr>
+</tbody></table>
+<p>The ResNet paper focuses on the third problem: the <strong>degradation problem</strong>.</p>
+<p>On CIFAR-10, the paper compared 20-layer and 56-layer plain convolutional networks. The 56-layer network had not only a higher test error but also a higher training error. The result therefore cannot be explained simply as overfitting.</p>
+<p><img src="/img/study/resnet-degradation-en.svg" alt="A conceptual comparison: a deeper plain network suffers degradation, whereas a residual network benefits from added depth"></p>
+<blockquote>
+<p>The curves are conceptual rather than a point-by-point copy of the paper’s experiment. The important part is the relative training error.</p>
+</blockquote>
+<h3 id="en-1-2-A-simple-but-crucial-argument"><a href="#en-1-2-A-simple-but-crucial-argument" class="headerlink" title="1.2 A simple but crucial argument"></a>1.2 A simple but crucial argument</h3><p>Suppose we already have a trained 20-layer network. We add 36 layers to make it 56 layers. If the 36 new layers change nothing and simply return their input, should the deeper network not at least match the 20-layer one?</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">first 20 layers: perform the original computation</span><br><span class="line">next 36 layers: output exactly what they receive</span><br><span class="line">result: should be no worse than the 20-layer network</span><br></pre></td></tr></table></figure>
+
+<p>“Output exactly what you receive” is the <strong>identity mapping</strong>:</p>
+<p>$$H(x) &#x3D; x$$</p>
+<p>The 56-layer model contains this solution in terms of representational capacity. The difficulty is optimisation: asking dozens of convolution and nonlinear activation layers to reproduce $H(x)&#x3D;x$ exactly is surprisingly hard.</p>
+<p>This is the starting point of ResNet: <strong>if a deep stack has trouble learning to do nothing, put “do nothing” directly into the architecture.</strong></p>
+<hr>
+<h2 id="en-2-What-does-residual-learning-actually-learn"><a href="#en-2-What-does-residual-learning-actually-learn" class="headerlink" title="2. What does residual learning actually learn?"></a>2. What does residual learning actually learn?</h2><p>First, define the symbols:</p>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>$x$</td>
+<td>input to a residual block</td>
+</tr>
+<tr>
+<td>$H(x)$</td>
+<td>ideal output the block should produce</td>
+</tr>
+<tr>
+<td>$F(x)$</td>
+<td>the change the main branch must learn</td>
+</tr>
+<tr>
+<td>$y$</td>
+<td>actual output of the residual block</td>
+</tr>
+</tbody></table>
+<p>A plain block learns:</p>
+<p>$$y &#x3D; H(x)$$</p>
+<p>ResNet rewrites the task as:</p>
+<p>$$\begin{aligned} F(x) &amp;&#x3D; H(x) - x \cr y &amp;&#x3D; F(x) + x \end{aligned}$$</p>
+<p>The “residual” is what is still missing between the input and the desired output.</p>
+<p><img src="/img/study/resnet-plain-vs-residual-en.svg" alt="A plain block learns the complete target mapping, while a residual block learns only the change relative to its input"></p>
+<h3 id="en-2-1-Think-of-photo-editing"><a href="#en-2-1-Think-of-photo-editing" class="headerlink" title="2.1 Think of photo editing"></a>2.1 Think of photo editing</h3><p>Suppose $x$ is a slightly underexposed photograph and $H(x)$ is the corrected photograph.</p>
+<p>A plain network must <strong>generate the entire corrected image</strong>.</p>
+<p>A residual network only needs to generate <strong>an edit list describing where to brighten and where to increase contrast</strong>, then add that list back to the original image.</p>
+<p>If the input is already good:</p>
+<p>$$H(x) \approx x \quad \Longrightarrow \quad F(x) &#x3D; H(x)-x \approx 0$$</p>
+<p>The model can preserve its input simply by making the main branch output nearly zero. That is usually easier than asking several layers to reproduce $x$ exactly.</p>
+<h3 id="en-2-2-A-numerical-example"><a href="#en-2-2-A-numerical-example" class="headerlink" title="2.2 A numerical example"></a>2.2 A numerical example</h3><p>Suppose a feature has value $x&#x3D;10$ and its ideal output is $H(x)&#x3D;10.5$.</p>
+<ul>
+<li><strong>Plain learning:</strong> directly transform 10 into 10.5.</li>
+<li><strong>Residual learning:</strong> learn only $F(x)&#x3D;10.5-10&#x3D;0.5$, then compute $0.5+10&#x3D;10.5$.</li>
+</ul>
+<p>If the desired output is exactly 10:</p>
+<ul>
+<li><strong>Plain learning:</strong> the complete stack must implement $H(10)&#x3D;10$.</li>
+<li><strong>Residual learning:</strong> the main branch only needs to output $F(10)&#x3D;0$.</li>
+</ul>
+<p>The residual here is not a prediction error or a loss value. It is the <strong>difference between input and output features</strong>, deliberately learned inside the network.</p>
+<hr>
+<h2 id="en-3-Why-does-the-shortcut-help-gradients-flow"><a href="#en-3-Why-does-the-shortcut-help-gradients-flow" class="headerlink" title="3. Why does the shortcut help gradients flow?"></a>3. Why does the shortcut help gradients flow?</h2><p>A residual block has two paths:</p>
+<ol>
+<li><strong>Main branch:</strong> convolution, BN and ReLU produce $F(x)$.</li>
+<li><strong>Shortcut branch:</strong> the original $x$ bypasses those operations.</li>
+</ol>
+<p>The two paths are added element by element:</p>
+<p>$$y &#x3D; F(x)+x$$</p>
+<p><img src="/img/study/resnet.svg" alt="Residual block: the main branch learns F(x), the shortcut carries x directly, and the two are added to obtain the output"></p>
+<p>Addition requires identical shapes. For example, both branches must have shape $N \times 64 \times 56 \times 56$. We will handle mismatched shapes later.</p>
+<h3 id="en-3-1-Gradients-in-an-ordinary-deep-network"><a href="#en-3-1-Gradients-in-an-ordinary-deep-network" class="headerlink" title="3.1 Gradients in an ordinary deep network"></a>3.1 Gradients in an ordinary deep network</h3><p>Backpropagation follows the chain rule. Across a long sequence of layers, local gradients keep multiplying:</p>
+<p>$$\frac{\partial L}{\partial x_0}&#x3D;g_1g_2\cdots g_n&#x3D;\prod_{i&#x3D;1}^{n}g_i$$</p>
+<p>If every segment is approximately 0.8, then after 20 multiplications:</p>
+<p>$$0.8^{20}\approx0.0115$$</p>
+<p>Only a very small signal reaches early layers. If the factors are repeatedly larger than one, the gradient may instead grow without control. Real gradients are tensors rather than single numbers, but the intuition is the same.</p>
+<h3 id="en-3-2-A-residual-block-contributes-an-extra-“1”"><a href="#en-3-2-A-residual-block-contributes-an-extra-“1”" class="headerlink" title="3.2 A residual block contributes an extra “1”"></a>3.2 A residual block contributes an extra “1”</h3><p>Differentiate $y&#x3D;F(x)+x$:</p>
+<p>$$\frac{\partial y}{\partial x}&#x3D;\frac{\partial F(x)}{\partial x}+1$$</p>
+<p>Therefore:</p>
+<p>$$\frac{\partial L}{\partial x}&#x3D;\frac{\partial L}{\partial y}\left(\frac{\partial F(x)}{\partial x}+1\right)$$</p>
+<p>The $1$ comes from the shortcut. Even if the local gradient through the main branch is small, part of the gradient can still travel directly through the shortcut.</p>
+<p><img src="/img/study/resnet-gradient-path-en.svg" alt="Forward information and backward gradients can cross a complex main branch through the identity shortcut"></p>
+<p>Across many residual blocks, shallow features reach deeper layers through both transformed paths and a sequence of additive shortcuts. ResNet does not make vanishing gradients mathematically impossible, but it greatly improves the optimisation conditions of deep networks.</p>
+<h3 id="en-3-3-Why-addition-rather-than-concatenation"><a href="#en-3-3-Why-addition-rather-than-concatenation" class="headerlink" title="3.3 Why addition rather than concatenation?"></a>3.3 Why addition rather than concatenation?</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add:     two C-channel tensors → still C channels</span><br><span class="line">concat:  two C-channel tensors → 2C channels</span><br></pre></td></tr></table></figure>
+
+<p>ResNet uses addition, so channel counts do not keep growing and computation stays controlled. <a href="/2025/11/26/DenseNet/">DenseNet</a> uses channel concatenation so later layers can explicitly access every earlier feature. Both are shortcuts, but they fuse information differently.</p>
+<hr>
+<h2 id="en-4-BasicBlock-the-building-block-of-ResNet-18-and-ResNet-34"><a href="#en-4-BasicBlock-the-building-block-of-ResNet-18-and-ResNet-34" class="headerlink" title="4. BasicBlock: the building block of ResNet-18 and ResNet-34"></a>4. BasicBlock: the building block of ResNet-18 and ResNet-34</h2><p>The main branch of the original ResNet v1 BasicBlock contains two 3×3 convolutions:</p>
+<pre><code class="highlight mermaid">flowchart LR
+  X[&quot;input x&quot;] --&gt; C1[&quot;3×3 Conv&quot;]
+  C1 --&gt; B1[&quot;BN&quot;] --&gt; R1[&quot;ReLU&quot;]
+  R1 --&gt; C2[&quot;3×3 Conv&quot;] --&gt; B2[&quot;BN&quot;]
+  B2 --&gt; ADD((&quot;element-wise add&quot;))
+  X -- &quot;identity shortcut&quot; --&gt; ADD
+  ADD --&gt; R2[&quot;ReLU&quot;] --&gt; Y[&quot;output y&quot;]</code></pre>
+
+<p>Memorise the order as one line:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Conv → BN → ReLU → Conv → BN → Add → ReLU</span><br></pre></td></tr></table></figure>
+
+<p>There is no ReLU immediately after the second BN. The main branch must retain both positive and negative values before it is added to $x$; otherwise it cannot freely increase or cancel parts of the input.</p>
+<h3 id="en-Track-the-shape-by-hand"><a href="#en-Track-the-shape-by-hand" class="headerlink" title="Track the shape by hand"></a>Track the shape by hand</h3><p>Suppose the input is:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x: (N=8, C=64, H=56, W=56)</span><br></pre></td></tr></table></figure>
+
+<p>Both convolutions use <code>kernel=3, stride=1, padding=1</code>, so height, width and channel count remain unchanged:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">main branch F(x): (8, 64, 56, 56)</span><br><span class="line">shortcut x:       (8, 64, 56, 56)</span><br><span class="line">sum y:            (8, 64, 56, 56)</span><br></pre></td></tr></table></figure>
+
+<p>The operation does not sum all entries into one number. It adds matching positions:</p>
+<p>$$y_{n,c,h,w}&#x3D;F_{n,c,h,w}+x_{n,c,h,w}$$</p>
+<p>Here $F$ denotes the main branch output $F(x)$.</p>
+<hr>
+<h2 id="en-5-What-if-the-dimensions-do-not-match"><a href="#en-5-What-if-the-dimensions-do-not-match" class="headerlink" title="5. What if the dimensions do not match?"></a>5. What if the dimensions do not match?</h2><p>When a network enters a new stage it commonly does two things:</p>
+<ul>
+<li>halves height and width, for example <code>56×56 → 28×28</code>;</li>
+<li>increases channels, for example <code>64 → 128</code>.</li>
+</ul>
+<p>Now the branches have different shapes:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">main branch: N × 128 × 28 × 28</span><br><span class="line">shortcut:    N ×  64 × 56 × 56</span><br></pre></td></tr></table></figure>
+
+<p>They cannot be added. The usual solution is a <code>1×1</code> convolution with <code>stride=2</code> on the shortcut:</p>
+<pre><code class="highlight mermaid">flowchart LR
+  X[&quot;x: 64×56×56&quot;] --&gt; MAIN[&quot;main branch&lt;br/&gt;3×3 Conv, stride=2&quot;]
+  MAIN --&gt; FM[&quot;F(x): 128×28×28&quot;] --&gt; ADD((&quot;+&quot;))
+  X --&gt; PROJ[&quot;shortcut&lt;br/&gt;1×1 Conv, stride=2&quot;]
+  PROJ --&gt; ID[&quot;projected: 128×28×28&quot;] --&gt; ADD
+  ADD --&gt; Y[&quot;y: 128×28×28&quot;]</code></pre>
+
+<p>This is a <strong>projection shortcut</strong>. It:</p>
+<ol>
+<li>uses stride 2 to reduce the spatial size;</li>
+<li>uses a new set of filters to change the number of channels;</li>
+<li>gives both branches matching shapes so they can be added.</li>
+</ol>
+<p>The paper also discusses zero-padding the channel dimension. In practice, the common rule is: <strong>use a 1×1 projection only when spatial size or channel count changes; otherwise keep the parameter-free identity shortcut.</strong></p>
+<hr>
+<h2 id="en-6-Bottleneck-why-ResNet-50-101-152-do-not-simply-stack-3×3-layers"><a href="#en-6-Bottleneck-why-ResNet-50-101-152-do-not-simply-stack-3×3-layers" class="headerlink" title="6. Bottleneck: why ResNet-50&#x2F;101&#x2F;152 do not simply stack 3×3 layers"></a>6. Bottleneck: why ResNet-50&#x2F;101&#x2F;152 do not simply stack 3×3 layers</h2><p>Two 3×3 convolutions become expensive when the channel count is large. A Bottleneck uses three convolutions:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1×1 reduce channels → 3×3 process → 1×1 restore channels</span><br></pre></td></tr></table></figure>
+
+<p>A typical example is:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">input: 256 channels</span><br><span class="line">  ↓ 1×1</span><br><span class="line">reduce to 64 channels</span><br><span class="line">  ↓ 3×3</span><br><span class="line">keep 64 channels</span><br><span class="line">  ↓ 1×1</span><br><span class="line">expand to 256 channels</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/study/resnet-block-types-en.svg" alt="BasicBlock and Bottleneck compared by structure, channel changes and the ResNet variants that use them"></p>
+<p>“Bottleneck” does not mean that useful information must be destroyed. It means the middle channel dimension narrows like the neck of a bottle, allowing the expensive 3×3 convolution to run on fewer channels.</p>
+<h3 id="en-6-1-How-can-a-1×1-convolution-change-channels"><a href="#en-6-1-How-can-a-1×1-convolution-change-channels" class="headerlink" title="6.1 How can a 1×1 convolution change channels?"></a>6.1 How can a 1×1 convolution change channels?</h3><p>A 1×1 kernel examines only one spatial position, but it reads every input channel at that position. Given 256 input channels, 64 different 1×1 kernels mix the 256-dimensional vector into 64 output dimensions at every pixel.</p>
+<p>It does not inspect neighbouring pixels. Its main jobs are <strong>channel mixing and dimensionality reduction or expansion</strong>.</p>
+<h3 id="en-6-2-Calculate-the-parameter-count"><a href="#en-6-2-Calculate-the-parameter-count" class="headerlink" title="6.2 Calculate the parameter count"></a>6.2 Calculate the parameter count</h3><p>Ignoring bias, a convolution has:</p>
+<p>$$\text{params}&#x3D;k_hk_wC_{\text{in}}C_{\text{out}}$$</p>
+<p>Two 3×3 convolutions operating entirely at 256 channels require:</p>
+<p>$$2(3\times3\times256\times256)&#x3D;1{,}179{,}648$$</p>
+<p>The Bottleneck main branch requires:</p>
+<table>
+<thead>
+<tr>
+<th>Convolution</th>
+<th>Calculation</th>
+<th>Parameters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1×1 reduction</td>
+<td>$1\times1\times256\times64$</td>
+<td>16,384</td>
+</tr>
+<tr>
+<td>3×3 processing</td>
+<td>$3\times3\times64\times64$</td>
+<td>36,864</td>
+</tr>
+<tr>
+<td>1×1 expansion</td>
+<td>$1\times1\times64\times256$</td>
+<td>16,384</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td></td>
+<td><strong>69,632</strong></td>
+</tr>
+</tbody></table>
+<p>This comparison demonstrates why channel compression saves parameters; it does not claim the two blocks have the same number of layers. A Bottleneck has three convolutions and a BasicBlock has two.</p>
+<h3 id="en-6-3-What-does-expansion-4-mean"><a href="#en-6-3-What-does-expansion-4-mean" class="headerlink" title="6.3 What does expansion = 4 mean?"></a>6.3 What does <code>expansion = 4</code> mean?</h3><p>The output of a standard Bottleneck has four times as many channels as its middle representation:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">middle 64  → output 256</span><br><span class="line">middle 128 → output 512</span><br><span class="line">middle 256 → output 1024</span><br><span class="line">middle 512 → output 2048</span><br></pre></td></tr></table></figure>
+
+<p>That is why PyTorch sets <code>expansion = 4</code>. The final stage of ResNet-50 outputs 2048 channels, while ResNet-18 ends with 512.</p>
+<hr>
+<h2 id="en-7-Building-a-complete-ResNet-from-blocks"><a href="#en-7-Building-a-complete-ResNet-from-blocks" class="headerlink" title="7. Building a complete ResNet from blocks"></a>7. Building a complete ResNet from blocks</h2><p>A standard ImageNet ResNet can be read as:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">input 224×224</span><br><span class="line">  ↓ 7×7 Conv, stride=2</span><br><span class="line">112×112</span><br><span class="line">  ↓ 3×3 MaxPool, stride=2</span><br><span class="line">56×56</span><br><span class="line">  ↓ stage 1</span><br><span class="line">56×56</span><br><span class="line">  ↓ stage 2 (first block downsamples)</span><br><span class="line">28×28</span><br><span class="line">  ↓ stage 3</span><br><span class="line">14×14</span><br><span class="line">  ↓ stage 4</span><br><span class="line">7×7</span><br><span class="line">  ↓ global average pooling</span><br><span class="line">one number per channel</span><br><span class="line">  ↓ fully connected layer</span><br><span class="line">class scores</span><br></pre></td></tr></table></figure>
+
+<p>The main differences between variants are the block type and the number of repetitions per stage:</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Block</th>
+<th>Blocks in four stages</th>
+<th>Intuition for layer count</th>
+<th>Approx. parameters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ResNet-18</td>
+<td>BasicBlock</td>
+<td>2, 2, 2, 2</td>
+<td><code>8×2 + stem + FC</code></td>
+<td>11.7 M</td>
+</tr>
+<tr>
+<td>ResNet-34</td>
+<td>BasicBlock</td>
+<td>3, 4, 6, 3</td>
+<td><code>16×2 + stem + FC</code></td>
+<td>21.8 M</td>
+</tr>
+<tr>
+<td>ResNet-50</td>
+<td>Bottleneck</td>
+<td>3, 4, 6, 3</td>
+<td><code>16×3 + stem + FC</code></td>
+<td>25.6 M</td>
+</tr>
+<tr>
+<td>ResNet-101</td>
+<td>Bottleneck</td>
+<td>3, 4, 23, 3</td>
+<td>a much deeper middle stage</td>
+<td>44.5 M</td>
+</tr>
+<tr>
+<td>ResNet-152</td>
+<td>Bottleneck</td>
+<td>3, 8, 36, 3</td>
+<td>an even deeper third stage</td>
+<td>60.2 M</td>
+</tr>
+</tbody></table>
+<p>Layer counting normally includes weighted convolutional layers and the final fully connected layer, but excludes BN, ReLU, pooling and element-wise additions. A BasicBlock therefore contributes two “layers” even though its computation graph contains more operations.</p>
+<h3 id="en-Why-do-ResNet-50-and-ResNet-34-have-the-same-number-of-blocks-but-different-names"><a href="#en-Why-do-ResNet-50-and-ResNet-34-have-the-same-number-of-blocks-but-different-names" class="headerlink" title="Why do ResNet-50 and ResNet-34 have the same number of blocks but different names?"></a>Why do ResNet-50 and ResNet-34 have the same number of blocks but different names?</h3><p>Both use <code>[3, 4, 6, 3]</code>, or 16 blocks in total:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ResNet-34: 16 blocks × 2 convolutions + 1 stem convolution + FC = 34</span><br><span class="line">ResNet-50: 16 blocks × 3 convolutions + 1 stem convolution + FC = 50</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="en-8-ResNet-v1-and-v2-the-position-of-ReLU-matters"><a href="#en-8-ResNet-v1-and-v2-the-position-of-ReLU-matters" class="headerlink" title="8. ResNet v1 and v2: the position of ReLU matters"></a>8. ResNet v1 and v2: the position of ReLU matters</h2><p>Original ResNet v1:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x → Conv → BN → ReLU → Conv → BN → Add → ReLU</span><br><span class="line">└──────────────────────────────→ Add</span><br></pre></td></tr></table></figure>
+
+<p>The later paper <em>Identity Mappings in Deep Residual Networks</em> proposed pre-activation ResNet v2:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x → BN → ReLU → Conv → BN → ReLU → Conv → Add</span><br><span class="line">└──────────────────────────────────────→ Add</span><br></pre></td></tr></table></figure>
+
+<p>V2 moves BN and ReLU before each convolution and applies no immediate activation after addition. Across many blocks, the shortcut backbone is therefore closer to a pure identity mapping, giving information and gradients a more direct route.</p>
+<p>Do not confuse v1&#x2F;v2 with BasicBlock&#x2F;Bottleneck:</p>
+<ul>
+<li>v1&#x2F;v2 describe the <strong>ordering of operations</strong>;</li>
+<li>BasicBlock&#x2F;Bottleneck describe the <strong>convolutional structure of the main branch</strong>.</li>
+</ul>
+<hr>
+<h2 id="en-9-Read-a-PyTorch-BasicBlock-step-by-step"><a href="#en-9-Read-a-PyTorch-BasicBlock-step-by-step" class="headerlink" title="9. Read a PyTorch BasicBlock step by step"></a>9. Read a PyTorch BasicBlock step by step</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">BasicBlock</span>(nn.Module):</span><br><span class="line">    expansion = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, in_ch, out_ch, stride=<span class="number">1</span></span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># First main-branch layer: may perform downsampling.</span></span><br><span class="line">        <span class="variable language_">self</span>.conv1 = nn.Conv2d(</span><br><span class="line">            in_ch, out_ch,</span><br><span class="line">            kernel_size=<span class="number">3</span>,</span><br><span class="line">            stride=stride,</span><br><span class="line">            padding=<span class="number">1</span>,</span><br><span class="line">            bias=<span class="literal">False</span>,</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.bn1 = nn.BatchNorm2d(out_ch)</span><br><span class="line">        <span class="variable language_">self</span>.relu = nn.ReLU(inplace=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Second main-branch layer: keeps the current size.</span></span><br><span class="line">        <span class="variable language_">self</span>.conv2 = nn.Conv2d(</span><br><span class="line">            out_ch, out_ch,</span><br><span class="line">            kernel_size=<span class="number">3</span>,</span><br><span class="line">            stride=<span class="number">1</span>,</span><br><span class="line">            padding=<span class="number">1</span>,</span><br><span class="line">            bias=<span class="literal">False</span>,</span><br><span class="line">        )</span><br><span class="line">        <span class="variable language_">self</span>.bn2 = nn.BatchNorm2d(out_ch)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># The shortcut needs a projection only when the shape changes.</span></span><br><span class="line">        <span class="keyword">if</span> stride != <span class="number">1</span> <span class="keyword">or</span> in_ch != out_ch:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Sequential(</span><br><span class="line">                nn.Conv2d(</span><br><span class="line">                    in_ch, out_ch,</span><br><span class="line">                    kernel_size=<span class="number">1</span>,</span><br><span class="line">                    stride=stride,</span><br><span class="line">                    bias=<span class="literal">False</span>,</span><br><span class="line">                ),</span><br><span class="line">                nn.BatchNorm2d(out_ch),</span><br><span class="line">            )</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="variable language_">self</span>.shortcut = nn.Identity()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        identity = <span class="variable language_">self</span>.shortcut(x)       <span class="comment"># shortcut branch</span></span><br><span class="line"></span><br><span class="line">        out = <span class="variable language_">self</span>.conv1(x)               <span class="comment"># main branch</span></span><br><span class="line">        out = <span class="variable language_">self</span>.bn1(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.relu(out)</span><br><span class="line"></span><br><span class="line">        out = <span class="variable language_">self</span>.conv2(out)</span><br><span class="line">        out = <span class="variable language_">self</span>.bn2(out)</span><br><span class="line"></span><br><span class="line">        out = out + identity              <span class="comment"># add first</span></span><br><span class="line">        out = <span class="variable language_">self</span>.relu(out)               <span class="comment"># activate afterwards (v1)</span></span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+<h3 id="en-Five-common-questions-about-the-code"><a href="#en-Five-common-questions-about-the-code" class="headerlink" title="Five common questions about the code"></a>Five common questions about the code</h3><p><strong>1. Why does the convolution use <code>bias=False</code>?</strong> The following <a href="/2026/10/25/BatchNorm/">BatchNorm</a> already has a learnable offset <code>beta</code>, and BN’s centring operation cancels the convolutional bias. Keeping both is usually redundant.</p>
+<p><strong>2. Why does the first convolution use <code>stride</code>, while the second always uses 1?</strong> Each stage only needs to downsample once. The first layer aligns the size, then the remaining computation runs on the smaller feature map.</p>
+<p><strong>3. Why <code>out + identity</code> rather than concatenation?</strong> The residual formula uses element-wise addition, which does not increase the channel count.</p>
+<p><strong>4. Why avoid <code>out += identity</code>?</strong> An in-place operation can overwrite an intermediate value still needed by autograd. Ordinary addition is safer.</p>
+<p><strong>5. What is <code>nn.Identity()</code> for?</strong> It returns its input unchanged, so <code>forward</code> does not need two different code paths.</p>
+<p>Verify the shapes with a small experiment:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">x = torch.randn(<span class="number">2</span>, <span class="number">64</span>, <span class="number">56</span>, <span class="number">56</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Shape is unchanged.</span></span><br><span class="line">block1 = BasicBlock(<span class="number">64</span>, <span class="number">64</span>, stride=<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(block1(x).shape)       <span class="comment"># torch.Size([2, 64, 56, 56])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Height and width halve, channels double, and the shortcut uses a 1×1 projection.</span></span><br><span class="line">block2 = BasicBlock(<span class="number">64</span>, <span class="number">128</span>, stride=<span class="number">2</span>)</span><br><span class="line"><span class="built_in">print</span>(block2(x).shape)       <span class="comment"># torch.Size([2, 128, 28, 28])</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="en-10-Seven-mistakes-beginners-often-make"><a href="#en-10-Seven-mistakes-beginners-often-make" class="headerlink" title="10. Seven mistakes beginners often make"></a>10. Seven mistakes beginners often make</h2><h3 id="en-Mistake-1-treating-the-residual-as-the-classification-error"><a href="#en-Mistake-1-treating-the-residual-as-the-classification-error" class="headerlink" title="Mistake 1: treating the residual as the classification error"></a>Mistake 1: treating the residual as the classification error</h3><p>$F(x)&#x3D;H(x)-x$ is an internal feature difference. The training loss compares the final prediction with the target label. They are not the same thing.</p>
+<h3 id="en-Mistake-2-assuming-the-shortcut-always-performs-no-computation"><a href="#en-Mistake-2-assuming-the-shortcut-always-performs-no-computation" class="headerlink" title="Mistake 2: assuming the shortcut always performs no computation"></a>Mistake 2: assuming the shortcut always performs no computation</h3><p>When the shape is unchanged the shortcut is <code>Identity</code>; when the shape changes it commonly contains a 1×1 convolution and BN.</p>
+<h3 id="en-Mistake-3-replacing-addition-with-channel-concatenation"><a href="#en-Mistake-3-replacing-addition-with-channel-concatenation" class="headerlink" title="Mistake 3: replacing addition with channel concatenation"></a>Mistake 3: replacing addition with channel concatenation</h3><p><code>torch.cat([out, identity], dim=1)</code> doubles the channels. That resembles a DenseNet or U-Net connection, not a standard ResNet shortcut.</p>
+<h3 id="en-Mistake-4-adding-branches-with-incompatible-shapes"><a href="#en-Mistake-4-adding-branches-with-incompatible-shapes" class="headerlink" title="Mistake 4: adding branches with incompatible shapes"></a>Mistake 4: adding branches with incompatible shapes</h3><p>If you see an error such as “The size of tensor a must match…”, print the shapes of both branches and check the channel count, stride and padding.</p>
+<h3 id="en-Mistake-5-thinking-ResNet-only-solves-vanishing-gradients"><a href="#en-Mistake-5-thinking-ResNet-only-solves-vanishing-gradients" class="headerlink" title="Mistake 5: thinking ResNet only solves vanishing gradients"></a>Mistake 5: thinking ResNet only solves vanishing gradients</h3><p>It does improve gradient flow, but the original paper directly targeted the <strong>optimisation degradation</strong> of deep plain networks. BN and sensible initialisation had already reduced basic exploding&#x2F;vanishing-gradient problems; residual structure made the deeper optimisation landscape easier still.</p>
+<h3 id="en-Mistake-6-assuming-deeper-is-always-better-for-your-task"><a href="#en-Mistake-6-assuming-deeper-is-always-better-for-your-task" class="headerlink" title="Mistake 6: assuming deeper is always better for your task"></a>Mistake 6: assuming deeper is always better for your task</h3><p>Deeper networks are slower, use more memory and depend more strongly on data volume and training strategy. On a small dataset, a pretrained ResNet-18&#x2F;34 can be more reliable than training ResNet-101 from scratch.</p>
+<h3 id="en-Mistake-7-forgetting-the-input-channel-count"><a href="#en-Mistake-7-forgetting-the-input-channel-count" class="headerlink" title="Mistake 7: forgetting the input channel count"></a>Mistake 7: forgetting the input channel count</h3><p>ImageNet-pretrained models normally expect three RGB channels. For grayscale medical images, either repeat the image across three channels or modify the first convolution and decide how to transfer its pretrained weights.</p>
+<hr>
+<h2 id="en-11-Using-ResNet-in-medical-image-segmentation"><a href="#en-11-Using-ResNet-in-medical-image-segmentation" class="headerlink" title="11. Using ResNet in medical-image segmentation"></a>11. Using ResNet in medical-image segmentation</h2><p>A U-Net encoder repeatedly downsamples and extracts multi-scale features, so its ordinary convolutional encoder is often replaced with a pretrained ResNet:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ResNet stage 1 (1/4 size)  ───────────┐</span><br><span class="line">ResNet stage 2 (1/8 size)  ───────┐   │</span><br><span class="line">ResNet stage 3 (1/16 size) ───┐   │   │  skip connections to decoder</span><br><span class="line">ResNet stage 4 (1/32 size)    │   │   │</span><br></pre></td></tr></table></figure>
+
+<p>This commonly provides two benefits:</p>
+<ul>
+<li>ImageNet pretraining supplies stable low-level edge and texture features, which are valuable when medical labels are scarce.</li>
+<li>Residual connections keep a deeper encoder reasonably easy to train.</li>
+</ul>
+<p>Watch the output stride. The deepest feature map of a classification ResNet is normally only $1&#x2F;32$ of the input resolution, which can erase tiny lesions. Segmentation models often remove a late downsampling step, replace it with dilated convolution, or rely on a strong decoder and high-resolution skip connections.</p>
+<hr>
+<h2 id="en-12-Use-ResNet-to-understand-later-networks"><a href="#en-12-Use-ResNet-to-understand-later-networks" class="headerlink" title="12. Use ResNet to understand later networks"></a>12. Use ResNet to understand later networks</h2><p>Once a residual block is separated into its main branch, shortcut and fusion operation, many later models become easier to read:</p>
+<table>
+<thead>
+<tr>
+<th>Work</th>
+<th>What changed?</th>
+<th>One-sentence interpretation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a href="/2025/11/26/DenseNet/">DenseNet</a></td>
+<td>fusion</td>
+<td>replace addition with channel concatenation and preserve every older feature</td>
+</tr>
+<tr>
+<td><a href="/2025/11/27/SENet/">SENet</a></td>
+<td>end of main branch</td>
+<td>learn an importance weight for each channel before addition</td>
+</tr>
+<tr>
+<td><a href="/2025/11/12/mm-unet-res2net/">Res2Net</a></td>
+<td>inside main branch</td>
+<td>create hierarchical multi-scale residuals inside one block</td>
+</tr>
+<tr>
+<td>ResNeXt</td>
+<td>inside main branch</td>
+<td>use parallel grouped transformations to increase cardinality</td>
+</tr>
+<tr>
+<td>ResNet v2</td>
+<td>operation order</td>
+<td>pre-activation keeps the identity shortcut cleaner</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="en-13-Three-self-check-questions"><a href="#en-13-Three-self-check-questions" class="headerlink" title="13. Three self-check questions"></a>13. Three self-check questions</h2><p>Answer each one before expanding it.</p>
+<details class="toggle" style="border: 1px solid  what should the main branch learn?"><summary class="toggle-button" style="background-color:  what should the main branch learn?;">1. If the ideal behaviour of a residual block is to change nothing</summary><div class="toggle-content"><p>It should learn $F(x)&#x3D;0$, so $y&#x3D;F(x)+x&#x3D;x$.</p>
+</div></details>
+
+<details class="toggle" ><summary class="toggle-button" style="">2. The input is 64×56×56 and the main-branch output is 128×28×28. Why can they not be added directly?</summary><div class="toggle-content"><p>Element-wise addition requires identical channel, height and width dimensions. Use a 1×1 convolution with <code>stride=2</code> on the shortcut to project the input to 128×28×28.</p>
+</div></details>
+
+<details class="toggle" ><summary class="toggle-button" style="">3. Why does ResNet-50 use Bottleneck rather than BasicBlock?</summary><div class="toggle-content"><p>Later stages have many channels. Bottleneck first reduces the channel count with a 1×1 convolution, runs the expensive 3×3 convolution in the narrow representation, and then expands again. This permits much greater depth at manageable parameter and compute cost.</p>
+</div></details>
+
+<h2 id="en-Final-review-checklist"><a href="#en-Final-review-checklist" class="headerlink" title="Final review checklist"></a>Final review checklist</h2><ul>
+<li>ResNet addresses <strong>training degradation</strong> in deep plain networks, not merely overfitting.</li>
+<li>A plain block learns $H(x)$; a residual block learns $F(x)&#x3D;H(x)-x$ and outputs $F(x)+x$.</li>
+<li>When the ideal mapping is close to identity, learning $F(x)\approx0$ is easier.</li>
+<li>Shortcuts provide direct routes for forward information and backward gradients.</li>
+<li>BasicBlock uses two 3×3 convolutions in ResNet-18&#x2F;34.</li>
+<li>Bottleneck uses <code>1×1 → 3×3 → 1×1</code> in ResNet-50&#x2F;101&#x2F;152.</li>
+<li>When the two branches have different shapes, a 1×1 projection shortcut aligns them.</li>
+<li>Residual addition is not the same operation as channel concatenation in U-Net or DenseNet.</li>
+</ul>
+<h2 id="en-References"><a href="#en-References" class="headerlink" title="References"></a>References</h2><ul>
+<li>He et al., <em>Deep Residual Learning for Image Recognition</em>, CVPR 2016, <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1512.03385">arXiv:1512.03385</a></li>
+<li>He et al., <em>Identity Mappings in Deep Residual Networks</em>, ECCV 2016, <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1603.05027">arXiv:1603.05027</a></li>
+<li>Xie et al., <em>Aggregated Residual Transformations for Deep Neural Networks</em>, CVPR 2017, <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1611.05431">arXiv:1611.05431</a></li>
+<li>PyTorch, <a target="_blank" rel="noopener" href="https://github.com/pytorch/vision/blob/main/torchvision/models/resnet.py">source for torchvision.models.resnet</a></li>
+</ul>
+<aside class="seo-related" aria-label="Related reading"><h2>Related reading</h2><ul><li><a href="/2025/11/26/DenseNet/">DenseNet Explained: Dense Connections, Growth Rate, and Parameter Efficiency</a></li><li><a href="/2025/11/27/SENet/">SENet Channel Attention Explained: Squeeze-and-Excitation Principles and Computation</a></li><li><a href="/2026/10/25/BatchNorm/">BatchNorm Explained in Depth: Manual Calculation, Train vs. Eval, and Choosing BN/LN/IN/GN</a></li><li><a href="/2025/11/12/mm-unet-res2net/">MM-UNet 3D Res2Net Encoder: Expanding 2D Weights for Multi-Scale Feature Extraction</a></li></ul></aside></div></article><aside class="coffee-card"><div class="coffee-cup" aria-hidden="true"><span class="coffee-steam"><i></i><i></i><i></i></span><span class="coffee-body"></span><span class="coffee-saucer"></span><span class="coffee-heart">♥</span></div><div class="coffee-copy"><p class="coffee-title"><span class="lang-block" data-lang="zh">这篇笔记有帮到你吗？</span><span class="lang-block" data-lang="en" lang="en">Did this note help?</span></p><p class="coffee-note"><span class="lang-block" data-lang="zh">可以请 Soong 喝杯咖啡。</span><span class="lang-block" data-lang="en" lang="en">You could buy Soong a coffee.</span></p></div><a class="coffee-btn lang-block" data-lang="zh" href="https://ifdian.net/a/Soong" target="_blank" rel="noopener">请我喝咖啡</a><a class="coffee-btn lang-block" data-lang="en" lang="en" href="https://ko-fi.com/soonga" target="_blank" rel="noopener">Buy me a coffee</a></aside><script>(function () {
+  var card = document.currentScript.previousElementSibling;
+  card.querySelectorAll('.coffee-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      card.classList.remove('is-sent');
+      void card.offsetWidth;
+      card.classList.add('is-sent');
+      setTimeout(function () { card.classList.remove('is-sent'); }, 1400);
+    });
+  });
+})();</script><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://soong-a.github.io">Soong</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://soong-a.github.io/2026/10/25/ResNet/">https://soong-a.github.io/2026/10/25/ResNet/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://soong-a.github.io" target="_blank">Soong AI Notes</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</a><a class="post-meta__tags" href="/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</a><a class="post-meta__tags" href="/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</a><a class="post-meta__tags" href="/tags/%E7%BB%8F%E5%85%B8%E7%BD%91%E7%BB%9C/">经典网络</a><a class="post-meta__tags" href="/tags/%E6%AE%8B%E5%B7%AE%E7%BD%91%E7%BB%9C/">残差网络</a></div><div class="post-share"><div class="social-share" data-image="/img/study/resnet-cover.webp" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/10/25/BatchNorm/" title="BatchNorm 超详细入门：手算公式、训练与推理差异，以及 BN/LN/IN/GN 怎么选" data-article-nav="prev"><img class="cover" src="/img/study/batch-normalization-cover.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">BatchNorm 超详细入门：手算公式、训练与推理差异，以及 BN/LN/IN/GN 怎么选</div></div><div class="info-2"><div class="info-item-1">从四个数字手算 BatchNorm，图解 NCHW 上的统计范围、gamma/beta、running mean/var、train/eval 模式，并比较 LayerNorm、InstanceNorm 与 GroupNorm，解释小 batch 和医学影像中的选择。</div></div></div></a><a class="pagination-related" href="/2026/10/22/segmentation-metrics/" title="Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区" data-article-nav="next"><img class="cover" src="/img/study/segmentation-metrics.webp" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Dice、IoU、HD95 医学图像分割评价指标详解：公式、代码与解读误区</div></div><div class="info-2"><div class="info-item-1">Dice、IoU、精确率、召回率与 HD95 分别衡量什么，如何用 Python 计算，以及体素间距、空预测、2D 与 3D 平均这些最容易出错的细节。</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/11/26/DenseNet/" title="DenseNet 网络详解：密集连接、Growth Rate 与参数效率"><img class="cover" src="/img/study/densenet.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-26</div><div class="info-item-2">DenseNet 网络详解：密集连接、Growth Rate 与参数效率</div></div><div class="info-2"><div class="info-item-1">密集连接为什么优于加法融合：拼接保留特征的独立性，Growth Rate 则是可控的复杂度节流阀。</div></div></div></a><a class="pagination-related" href="/2025/11/27/SENet/" title="SENet 通道注意力详解：Squeeze-and-Excitation 原理与计算过程"><img class="cover" src="/img/study/senet.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-27</div><div class="info-item-2">SENet 通道注意力详解：Squeeze-and-Excitation 原理与计算过程</div></div><div class="info-2"><div class="info-item-1">Squeeze-and-Excitation：用全局平均池化加两层全连接，为每个通道学出一个重要性权重。</div></div></div></a><a class="pagination-related" href="/2025/08/02/cs231n-foundations/" title="CS231n 课程笔记：线性分类、反向传播与卷积神经网络"><img class="cover" src="/img/study/cs231n-foundations.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-08-02</div><div class="info-item-2">CS231n 课程笔记：线性分类、反向传播与卷积神经网络</div></div><div class="info-2"><div class="info-item-1">线性分类器、损失、优化器、反向传播、初始化、批归一化、卷积、架构演进、迁移学习，以及网络到底学到了什么。</div></div></div></a><a class="pagination-related" href="/2026/10/25/BatchNorm/" title="BatchNorm 超详细入门：手算公式、训练与推理差异，以及 BN&#x2F;LN&#x2F;IN&#x2F;GN 怎么选"><img class="cover" src="/img/study/batch-normalization-cover.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-10-25</div><div class="info-item-2">BatchNorm 超详细入门：手算公式、训练与推理差异，以及 BN&#x2F;LN&#x2F;IN&#x2F;GN 怎么选</div></div><div class="info-2"><div class="info-item-1">从四个数字手算 BatchNorm，图解 NCHW 上的统计范围、gamma/beta、running mean/var、train/eval 模式，并比较 LayerNorm、InstanceNorm 与 GroupNorm，解释小 batch 和医学影像中的选择。</div></div></div></a><a class="pagination-related" href="/2025/12/16/parameter-count/" title="深度学习模型参数量怎么计算？卷积层与全连接层公式详解"><img class="cover" src="/img/study/parameter-count.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-12-16</div><div class="info-item-2">深度学习模型参数量怎么计算？卷积层与全连接层公式详解</div></div><div class="info-2"><div class="info-item-1">逐层拆解参数量的计算方式，并解释卷积的参数共享为什么让它比全连接层轻得多。</div></div></div></a><a class="pagination-related" href="/2025/11/13/mm-unet-macm/" title="MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征"><img class="cover" src="/img/study/mm-unet-macm.webp" alt="cover"><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-11-13</div><div class="info-item-2">MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征</div></div><div class="info-2"><div class="info-item-1">用四个尺度的各向异性卷积分支，同时理解切片内结构与切片间连续性，并控制大卷积核的成本。</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info card-researcher is-compact"><div class="researcher-head"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="researcher-id"><div class="researcher-name-row"><div class="author-info-name">Soong</div><span class="researcher-status" title="持续记录中"><span class="researcher-status-dot" aria-hidden="true"></span><span class="researcher-status-text">持续记录中</span></span></div><div class="researcher-role">AI × Medical Imaging</div></div></div><div class="author-info-description">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="researcher-stats"><a href="/archives/"><strong>21</strong><span class="lang-block" data-lang="zh">文章</span><span class="lang-block" data-lang="en" lang="en">Articles</span></a><a href="/archives/"><strong>5</strong><span class="lang-block" data-lang="zh">主题</span><span class="lang-block" data-lang="en" lang="en">Topics</span></a><a href="/tags/"><strong>35</strong><span class="lang-block" data-lang="zh">标签</span><span class="lang-block" data-lang="en" lang="en">Tags</span></a></div><div class="researcher-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email</span><span class="researcher-arrow" aria-hidden="true">&nearr;</span></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%98%85%E8%AF%BB%E5%89%8D%E5%8F%AA%E9%9C%80%E8%A6%81%E7%9F%A5%E9%81%93%E4%B8%89%E4%BB%B6%E4%BA%8B"><span class="toc-number">1.</span> <span class="toc-text">阅读前只需要知道三件事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BA%E6%96%87%E5%90%8D%E7%89%87"><span class="toc-number">2.</span> <span class="toc-text">论文名片</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BD%93%E5%B9%B4%E5%A4%A7%E5%AE%B6%E6%83%B3%E6%8A%8A%E7%BD%91%E7%BB%9C%E5%81%9A%E6%B7%B1"><span class="toc-number">3.</span> <span class="toc-text">一、为什么当年大家想把网络做深</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E5%8C%BA%E5%88%86%E4%B8%89%E4%B8%AA%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.1.</span> <span class="toc-text">1. 先区分三个容易混淆的问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%80%E4%B8%AA%E7%9C%8B%E4%BC%BC%E7%AE%80%E5%8D%95%E3%80%81%E5%AE%9E%E9%99%85%E4%B8%8A%E5%BE%88%E5%85%B3%E9%94%AE%E7%9A%84%E9%80%BB%E8%BE%91"><span class="toc-number">3.2.</span> <span class="toc-text">2. 一个看似简单、实际上很关键的逻辑</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%AE%8B%E5%B7%AE%E5%AD%A6%E4%B9%A0%E5%88%B0%E5%BA%95%E5%9C%A8%E5%AD%A6%E4%BB%80%E4%B9%88"><span class="toc-number">4.</span> <span class="toc-text">二、残差学习到底在学什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%94%A8%E4%BF%AE%E5%9B%BE%E6%9D%A5%E7%90%86%E8%A7%A3%E6%AE%8B%E5%B7%AE"><span class="toc-number">4.1.</span> <span class="toc-text">1. 用修图来理解残差</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E7%94%A8%E4%B8%80%E4%B8%AA%E5%8F%AA%E6%9C%89%E6%95%B0%E5%AD%97%E7%9A%84%E4%BE%8B%E5%AD%90%E7%90%86%E8%A7%A3"><span class="toc-number">4.2.</span> <span class="toc-text">2. 用一个只有数字的例子理解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E9%82%A3%E6%9D%A1%E6%8D%B7%E5%BE%84%E4%B8%BA%E4%BB%80%E4%B9%88%E8%83%BD%E5%B8%AE%E5%8A%A9%E6%A2%AF%E5%BA%A6%E4%BC%A0%E6%92%AD"><span class="toc-number">5.</span> <span class="toc-text">三、那条捷径为什么能帮助梯度传播</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%85%88%E7%90%86%E8%A7%A3%E6%99%AE%E9%80%9A%E6%B7%B1%E5%B1%82%E7%BD%91%E7%BB%9C%E7%9A%84%E6%A2%AF%E5%BA%A6"><span class="toc-number">5.1.</span> <span class="toc-text">1. 先理解普通深层网络的梯度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%AE%8B%E5%B7%AE%E5%9D%97%E5%A4%9A%E5%87%BA%E6%9D%A5%E4%B8%80%E4%B8%AA%E2%80%9C1%E2%80%9D"><span class="toc-number">5.2.</span> <span class="toc-text">2. 残差块多出来一个“1”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E2%80%9C%E7%9B%B8%E5%8A%A0%E2%80%9D%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF%E2%80%9C%E6%8B%BC%E6%8E%A5%E2%80%9D"><span class="toc-number">5.3.</span> <span class="toc-text">3. 为什么要“相加”，而不是“拼接”</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81BasicBlock%EF%BC%9AResNet-18-%E5%92%8C-ResNet-34-%E7%9A%84%E7%A7%AF%E6%9C%A8"><span class="toc-number">6.</span> <span class="toc-text">四、BasicBlock：ResNet-18 和 ResNet-34 的积木</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%8B%E5%B7%A5%E8%B7%9F%E8%B8%AA%E4%B8%80%E6%AC%A1%E5%BD%A2%E7%8A%B6"><span class="toc-number">6.1.</span> <span class="toc-text">手工跟踪一次形状</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E7%BB%B4%E5%BA%A6%E4%B8%8D%E4%B8%80%E6%A0%B7%E6%97%B6%EF%BC%8C%E6%8D%B7%E5%BE%84%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="toc-number">7.</span> <span class="toc-text">五、维度不一样时，捷径怎么办</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81Bottleneck%EF%BC%9AResNet-50-101-152-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E7%9B%B4%E6%8E%A5%E5%A0%86-3%C3%973"><span class="toc-number">8.</span> <span class="toc-text">六、Bottleneck：ResNet-50&#x2F;101&#x2F;152 为什么不直接堆 3×3</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88-1%C3%971-%E5%8D%B7%E7%A7%AF%E8%83%BD%E6%94%B9%E5%8F%98%E9%80%9A%E9%81%93"><span class="toc-number">8.1.</span> <span class="toc-text">1. 为什么 1×1 卷积能改变通道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%8F%82%E6%95%B0%E9%87%8F%E6%89%8B%E7%AE%97"><span class="toc-number">8.2.</span> <span class="toc-text">2. 参数量手算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-expansion-4-%E6%98%AF%E4%BB%80%E4%B9%88%E6%84%8F%E6%80%9D"><span class="toc-number">8.3.</span> <span class="toc-text">3. expansion &#x3D; 4 是什么意思</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E4%BB%8E%E4%B8%80%E4%B8%AA%E5%9D%97%E6%8B%BC%E6%88%90%E5%AE%8C%E6%95%B4-ResNet"><span class="toc-number">9.</span> <span class="toc-text">七、从一个块拼成完整 ResNet</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-ResNet-50-%E5%92%8C-ResNet-34-%E7%9A%84%E5%9D%97%E6%95%B0%E7%9B%B8%E5%90%8C%EF%BC%8C%E5%90%8D%E5%AD%97%E5%8D%B4%E4%B8%8D%E5%90%8C"><span class="toc-number">9.1.</span> <span class="toc-text">为什么 ResNet-50 和 ResNet-34 的块数相同，名字却不同</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81ResNet-v1-%E4%B8%8E-v2%EF%BC%9AReLU-%E6%94%BE%E5%9C%A8%E5%93%AA%E9%87%8C%E5%BE%88%E9%87%8D%E8%A6%81"><span class="toc-number">10.</span> <span class="toc-text">八、ResNet v1 与 v2：ReLU 放在哪里很重要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E4%B8%80%E6%AD%A5%E6%AD%A5%E8%AF%BB%E6%87%82-PyTorch-%E7%9A%84-BasicBlock"><span class="toc-number">11.</span> <span class="toc-text">九、一步步读懂 PyTorch 的 BasicBlock</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E9%87%8C%E4%BA%94%E4%B8%AA%E5%B8%B8%E8%A7%81%E7%96%91%E9%97%AE"><span class="toc-number">11.1.</span> <span class="toc-text">代码里五个常见疑问</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81%E5%88%9D%E5%AD%A6%E8%80%85%E6%9C%80%E5%AE%B9%E6%98%93%E7%8A%AF%E7%9A%84%E4%B8%83%E4%B8%AA%E9%94%99%E8%AF%AF"><span class="toc-number">12.</span> <span class="toc-text">十、初学者最容易犯的七个错误</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-1%EF%BC%9A%E6%8A%8A-residual-%E5%BD%93%E6%88%90%E5%88%86%E7%B1%BB%E8%AF%AF%E5%B7%AE"><span class="toc-number">12.1.</span> <span class="toc-text">错误 1：把 residual 当成分类误差</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-2%EF%BC%9A%E8%AE%A4%E4%B8%BA%E6%8D%B7%E5%BE%84%E5%AE%8C%E5%85%A8%E6%B2%A1%E6%9C%89%E8%AE%A1%E7%AE%97"><span class="toc-number">12.2.</span> <span class="toc-text">错误 2：认为捷径完全没有计算</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-3%EF%BC%9A%E6%8A%8A%E7%9B%B8%E5%8A%A0%E5%86%99%E6%88%90%E9%80%9A%E9%81%93%E6%8B%BC%E6%8E%A5"><span class="toc-number">12.3.</span> <span class="toc-text">错误 3：把相加写成通道拼接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-4%EF%BC%9A%E4%B8%A4%E8%B7%AF%E5%BD%A2%E7%8A%B6%E4%B8%8D%E4%B8%80%E8%87%B4%E5%B0%B1%E7%9B%B8%E5%8A%A0"><span class="toc-number">12.4.</span> <span class="toc-text">错误 4：两路形状不一致就相加</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-5%EF%BC%9A%E6%8A%8A-ResNet-%E7%90%86%E8%A7%A3%E4%B8%BA%E5%8F%AA%E8%A7%A3%E5%86%B3%E6%A2%AF%E5%BA%A6%E6%B6%88%E5%A4%B1"><span class="toc-number">12.5.</span> <span class="toc-text">错误 5：把 ResNet 理解为只解决梯度消失</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-6%EF%BC%9A%E8%AE%A4%E4%B8%BA%E5%B1%82%E6%95%B0%E8%B6%8A%E6%B7%B1%E4%B8%80%E5%AE%9A%E8%B6%8A%E9%80%82%E5%90%88%E8%87%AA%E5%B7%B1%E7%9A%84%E4%BB%BB%E5%8A%A1"><span class="toc-number">12.6.</span> <span class="toc-text">错误 6：认为层数越深一定越适合自己的任务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%99%E8%AF%AF-7%EF%BC%9A%E5%BF%98%E8%AE%B0%E8%BE%93%E5%85%A5%E9%80%9A%E9%81%93%E6%95%B0"><span class="toc-number">12.7.</span> <span class="toc-text">错误 7：忘记输入通道数</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80%E3%80%81%E5%9C%A8%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2%E9%87%8C%E6%80%8E%E6%A0%B7%E4%BD%BF%E7%94%A8-ResNet"><span class="toc-number">13.</span> <span class="toc-text">十一、在医学图像分割里怎样使用 ResNet</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C%E3%80%81%E4%BB%8E-ResNet-%E7%9C%8B%E6%87%82%E5%90%8E%E6%9D%A5%E7%9A%84%E7%BD%91%E7%BB%9C"><span class="toc-number">14.</span> <span class="toc-text">十二、从 ResNet 看懂后来的网络</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%89%E3%80%81%E4%B8%89%E9%81%93%E8%87%AA%E6%B5%8B%E9%A2%98"><span class="toc-number">15.</span> <span class="toc-text">十三、三道自测题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E7%94%A8%E4%B8%80%E5%BC%A0%E6%B8%85%E5%8D%95%E5%A4%8D%E4%B9%A0"><span class="toc-number">16.</span> <span class="toc-text">最后用一张清单复习</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">17.</span> <span class="toc-text">参考资料</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">18.</span> <span class="toc-text">相关阅读</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Three-things-to-know-before-reading"><span class="toc-number">19.</span> <span class="toc-text">Three things to know before reading</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Paper-at-a-glance"><span class="toc-number">20.</span> <span class="toc-text">Paper at a glance</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-1-Why-did-researchers-want-deeper-networks"><span class="toc-number">21.</span> <span class="toc-text">1. Why did researchers want deeper networks?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-1-1-Separate-three-easily-confused-problems"><span class="toc-number">21.1.</span> <span class="toc-text">1.1 Separate three easily confused problems</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-1-2-A-simple-but-crucial-argument"><span class="toc-number">21.2.</span> <span class="toc-text">1.2 A simple but crucial argument</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-2-What-does-residual-learning-actually-learn"><span class="toc-number">22.</span> <span class="toc-text">2. What does residual learning actually learn?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-2-1-Think-of-photo-editing"><span class="toc-number">22.1.</span> <span class="toc-text">2.1 Think of photo editing</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-2-2-A-numerical-example"><span class="toc-number">22.2.</span> <span class="toc-text">2.2 A numerical example</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-3-Why-does-the-shortcut-help-gradients-flow"><span class="toc-number">23.</span> <span class="toc-text">3. Why does the shortcut help gradients flow?</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-3-1-Gradients-in-an-ordinary-deep-network"><span class="toc-number">23.1.</span> <span class="toc-text">3.1 Gradients in an ordinary deep network</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-3-2-A-residual-block-contributes-an-extra-%E2%80%9C1%E2%80%9D"><span class="toc-number">23.2.</span> <span class="toc-text">3.2 A residual block contributes an extra “1”</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-3-3-Why-addition-rather-than-concatenation"><span class="toc-number">23.3.</span> <span class="toc-text">3.3 Why addition rather than concatenation?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-4-BasicBlock-the-building-block-of-ResNet-18-and-ResNet-34"><span class="toc-number">24.</span> <span class="toc-text">4. BasicBlock: the building block of ResNet-18 and ResNet-34</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Track-the-shape-by-hand"><span class="toc-number">24.1.</span> <span class="toc-text">Track the shape by hand</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-5-What-if-the-dimensions-do-not-match"><span class="toc-number">25.</span> <span class="toc-text">5. What if the dimensions do not match?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-6-Bottleneck-why-ResNet-50-101-152-do-not-simply-stack-3%C3%973-layers"><span class="toc-number">26.</span> <span class="toc-text">6. Bottleneck: why ResNet-50&#x2F;101&#x2F;152 do not simply stack 3×3 layers</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-6-1-How-can-a-1%C3%971-convolution-change-channels"><span class="toc-number">26.1.</span> <span class="toc-text">6.1 How can a 1×1 convolution change channels?</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-6-2-Calculate-the-parameter-count"><span class="toc-number">26.2.</span> <span class="toc-text">6.2 Calculate the parameter count</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-6-3-What-does-expansion-4-mean"><span class="toc-number">26.3.</span> <span class="toc-text">6.3 What does expansion &#x3D; 4 mean?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-7-Building-a-complete-ResNet-from-blocks"><span class="toc-number">27.</span> <span class="toc-text">7. Building a complete ResNet from blocks</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Why-do-ResNet-50-and-ResNet-34-have-the-same-number-of-blocks-but-different-names"><span class="toc-number">27.1.</span> <span class="toc-text">Why do ResNet-50 and ResNet-34 have the same number of blocks but different names?</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-8-ResNet-v1-and-v2-the-position-of-ReLU-matters"><span class="toc-number">28.</span> <span class="toc-text">8. ResNet v1 and v2: the position of ReLU matters</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-9-Read-a-PyTorch-BasicBlock-step-by-step"><span class="toc-number">29.</span> <span class="toc-text">9. Read a PyTorch BasicBlock step by step</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Five-common-questions-about-the-code"><span class="toc-number">29.1.</span> <span class="toc-text">Five common questions about the code</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-10-Seven-mistakes-beginners-often-make"><span class="toc-number">30.</span> <span class="toc-text">10. Seven mistakes beginners often make</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-1-treating-the-residual-as-the-classification-error"><span class="toc-number">30.1.</span> <span class="toc-text">Mistake 1: treating the residual as the classification error</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-2-assuming-the-shortcut-always-performs-no-computation"><span class="toc-number">30.2.</span> <span class="toc-text">Mistake 2: assuming the shortcut always performs no computation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-3-replacing-addition-with-channel-concatenation"><span class="toc-number">30.3.</span> <span class="toc-text">Mistake 3: replacing addition with channel concatenation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-4-adding-branches-with-incompatible-shapes"><span class="toc-number">30.4.</span> <span class="toc-text">Mistake 4: adding branches with incompatible shapes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-5-thinking-ResNet-only-solves-vanishing-gradients"><span class="toc-number">30.5.</span> <span class="toc-text">Mistake 5: thinking ResNet only solves vanishing gradients</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-6-assuming-deeper-is-always-better-for-your-task"><span class="toc-number">30.6.</span> <span class="toc-text">Mistake 6: assuming deeper is always better for your task</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#en-Mistake-7-forgetting-the-input-channel-count"><span class="toc-number">30.7.</span> <span class="toc-text">Mistake 7: forgetting the input channel count</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-11-Using-ResNet-in-medical-image-segmentation"><span class="toc-number">31.</span> <span class="toc-text">11. Using ResNet in medical-image segmentation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-12-Use-ResNet-to-understand-later-networks"><span class="toc-number">32.</span> <span class="toc-text">12. Use ResNet to understand later networks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-13-Three-self-check-questions"><span class="toc-number">33.</span> <span class="toc-text">13. Three self-check questions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-Final-review-checklist"><span class="toc-number">34.</span> <span class="toc-text">Final review checklist</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#en-References"><span class="toc-number">35.</span> <span class="toc-text">References</span></a></li><li class="toc-item toc-level-2"><a class="toc-link"><span class="toc-number">36.</span> <span class="toc-text">Related reading</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer src="/js/site-polish.js?v=20261021g"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/analytics-events.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mvoatlhk"></script></body></html>

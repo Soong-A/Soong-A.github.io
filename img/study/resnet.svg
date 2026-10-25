@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 470" role="img" aria-labelledby="resnet-title resnet-desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="resnet-title">Residual block: main branch F(x) plus an identity shortcut x</title>
+  <desc id="resnet-desc">The main branch runs two 3 by 3 convolutions, each followed by batch normalisation, with a ReLU between them, producing F(x). A gold dashed shortcut carries the input x straight across. The two are summed, and the final ReLU is applied after the sum.</desc>
+  <defs>
+    <filter id="rn-shadow" x="-25%" y="-25%" width="150%" height="165%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#51493F" flood-opacity="0.14"/>
+    </filter>
+    <pattern id="rn-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="#756F67" stroke-opacity="0.075"/>
+    </pattern>
+    <linearGradient id="rn-lavender" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F1EBF8"/><stop offset="1" stop-color="#DCCFEB"/>
+    </linearGradient>
+    <linearGradient id="rn-sage" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF4F0"/><stop offset="1" stop-color="#CFE8E0"/>
+    </linearGradient>
+    <linearGradient id="rn-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F6E8C0"/><stop offset="1" stop-color="#E3C778"/>
+    </linearGradient>
+    <marker id="rn-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#8B837A"/>
+    </marker>
+    <marker id="rn-arrow-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#B68B2D"/>
+    </marker>
+  </defs>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="44" y="48" font-size="15" font-weight="700" letter-spacing="2.7" fill="#8F6A21">F(x) + x</text>
+
+    <!-- main branch bracket and label -->
+    <path d="M146 142V124H704V142" fill="none" stroke="#75629C" stroke-width="1.6" stroke-opacity="0.55"/>
+    <text x="425" y="112" text-anchor="middle" font-size="22" font-style="italic" font-weight="600" fill="#5F4F85">F(x)</text>
+
+    <!-- input node -->
+    <circle cx="72" cy="214" r="27" fill="#FFFEFC" stroke="#8B837A" stroke-width="1.8" filter="url(#rn-shadow)"/>
+    <text x="72" y="222" text-anchor="middle" font-size="23" font-style="italic" font-weight="600" fill="#51493F">x</text>
+
+    <g stroke="#8B837A" stroke-width="1.8" fill="none" marker-end="url(#rn-arrow)">
+      <path d="M101 214H140"/>
+      <path d="M278 214H292"/>
+      <path d="M368 214H382"/>
+      <path d="M466 214H480"/>
+      <path d="M616 214H630"/>
+      <path d="M706 214H747"/>
+      <path d="M809 214H833"/>
+      <path d="M917 214H941"/>
+    </g>
+
+    <g filter="url(#rn-shadow)">
+      <rect x="146" y="178" width="132" height="72" rx="13" fill="url(#rn-lavender)" stroke="#75629C" stroke-width="1.8"/>
+      <rect x="296" y="178" width="72" height="72" rx="13" fill="url(#rn-sage)" stroke="#3B9E88" stroke-width="1.8"/>
+      <rect x="386" y="178" width="80" height="72" rx="13" fill="url(#rn-gold)" stroke="#B68B2D" stroke-width="1.8"/>
+      <rect x="484" y="178" width="132" height="72" rx="13" fill="url(#rn-lavender)" stroke="#75629C" stroke-width="1.8"/>
+      <rect x="634" y="178" width="72" height="72" rx="13" fill="url(#rn-sage)" stroke="#3B9E88" stroke-width="1.8"/>
+      <rect x="835" y="178" width="82" height="72" rx="13" fill="url(#rn-gold)" stroke="#B68B2D" stroke-width="1.8"/>
+    </g>
+
+    <g font-size="17" font-weight="600" text-anchor="middle" fill="#51493F">
+      <text x="212" y="208">Conv</text><text x="212" y="231" font-size="15" font-weight="500" fill="#5F4F85">3 × 3</text>
+      <text x="332" y="221">BN</text>
+      <text x="426" y="221">ReLU</text>
+      <text x="550" y="208">Conv</text><text x="550" y="231" font-size="15" font-weight="500" fill="#5F4F85">3 × 3</text>
+      <text x="670" y="221">BN</text>
+      <text x="876" y="221">ReLU</text>
+    </g>
+
+    <!-- sum node -->
+    <circle cx="780" cy="214" r="29" fill="#FBF2D7" stroke="#B68B2D" stroke-width="2.4" filter="url(#rn-shadow)"/>
+    <path d="M780 198V230M764 214H796" stroke="#8F6A21" stroke-width="3.2" stroke-linecap="round"/>
+    <text x="780" y="158" text-anchor="middle" font-size="19" font-style="italic" font-weight="600" fill="#8F6A21">F(x) + x</text>
+
+    <!-- output node -->
+    <circle cx="968" cy="214" r="27" fill="#FFFEFC" stroke="#8B837A" stroke-width="1.8" filter="url(#rn-shadow)"/>
+    <text x="968" y="222" text-anchor="middle" font-size="23" font-style="italic" font-weight="600" fill="#51493F">y</text>
+
+    <!-- identity shortcut -->
+    <path d="M72 243V320Q72 334 86 334H766Q780 334 780 320V247" fill="none" stroke="#B68B2D"
+          stroke-width="3" stroke-dasharray="11 8" stroke-linecap="round" marker-end="url(#rn-arrow-gold)"/>
+    <rect x="384" y="314" width="112" height="40" rx="12" fill="#FBF2D7" stroke="#B68B2D" stroke-width="1.6"/>
+    <text x="440" y="341" text-anchor="middle" font-size="22" font-style="italic" font-weight="600" fill="#8F6A21">x</text>
+  </g>
+</svg>

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 610" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">下采样后的信息不可逆</title>
+  <desc id="desc">两个不同的四乘四高分辨率网格经过每个二乘二区域的平均池化后，都得到元素全为5的二乘二网格。因此只看低分辨率结果，无法知道原来是哪种细节。</desc>
+  <defs>
+    <pattern id="gridbg" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#51493F" flood-opacity=".13"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+  </defs>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif" fill="#51493F">
+    <text x="580" y="54" text-anchor="middle" font-size="28" font-weight="700">尺寸可以放回去，已经丢掉的细节却没有唯一答案</text>
+    <g transform="translate(70 125)" filter="url(#shadow)">
+      <rect x="-25" y="-45" width="290" height="330" rx="20" fill="#FFFEFC" stroke="#D8D0C4"/>
+      <text x="120" y="-12" text-anchor="middle" font-size="20" font-weight="700" fill="#5F4F85">高分辨率 A</text>
+      <g font-size="18" text-anchor="middle">
+        <rect x="0" y="20" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="29" y="56">2</text><rect x="60" y="20" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="89" y="56">8</text><rect x="120" y="20" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="149" y="56">2</text><rect x="180" y="20" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="209" y="56">8</text>
+        <rect x="0" y="80" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="29" y="116">8</text><rect x="60" y="80" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="89" y="116">2</text><rect x="120" y="80" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="149" y="116">8</text><rect x="180" y="80" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="209" y="116">2</text>
+        <rect x="0" y="140" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="29" y="176">2</text><rect x="60" y="140" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="89" y="176">8</text><rect x="120" y="140" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="149" y="176">2</text><rect x="180" y="140" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="209" y="176">8</text>
+        <rect x="0" y="200" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="29" y="236">8</text><rect x="60" y="200" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="89" y="236">2</text><rect x="120" y="200" width="58" height="58" fill="#C8B1DD" stroke="#75629C"/><text x="149" y="236">8</text><rect x="180" y="200" width="58" height="58" fill="#E9DEF3" stroke="#75629C"/><text x="209" y="236">2</text>
+      </g>
+    </g>
+    <g transform="translate(395 125)" filter="url(#shadow)">
+      <rect x="-25" y="-45" width="290" height="330" rx="20" fill="#FFFEFC" stroke="#D8D0C4"/>
+      <text x="120" y="-12" text-anchor="middle" font-size="20" font-weight="700" fill="#277F6E">高分辨率 B</text>
+      <g font-size="18" text-anchor="middle">
+        <rect x="0" y="20" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="29" y="56">1</text><rect x="60" y="20" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="89" y="56">9</text><rect x="120" y="20" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="149" y="56">1</text><rect x="180" y="20" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="209" y="56">9</text>
+        <rect x="0" y="80" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="29" y="116">1</text><rect x="60" y="80" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="89" y="116">9</text><rect x="120" y="80" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="149" y="116">1</text><rect x="180" y="80" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="209" y="116">9</text>
+        <rect x="0" y="140" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="29" y="176">9</text><rect x="60" y="140" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="89" y="176">1</text><rect x="120" y="140" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="149" y="176">9</text><rect x="180" y="140" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="209" y="176">1</text>
+        <rect x="0" y="200" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="29" y="236">9</text><rect x="60" y="200" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="89" y="236">1</text><rect x="120" y="200" width="58" height="58" fill="#A0D3C5" stroke="#3B9E88"/><text x="149" y="236">9</text><rect x="180" y="200" width="58" height="58" fill="#E1F2EC" stroke="#3B9E88"/><text x="209" y="236">1</text>
+      </g>
+    </g>
+    <text x="355" y="452" text-anchor="middle" font-size="17" font-weight="700" fill="#756F67">两种不同细节</text>
+    <path d="M680 245H760" stroke="#8B837A" stroke-width="2.5" marker-end="url(#arr)"/>
+    <text x="720" y="218" text-anchor="middle" font-size="16" font-weight="700">2×2 平均池化</text>
+    <g transform="translate(805 180)" filter="url(#shadow)">
+      <rect x="-30" y="-70" width="300" height="285" rx="20" fill="#FFFEFC" stroke="#B68B2D" stroke-width="1.8"/>
+      <text x="120" y="-33" text-anchor="middle" font-size="20" font-weight="700" fill="#8F6A21">得到同一个低分辨率结果</text>
+      <g font-size="25" font-weight="700" text-anchor="middle"><rect x="0" y="0" width="116" height="86" fill="#F6E8C0" stroke="#B68B2D"/><text x="58" y="52">5</text><rect x="120" y="0" width="116" height="86" fill="#F6E8C0" stroke="#B68B2D"/><text x="178" y="52">5</text><rect x="0" y="90" width="116" height="86" fill="#F6E8C0" stroke="#B68B2D"/><text x="58" y="142">5</text><rect x="120" y="90" width="116" height="86" fill="#F6E8C0" stroke="#B68B2D"/><text x="178" y="142">5</text></g>
+      <text x="120" y="205" text-anchor="middle" font-size="15" fill="#756F67">只看它，无法判断原图是 A 还是 B</text>
+    </g>
+    <rect x="245" y="508" width="670" height="58" rx="16" fill="#FBF2D7" stroke="#B68B2D"/>
+    <text x="580" y="544" text-anchor="middle" font-size="18" font-weight="700" fill="#8F6A21">上采样能生成更密的网格，但缺失细节只能推测，不能唯一反演</text>
+  </g>
+</svg>

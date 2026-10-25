@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 600" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">Statistical Stability of Large Batches, Small Batches and GroupNorm</title>
+  <desc id="desc">A larger batch on the left estimates a mean near the population center. With only two samples in the middle, different draws make the mean swing. GroupNorm on the right groups channels within each sample, so it does not depend on other batch samples.</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#51493F" flood-opacity=".13"/></filter>
+  </defs>
+  <g font-family="'Segoe UI','Arial',sans-serif" fill="#51493F">
+    <text x="560" y="54" text-anchor="middle" font-size="28" font-weight="700">BN's Weakness Is Unstable Statistics, Not Smallness Itself</text>
+    <g transform="translate(40 105)" filter="url(#shadow)">
+      <rect width="325" height="415" rx="22" fill="#FFFEFC" stroke="#3B9E88" stroke-width="1.8"/>
+      <text x="162" y="43" text-anchor="middle" font-size="21" font-weight="700" fill="#277F6E">Larger batch</text>
+      <text x="162" y="69" text-anchor="middle" font-size="14" fill="#756F67">More samples in one draw</text>
+      <line x1="42" y1="210" x2="283" y2="210" stroke="#B3ABA0" stroke-width="2"/>
+      <g fill="#8CCABA" stroke="#3B9E88"><circle cx="67" cy="192" r="9"/><circle cx="88" cy="230" r="9"/><circle cx="110" cy="202" r="9"/><circle cx="132" cy="220" r="9"/><circle cx="151" cy="188" r="9"/><circle cx="171" cy="228" r="9"/><circle cx="190" cy="198" r="9"/><circle cx="211" cy="218" r="9"/><circle cx="234" cy="190" r="9"/><circle cx="256" cy="225" r="9"/></g>
+      <line x1="162" y1="132" x2="162" y2="281" stroke="#3B9E88" stroke-width="4" stroke-dasharray="8 6"/>
+      <text x="162" y="310" text-anchor="middle" font-size="17" font-weight="700">Mean estimate is more stable</text>
+      <path d="M65 350Q162 320 260 350" fill="none" stroke="#3B9E88" stroke-width="3"/>
+      <text x="162" y="385" text-anchor="middle" font-size="15" fill="#756F67">A new batch shifts the center only slightly</text>
+    </g>
+    <g transform="translate(397 105)" filter="url(#shadow)">
+      <rect width="325" height="415" rx="22" fill="#FFFEFC" stroke="#C14E69" stroke-width="1.8"/>
+      <text x="162" y="43" text-anchor="middle" font-size="21" font-weight="700" fill="#B45269">Tiny batch</text>
+      <text x="162" y="69" text-anchor="middle" font-size="14" fill="#756F67">For example, only 2 samples</text>
+      <line x1="42" y1="210" x2="283" y2="210" stroke="#B3ABA0" stroke-width="2"/>
+      <circle cx="78" cy="193" r="12" fill="#E5A9B7" stroke="#C14E69"/><circle cx="118" cy="226" r="12" fill="#E5A9B7" stroke="#C14E69"/>
+      <line x1="98" y1="132" x2="98" y2="281" stroke="#C14E69" stroke-width="4" stroke-dasharray="8 6"/>
+      <circle cx="228" cy="185" r="12" fill="#E3C778" stroke="#B68B2D"/><circle cx="267" cy="222" r="12" fill="#E3C778" stroke="#B68B2D"/>
+      <line x1="247" y1="132" x2="247" y2="281" stroke="#B68B2D" stroke-width="4" stroke-dasharray="8 6"/>
+      <path d="M111 307C151 340 196 340 235 307" fill="none" stroke="#8B837A" stroke-width="2"/>
+      <text x="173" y="340" text-anchor="middle" font-size="17" font-weight="700">Different draws make the mean swing</text>
+      <text x="162" y="383" text-anchor="middle" font-size="15" fill="#756F67">Train and inference statistics diverge</text>
+    </g>
+    <g transform="translate(755 105)" filter="url(#shadow)">
+      <rect width="325" height="415" rx="22" fill="#FFFEFC" stroke="#75629C" stroke-width="1.8"/>
+      <text x="162" y="43" text-anchor="middle" font-size="21" font-weight="700" fill="#5F4F85">GroupNorm</text>
+      <text x="162" y="69" text-anchor="middle" font-size="14" fill="#756F67">Statistics within one sample</text>
+      <g transform="translate(58 105)">
+        <rect x="0" y="0" width="52" height="52" rx="7" fill="#D9C9E8" stroke="#75629C"/><rect x="56" y="0" width="52" height="52" rx="7" fill="#D9C9E8" stroke="#75629C"/>
+        <rect x="112" y="0" width="52" height="52" rx="7" fill="#E3C778" stroke="#B68B2D"/><rect x="168" y="0" width="52" height="52" rx="7" fill="#E3C778" stroke="#B68B2D"/>
+        <rect x="0" y="56" width="52" height="52" rx="7" fill="#CFE8E0" stroke="#3B9E88"/><rect x="56" y="56" width="52" height="52" rx="7" fill="#CFE8E0" stroke="#3B9E88"/>
+        <rect x="112" y="56" width="52" height="52" rx="7" fill="#F1CCD5" stroke="#C14E69"/><rect x="168" y="56" width="52" height="52" rx="7" fill="#F1CCD5" stroke="#C14E69"/>
+      </g>
+      <text x="162" y="253" text-anchor="middle" font-size="15">Each color is one channel group</text>
+      <text x="162" y="292" text-anchor="middle" font-size="17" font-weight="700">No other batch samples required</text>
+      <rect x="48" y="325" width="229" height="52" rx="13" fill="#F1EBF8" stroke="#75629C"/>
+      <text x="162" y="358" text-anchor="middle" font-size="16" font-weight="700" fill="#5F4F85">Same rule when N=1</text>
+    </g>
+    <text x="560" y="566" text-anchor="middle" font-size="18" font-weight="700" fill="#8F6A21">Gradient accumulation does not turn 2 micro-batch samples into 16 samples for one BN estimate</text>
+  </g>
+</svg>

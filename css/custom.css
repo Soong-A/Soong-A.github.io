@@ -2231,6 +2231,56 @@ html[data-lang="en"] #nav .lang-toggle [data-l="en"] {
   }
 }
 
+/* ---------- Sticky table of contents on post pages (desktop) ---------- */
+/* On a post the sidebar holds only the table of contents, and it has to stay
+   beside the text the whole way down: a reader who is 3000px into a 20-minute
+   note still needs to see where they are. The group sits 76px from the top so
+   the nav bar (60px) never crowds it when it slides back in.
+   A long note's contents can be taller than the window, so the card itself is
+   capped to the window and its list scrolls inside; the card heading and the
+   reading-progress bar stay put while it does. Below 901px the sidebar is
+   hidden altogether and js/mobile-toc.js provides the floating button. */
+@media (min-width: 901px) {
+  #content-inner:has(#post) > #aside-content {
+    align-self: stretch;
+  }
+
+  #content-inner:has(#post) > #aside-content > .sticky_layout {
+    position: sticky !important;
+    top: var(--aside-sticky-top, 76px);
+    transition: top .3s var(--soong-ease);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - var(--aside-sticky-top, 76px) - 20px);
+  }
+
+  #content-inner:has(#post) > #aside-content > .sticky_layout > #card-toc {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Overrides the unbounded height this file sets for every sidebar TOC. */
+  #content-inner:has(#post) #card-toc .toc-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+
+  #content-inner:has(#post) #card-toc .toc-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #content-inner:has(#post) #card-toc .toc-content::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: var(--soong-gold-soft, rgba(226, 174, 69, .35));
+  }
+}
+
 /* ---------- Footer: a clear closing band ---------- */
 #footer {
   border-top: 1px solid rgba(226, 174, 69, .75);

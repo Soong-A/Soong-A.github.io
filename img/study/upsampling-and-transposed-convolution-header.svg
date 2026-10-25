@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">上采样的两条路线：固定插值与可学习转置卷积</title>
+  <desc id="desc">同一张三乘三低分辨率特征图分为两路，上方用固定几何插值后卷积，下方用转置卷积将每个输入值按学习到的核散射到输出，最终都得到更密的六乘六网格。</desc>
+  <defs>
+    <radialGradient id="bg" cx="62%" cy="38%" r="90%"><stop offset="0" stop-color="#132849"/><stop offset=".52" stop-color="#0A1728"/><stop offset="1" stop-color="#060C17"/></radialGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#AFC2DD" opacity=".12"/></pattern>
+    <linearGradient id="p" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A89DFF"/><stop offset="1" stop-color="#5C4DD6"/></linearGradient>
+    <linearGradient id="t" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#56E6D1"/><stop offset="1" stop-color="#0D8D7E"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000" flood-opacity=".38"/></filter>
+    <filter id="glow"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="arrP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B7CFF"/></marker>
+    <marker id="arrT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#22D3B6"/></marker>
+  </defs>
+  <rect width="1600" height="500" fill="url(#bg)"/><rect width="1600" height="500" fill="url(#dots)"/>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="74" y="52" font-size="22" font-weight="800" letter-spacing="2" fill="#C8C1FF">UPSAMPLING · 两条放大路线</text>
+    <text x="1160" y="52" font-size="20" font-weight="700" fill="#9FB0C7">固定几何规则</text><text x="1310" y="52" font-size="20" fill="#6B7C93">vs.</text><text x="1360" y="52" font-size="20" font-weight="700" fill="#70F1DC">可学习规则</text>
+
+    <g transform="translate(280 -15) scale(.65)">
+    <!-- source grid -->
+    <g transform="translate(112 205)" filter="url(#shadow)">
+      <text x="82" y="-22" text-anchor="middle" font-size="17" font-weight="700" fill="#BEB5FF">低分辨率特征</text>
+      <g stroke="#A99FFF" stroke-width="2"><rect width="50" height="50" rx="6" fill="#302B59"/><rect x="55" width="50" height="50" rx="6" fill="#41366F"/><rect x="110" width="50" height="50" rx="6" fill="#2A2754"/><rect y="55" width="50" height="50" rx="6" fill="#514493"/><rect x="55" y="55" width="50" height="50" rx="6" fill="url(#p)"/><rect x="110" y="55" width="50" height="50" rx="6" fill="#443B7C"/><rect y="110" width="50" height="50" rx="6" fill="#272548"/><rect x="55" y="110" width="50" height="50" rx="6" fill="#393467"/><rect x="110" y="110" width="50" height="50" rx="6" fill="#5B4B9E"/></g>
+      <text x="80" y="192" text-anchor="middle" font-size="18" font-weight="700" fill="#BEB5FF">3 × 3</text>
+    </g>
+
+    <!-- split -->
+    <path d="M308 286H386Q414 286 432 260L478 202" fill="none" stroke="#8B7CFF" stroke-width="4" marker-end="url(#arrP)"/>
+    <path d="M308 286H386Q414 286 432 312L478 370" fill="none" stroke="#22D3B6" stroke-width="4" marker-end="url(#arrT)"/>
+
+    <!-- interpolation route -->
+    <g transform="translate(500 154)" filter="url(#shadow)"><rect width="292" height="96" rx="22" fill="#171B39" stroke="#8B7CFF" stroke-width="2"/><g transform="translate(24 21)" fill="#514493"><rect width="25" height="25" rx="3"/><rect x="28" width="25" height="25" rx="3"/><rect y="28" width="25" height="25" rx="3"/><rect x="28" y="28" width="25" height="25" rx="3"/></g><path d="M93 48H133" stroke="#8B7CFF" stroke-width="3" marker-end="url(#arrP)"/><text x="206" y="41" text-anchor="middle" font-size="20" font-weight="800" fill="#C9C3FF">插值 + 卷积</text><text x="206" y="68" text-anchor="middle" font-size="15" fill="#9FB0C7">固定坐标 → 学习修正</text></g>
+    <g transform="translate(500 322)" filter="url(#shadow)"><rect width="292" height="96" rx="22" fill="#102B2D" stroke="#22D3B6" stroke-width="2"/><g transform="translate(26 22)" fill="none" stroke="#2DD4BF"><circle cx="25" cy="25" r="8" fill="#22D3B6"/><circle cx="6" cy="6" r="4"/><circle cx="44" cy="6" r="4"/><circle cx="6" cy="44" r="4"/><circle cx="44" cy="44" r="4"/></g><path d="M93 48H133" stroke="#22D3B6" stroke-width="3" marker-end="url(#arrT)"/><text x="206" y="41" text-anchor="middle" font-size="20" font-weight="800" fill="#70F1DC">转置卷积</text><text x="206" y="68" text-anchor="middle" font-size="15" fill="#9FB0C7">学习卷积核 → 散射相加</text></g>
+
+    <path d="M798 202H888" stroke="#8B7CFF" stroke-width="4" marker-end="url(#arrP)"/><path d="M798 370H888" stroke="#22D3B6" stroke-width="4" marker-end="url(#arrT)"/>
+
+    <!-- output grid -->
+    <g transform="translate(930 180)" filter="url(#shadow)">
+      <text x="128" y="-22" text-anchor="middle" font-size="17" font-weight="700" fill="#70F1DC">高分辨率输出</text>
+      <g fill="url(#t)" stroke="#61EAD6" stroke-width="1.3">
+        <rect width="38" height="38" rx="5"/><rect x="43" width="38" height="38" rx="5"/><rect x="86" width="38" height="38" rx="5"/><rect x="129" width="38" height="38" rx="5"/><rect x="172" width="38" height="38" rx="5"/><rect x="215" width="38" height="38" rx="5"/>
+        <rect y="43" width="38" height="38" rx="5"/><rect x="43" y="43" width="38" height="38" rx="5"/><rect x="86" y="43" width="38" height="38" rx="5"/><rect x="129" y="43" width="38" height="38" rx="5"/><rect x="172" y="43" width="38" height="38" rx="5"/><rect x="215" y="43" width="38" height="38" rx="5"/>
+        <rect y="86" width="38" height="38" rx="5"/><rect x="43" y="86" width="38" height="38" rx="5"/><rect x="86" y="86" width="38" height="38" rx="5"/><rect x="129" y="86" width="38" height="38" rx="5"/><rect x="172" y="86" width="38" height="38" rx="5"/><rect x="215" y="86" width="38" height="38" rx="5"/>
+        <rect y="129" width="38" height="38" rx="5"/><rect x="43" y="129" width="38" height="38" rx="5"/><rect x="86" y="129" width="38" height="38" rx="5"/><rect x="129" y="129" width="38" height="38" rx="5"/><rect x="172" y="129" width="38" height="38" rx="5"/><rect x="215" y="129" width="38" height="38" rx="5"/>
+        <rect y="172" width="38" height="38" rx="5"/><rect x="43" y="172" width="38" height="38" rx="5"/><rect x="86" y="172" width="38" height="38" rx="5"/><rect x="129" y="172" width="38" height="38" rx="5"/><rect x="172" y="172" width="38" height="38" rx="5"/><rect x="215" y="172" width="38" height="38" rx="5"/>
+        <rect y="215" width="38" height="38" rx="5"/><rect x="43" y="215" width="38" height="38" rx="5"/><rect x="86" y="215" width="38" height="38" rx="5"/><rect x="129" y="215" width="38" height="38" rx="5"/><rect x="172" y="215" width="38" height="38" rx="5"/><rect x="215" y="215" width="38" height="38" rx="5"/>
+      </g><text x="126" y="282" text-anchor="middle" font-size="18" font-weight="700" fill="#70F1DC">6 × 6</text>
+    </g>
+
+    <!-- caution mini-map -->
+    <g transform="translate(1288 185)" filter="url(#shadow)"><rect width="222" height="238" rx="24" fill="#171827" stroke="#FF718B" stroke-opacity=".65"/><text x="111" y="38" text-anchor="middle" font-size="17" font-weight="800" fill="#FF9AAF">注意不均匀覆盖</text><g transform="translate(38 60)" font-size="16" font-weight="700" text-anchor="middle"><g fill="#462331" stroke="#FF718B"><rect width="45" height="45"/><rect x="48" width="45" height="45" fill="#73364A"/><rect x="96" width="45" height="45"/><rect y="48" width="45" height="45" fill="#73364A"/><rect x="48" y="48" width="45" height="45" fill="#B34C67"/><rect x="96" y="48" width="45" height="45" fill="#73364A"/><rect y="96" width="45" height="45"/><rect x="48" y="96" width="45" height="45" fill="#73364A"/><rect x="96" y="96" width="45" height="45"/></g><g fill="#FFDCE3"><text x="22" y="29">1</text><text x="70" y="29">2</text><text x="118" y="29">1</text><text x="22" y="77">2</text><text x="70" y="77">4</text><text x="118" y="77">2</text><text x="22" y="125">1</text><text x="70" y="125">2</text><text x="118" y="125">1</text></g></g><text x="111" y="220" text-anchor="middle" font-size="15" fill="#FF9AAF">覆盖次数不同 → 棋盘格</text></g>
+    </g>
+  </g>
+</svg>

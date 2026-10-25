@@ -17,6 +17,9 @@ https://soong-a.github.io/2025/12/16/parameter-count/
 https://soong-a.github.io/2026/10/22/dice-loss/
 https://soong-a.github.io/2026/10/22/segmentation-metrics/
 https://soong-a.github.io/2026/10/22/unet-architecture/
+https://soong-a.github.io/2026/10/25/BatchNorm/
+https://soong-a.github.io/2026/10/25/ResNet/
+https://soong-a.github.io/2026/10/25/upsampling-and-transposed-convolution/
 https://soong-a.github.io/about/
 https://soong-a.github.io/archives/
 https://soong-a.github.io/explore/

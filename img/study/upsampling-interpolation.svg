@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 600" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">最近邻插值和双线性插值</title>
+  <desc id="desc">相同的二乘二输入放大为四乘四。最近邻把每个输入值复制成二乘二块；双线性插值根据周围四个值和距离形成连续过渡。</desc>
+  <defs>
+    <pattern id="gridbg" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#51493F" flood-opacity=".13"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+  </defs>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif" fill="#51493F">
+    <text x="570" y="54" text-anchor="middle" font-size="28" font-weight="700">相同输入，两种固定的“填新格子”规则</text>
+    <g transform="translate(55 190)" filter="url(#shadow)">
+      <text x="92" y="-40" text-anchor="middle" font-size="20" font-weight="700">输入 2×2</text>
+      <g font-size="22" font-weight="700" text-anchor="middle"><rect width="86" height="86" fill="#F1EBF8" stroke="#75629C"/><text x="43" y="52">0</text><rect x="90" width="86" height="86" fill="#D8CBE6" stroke="#75629C"/><text x="133" y="52">10</text><rect y="90" width="86" height="86" fill="#CFE8E0" stroke="#3B9E88"/><text x="43" y="142">20</text><rect x="90" y="90" width="86" height="86" fill="#7CC1AE" stroke="#3B9E88"/><text x="133" y="142">30</text></g>
+    </g>
+    <path d="M255 275H330" stroke="#8B837A" stroke-width="2.3" marker-end="url(#arr)"/><text x="292" y="250" text-anchor="middle" font-size="16" font-weight="700">复制最近值</text>
+    <g transform="translate(355 135)" filter="url(#shadow)">
+      <text x="142" y="-18" text-anchor="middle" font-size="21" font-weight="700" fill="#5F4F85">最近邻 4×4</text>
+      <g font-size="16" text-anchor="middle">
+        <rect width="66" height="66" fill="#F1EBF8" stroke="#75629C"/><text x="33" y="40">0</text><rect x="68" width="66" height="66" fill="#F1EBF8" stroke="#75629C"/><text x="101" y="40">0</text><rect x="136" width="66" height="66" fill="#D8CBE6" stroke="#75629C"/><text x="169" y="40">10</text><rect x="204" width="66" height="66" fill="#D8CBE6" stroke="#75629C"/><text x="237" y="40">10</text>
+        <rect y="68" width="66" height="66" fill="#F1EBF8" stroke="#75629C"/><text x="33" y="108">0</text><rect x="68" y="68" width="66" height="66" fill="#F1EBF8" stroke="#75629C"/><text x="101" y="108">0</text><rect x="136" y="68" width="66" height="66" fill="#D8CBE6" stroke="#75629C"/><text x="169" y="108">10</text><rect x="204" y="68" width="66" height="66" fill="#D8CBE6" stroke="#75629C"/><text x="237" y="108">10</text>
+        <rect y="136" width="66" height="66" fill="#CFE8E0" stroke="#3B9E88"/><text x="33" y="176">20</text><rect x="68" y="136" width="66" height="66" fill="#CFE8E0" stroke="#3B9E88"/><text x="101" y="176">20</text><rect x="136" y="136" width="66" height="66" fill="#7CC1AE" stroke="#3B9E88"/><text x="169" y="176">30</text><rect x="204" y="136" width="66" height="66" fill="#7CC1AE" stroke="#3B9E88"/><text x="237" y="176">30</text>
+        <rect y="204" width="66" height="66" fill="#CFE8E0" stroke="#3B9E88"/><text x="33" y="244">20</text><rect x="68" y="204" width="66" height="66" fill="#CFE8E0" stroke="#3B9E88"/><text x="101" y="244">20</text><rect x="136" y="204" width="66" height="66" fill="#7CC1AE" stroke="#3B9E88"/><text x="169" y="244">30</text><rect x="204" y="204" width="66" height="66" fill="#7CC1AE" stroke="#3B9E88"/><text x="237" y="244">30</text>
+      </g>
+      <text x="135" y="310" text-anchor="middle" font-size="16" font-weight="700">清晰但有块状边界</text>
+    </g>
+    <path d="M660 275H735" stroke="#8B837A" stroke-width="2.3" marker-end="url(#arr)"/><text x="697" y="250" text-anchor="middle" font-size="16" font-weight="700">按距离加权</text>
+    <g transform="translate(760 135)" filter="url(#shadow)">
+      <text x="142" y="-18" text-anchor="middle" font-size="21" font-weight="700" fill="#277F6E">双线性 4×4</text>
+      <g font-size="15" text-anchor="middle">
+        <rect width="66" height="66" fill="#F1EBF8" stroke="#75629C"/><text x="33" y="40">0</text><rect x="68" width="66" height="66" fill="#EEE8F7" stroke="#8A75AB"/><text x="101" y="40">3</text><rect x="136" width="66" height="66" fill="#E4D8F0" stroke="#8A75AB"/><text x="169" y="40">7</text><rect x="204" width="66" height="66" fill="#D8CBE6" stroke="#75629C"/><text x="237" y="40">10</text>
+        <rect y="68" width="66" height="66" fill="#F0F8F5" stroke="#62B7A1"/><text x="33" y="108">7</text><rect x="68" y="68" width="66" height="66" fill="#E9F5F1" stroke="#62B7A1"/><text x="101" y="108">10</text><rect x="136" y="68" width="66" height="66" fill="#DCEFE9" stroke="#62B7A1"/><text x="169" y="108">14</text><rect x="204" y="68" width="66" height="66" fill="#D4ECE5" stroke="#62B7A1"/><text x="237" y="108">17</text>
+        <rect y="136" width="66" height="66" fill="#D8EEE7" stroke="#3B9E88"/><text x="33" y="176">13</text><rect x="68" y="136" width="66" height="66" fill="#CEEAE1" stroke="#3B9E88"/><text x="101" y="176">16</text><rect x="136" y="136" width="66" height="66" fill="#C8E7DD" stroke="#3B9E88"/><text x="169" y="176">20</text><rect x="204" y="136" width="66" height="66" fill="#AED8CD" stroke="#3B9E88"/><text x="237" y="176">23</text>
+        <rect y="204" width="66" height="66" fill="#CFE8E0" stroke="#3B9E88"/><text x="33" y="244">20</text><rect x="68" y="204" width="66" height="66" fill="#B8DDD2" stroke="#3B9E88"/><text x="101" y="244">23</text><rect x="136" y="204" width="66" height="66" fill="#A6D6C9" stroke="#3B9E88"/><text x="169" y="244">27</text><rect x="204" y="204" width="66" height="66" fill="#7CC1AE" stroke="#3B9E88"/><text x="237" y="244">30</text>
+      </g>
+      <text x="135" y="310" text-anchor="middle" font-size="16" font-weight="700">产生平滑过渡</text>
+    </g>
+    <rect x="210" y="515" width="720" height="52" rx="15" fill="#FBF2D7" stroke="#B68B2D"/>
+    <text x="570" y="548" text-anchor="middle" font-size="18" font-weight="700" fill="#8F6A21">两者权重都由几何规则决定，不会从训练数据中学习</text>
+  </g>
+</svg>

@@ -5,15 +5,15 @@
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/07/06/machine-learning-specialization/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/08/02/cs231n-foundations/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/08/24/llm-foundations/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/11/mm-unet-background/</loc>
@@ -25,11 +25,11 @@
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/12/mm-unet-affm/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/12/mm-unet-overview/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/12/mm-unet-res2net/</loc>
@@ -37,11 +37,11 @@
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/13/mm-unet-gcm/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/13/mm-unet-macm/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/19/medical-imaging-model-map/</loc>
@@ -49,31 +49,43 @@
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/26/DenseNet/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/11/27/SENet/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/12/16/GFLOPs/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2025/12/16/parameter-count/</loc>
-    <lastmod>2026-10-21</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2026/10/22/dice-loss/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2026/10/22/segmentation-metrics/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/2026/10/22/unet-architecture/</loc>
-    <lastmod>2026-10-22</lastmod>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://soong-a.github.io/2026/10/25/BatchNorm/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://soong-a.github.io/2026/10/25/ResNet/</loc>
+    <lastmod>2026-10-25</lastmod>
+  </url>
+  <url>
+    <loc>https://soong-a.github.io/2026/10/25/upsampling-and-transposed-convolution/</loc>
+    <lastmod>2026-10-25</lastmod>
   </url>
   <url>
     <loc>https://soong-a.github.io/about/</loc>

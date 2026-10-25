@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 450" role="img" aria-labelledby="up-title up-desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="up-title">A transposed convolution as zero insertion plus an ordinary convolution</title>
+  <desc id="up-desc">A 2 by 2 input becomes 3 by 3 once a row and a column of zeros are inserted between its pixels, is padded by one on every side to 5 by 5, and an ordinary 2 by 2 convolution with stride 1 over that produces the 4 by 4 output. Equivalent to a transposed convolution with stride 2 and kernel 2.</desc>
+  <defs>
+    <filter id="up-shadow" x="-25%" y="-25%" width="150%" height="165%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#51493F" flood-opacity="0.13"/>
+    </filter>
+    <pattern id="up-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="#756F67" stroke-opacity="0.075"/>
+    </pattern>
+    <linearGradient id="up-lavender" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F1EBF8"/><stop offset="1" stop-color="#C9B6E2"/>
+    </linearGradient>
+    <linearGradient id="up-sage" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF4F0"/><stop offset="1" stop-color="#CFE8E0"/>
+    </linearGradient>
+    <marker id="up-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#8B837A"/>
+    </marker>
+  </defs>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="44" y="46" font-size="15" font-weight="700" letter-spacing="2.7" fill="#8F6A21">stride 2 · kernel 2</text>
+
+    <!-- step 1: 2x2 input -->
+    <g transform="translate(66 118)">
+      <g stroke="#75629C" stroke-width="1.8" fill="url(#up-lavender)" filter="url(#up-shadow)">
+        <rect x="0" y="0" width="52" height="52" rx="5"/><rect x="54" y="0" width="52" height="52" rx="5"/>
+        <rect x="0" y="54" width="52" height="52" rx="5"/><rect x="54" y="54" width="52" height="52" rx="5"/>
+      </g>
+      <text x="53" y="150" text-anchor="middle" font-size="18" font-weight="700" fill="#5F4F85">2 × 2</text>
+      <text x="53" y="-18" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="1.6" fill="#756F67">in</text>
+    </g>
+
+    <path d="M192 172H244" stroke="#8B837A" stroke-width="1.8" fill="none" marker-end="url(#up-arrow)"/>
+    <text x="218" y="156" text-anchor="middle" font-size="19" font-weight="700" fill="#8F6A21">+0</text>
+
+    <!-- step 2: zeros inserted -> 3x3 -->
+    <g transform="translate(266 92)">
+      <g stroke-width="1.8" filter="url(#up-shadow)">
+        <rect x="0" y="0" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+        <rect x="54" y="0" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC" stroke-dasharray="5 4"/>
+        <rect x="108" y="0" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+        <rect x="0" y="54" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC" stroke-dasharray="5 4"/>
+        <rect x="54" y="54" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC" stroke-dasharray="5 4"/>
+        <rect x="108" y="54" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC" stroke-dasharray="5 4"/>
+        <rect x="0" y="108" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+        <rect x="54" y="108" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC" stroke-dasharray="5 4"/>
+        <rect x="108" y="108" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+      </g>
+      <g font-size="20" font-weight="600" fill="#756F67" text-anchor="middle">
+        <text x="80" y="34">0</text><text x="26" y="88">0</text><text x="80" y="88">0</text>
+        <text x="134" y="88">0</text><text x="80" y="142">0</text>
+      </g>
+      <text x="80" y="204" text-anchor="middle" font-size="18" font-weight="700" fill="#5F4F85">3 × 3</text>
+    </g>
+
+    <path d="M452 172H504" stroke="#8B837A" stroke-width="1.8" fill="none" marker-end="url(#up-arrow)"/>
+    <text x="478" y="156" text-anchor="middle" font-size="15" font-weight="700" fill="#8F6A21">pad</text>
+
+    <!-- step 3: padded, with kernel window -->
+    <g transform="translate(526 66)">
+      <rect x="-4" y="-4" width="220" height="220" rx="10" fill="none" stroke="#C0B8AC" stroke-width="1.6" stroke-dasharray="6 5"/>
+      <g stroke-width="1.6" filter="url(#up-shadow)">
+        <rect x="27" y="27" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+        <rect x="81" y="27" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC"/>
+        <rect x="135" y="27" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+        <rect x="27" y="81" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC"/>
+        <rect x="81" y="81" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC"/>
+        <rect x="135" y="81" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC"/>
+        <rect x="27" y="135" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+        <rect x="81" y="135" width="52" height="52" rx="5" fill="#FFFEFC" stroke="#C0B8AC"/>
+        <rect x="135" y="135" width="52" height="52" rx="5" fill="url(#up-lavender)" stroke="#75629C"/>
+      </g>
+      <rect x="0" y="0" width="106" height="106" rx="8" fill="#B68B2D" fill-opacity="0.16" stroke="#B68B2D" stroke-width="2.6"/>
+      <text x="53" y="-16" text-anchor="middle" font-size="15" font-weight="700" fill="#8F6A21">k = 2</text>
+      <text x="106" y="230" text-anchor="middle" font-size="18" font-weight="700" fill="#5F4F85">5 × 5</text>
+    </g>
+
+    <path d="M760 172H812" stroke="#8B837A" stroke-width="1.8" fill="none" marker-end="url(#up-arrow)"/>
+    <text x="786" y="156" text-anchor="middle" font-size="15" font-weight="700" fill="#8F6A21">conv</text>
+
+    <!-- step 4: 4x4 output -->
+    <g transform="translate(834 118)">
+      <g stroke="#3B9E88" stroke-width="1.6" fill="url(#up-sage)" filter="url(#up-shadow)">
+        <rect x="0" y="0" width="34" height="34" rx="4"/><rect x="36" y="0" width="34" height="34" rx="4"/><rect x="72" y="0" width="34" height="34" rx="4"/><rect x="108" y="0" width="34" height="34" rx="4"/>
+        <rect x="0" y="36" width="34" height="34" rx="4"/><rect x="36" y="36" width="34" height="34" rx="4"/><rect x="72" y="36" width="34" height="34" rx="4"/><rect x="108" y="36" width="34" height="34" rx="4"/>
+        <rect x="0" y="72" width="34" height="34" rx="4"/><rect x="36" y="72" width="34" height="34" rx="4"/><rect x="72" y="72" width="34" height="34" rx="4"/><rect x="108" y="72" width="34" height="34" rx="4"/>
+        <rect x="0" y="108" width="34" height="34" rx="4"/><rect x="36" y="108" width="34" height="34" rx="4"/><rect x="72" y="108" width="34" height="34" rx="4"/><rect x="108" y="108" width="34" height="34" rx="4"/>
+      </g>
+      <text x="71" y="186" text-anchor="middle" font-size="18" font-weight="700" fill="#277F6E">4 × 4</text>
+      <text x="71" y="-18" text-anchor="middle" font-size="14" font-weight="600" letter-spacing="1.6" fill="#756F67">out</text>
+    </g>
+
+    <!-- formula -->
+    <text x="520" y="414" text-anchor="middle" font-size="19" font-weight="600" fill="#51493F">
+      out = (in − 1) × stride − 2·padding + kernel
+    </text>
+  </g>
+</svg>

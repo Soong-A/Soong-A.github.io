@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">普通深层网络的退化与残差网络的改善</title>
+  <desc id="desc">左侧概念图表示普通网络从20层增至56层时训练误差反而升高，右侧表示残差网络加深后训练误差继续下降。曲线仅用于概念说明，不是论文数据复刻。</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#51493F" flood-opacity=".13"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+  </defs>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif" fill="#51493F">
+    <text x="550" y="55" text-anchor="middle" font-size="27" font-weight="700">加深网络，不应该让训练结果更差</text>
+    <text x="550" y="86" text-anchor="middle" font-size="15" fill="#756F67">概念示意 · 纵轴越低越好</text>
+
+    <g transform="translate(70 125)" filter="url(#shadow)">
+      <rect width="445" height="365" rx="20" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.5"/>
+      <text x="222" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="#5F4F85">普通网络</text>
+      <line x1="70" y1="300" x2="388" y2="300" stroke="#8B837A" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <line x1="70" y1="300" x2="70" y2="80" stroke="#8B837A" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <text x="390" y="327" text-anchor="end" font-size="15">网络深度</text>
+      <text x="42" y="94" transform="rotate(-90 42 94)" text-anchor="end" font-size="15">训练误差</text>
+      <path d="M93 245C145 212 190 180 230 172C278 162 326 183 370 224" fill="none" stroke="#C14E69" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="145" cy="212" r="8" fill="#C14E69"/><circle cx="345" cy="206" r="8" fill="#C14E69"/>
+      <text x="145" y="196" text-anchor="middle" font-size="15" font-weight="700">20 层</text>
+      <text x="345" y="190" text-anchor="middle" font-size="15" font-weight="700">56 层</text>
+      <path d="M164 222C205 257 270 263 326 224" fill="none" stroke="#B68B2D" stroke-width="2" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+      <text x="244" y="281" text-anchor="middle" font-size="17" font-weight="700" fill="#8F6A21">更深，训练误差反而更高</text>
+    </g>
+
+    <g transform="translate(585 125)" filter="url(#shadow)">
+      <rect width="445" height="365" rx="20" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.5"/>
+      <text x="222" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="#277F6E">残差网络</text>
+      <line x1="70" y1="300" x2="388" y2="300" stroke="#8B837A" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <line x1="70" y1="300" x2="70" y2="80" stroke="#8B837A" stroke-width="1.8" marker-end="url(#arrow)"/>
+      <text x="390" y="327" text-anchor="end" font-size="15">网络深度</text>
+      <text x="42" y="94" transform="rotate(-90 42 94)" text-anchor="end" font-size="15">训练误差</text>
+      <path d="M93 245C158 222 220 195 278 164C320 141 349 126 373 116" fill="none" stroke="#3B9E88" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="145" cy="226" r="8" fill="#3B9E88"/><circle cx="345" cy="130" r="8" fill="#3B9E88"/>
+      <text x="145" y="210" text-anchor="middle" font-size="15" font-weight="700">20 层</text>
+      <text x="345" y="114" text-anchor="middle" font-size="15" font-weight="700">56 层</text>
+      <text x="245" y="281" text-anchor="middle" font-size="17" font-weight="700" fill="#277F6E">捷径让深网更容易优化</text>
+    </g>
+
+    <rect x="310" y="526" width="480" height="56" rx="16" fill="#FBF2D7" stroke="#B68B2D" stroke-width="1.5"/>
+    <text x="550" y="561" text-anchor="middle" font-size="18" font-weight="700" fill="#8F6A21">关键证据：比较的是训练误差，所以不是普通的过拟合</text>
+  </g>
+</svg>

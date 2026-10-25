@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">ResNet 残差连接：主分支学习变化，捷径保留原始信息</title>
+  <desc id="desc">输入特征分成两路，紫色主分支通过卷积学习F(x)，金色高速捷径将x原样送到加法节点，最后得到F(x)+x。</desc>
+  <defs>
+    <radialGradient id="bg" cx="72%" cy="40%" r="85%"><stop offset="0" stop-color="#142445"/><stop offset=".48" stop-color="#0B172A"/><stop offset="1" stop-color="#060C17"/></radialGradient>
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#A89DFF"/><stop offset="1" stop-color="#6655E8"/></linearGradient>
+    <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5EEAD4"/><stop offset="1" stop-color="#0F9E8A"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFE59A"/><stop offset="1" stop-color="#F2B83B"/></linearGradient>
+    <pattern id="dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#AFC2DD" opacity=".12"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#000" flood-opacity=".38"/></filter>
+    <marker id="arrowP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B7CFF"/></marker>
+    <marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#F6C85F"/></marker>
+    <marker id="arrowT" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#2DD4BF"/></marker>
+  </defs>
+  <rect width="1600" height="500" fill="url(#bg)"/><rect width="1600" height="500" fill="url(#dots)"/>
+  <path d="M0 438C280 402 440 472 710 434C980 397 1180 465 1600 412V500H0Z" fill="#513EAE" opacity=".12"/>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <g transform="translate(92 74)">
+      <rect width="270" height="50" rx="25" fill="#8B7CFF" fill-opacity=".12" stroke="#8B7CFF" stroke-opacity=".38"/>
+      <circle cx="28" cy="25" r="7" fill="#8B7CFF" filter="url(#glow)"/>
+      <text x="50" y="33" font-size="22" font-weight="700" fill="#C8C1FF">DEEP RESIDUAL LEARNING</text>
+    </g>
+
+    <g transform="translate(0 -95)">
+    <!-- input feature stack -->
+    <g transform="translate(110 292)" filter="url(#shadow)">
+      <path d="M0 14L58 0L111 20L54 36Z" fill="#594CA7" opacity=".55"/><path d="M0 33L58 19L111 39L54 55Z" fill="#7164D2" opacity=".7"/><path d="M0 52L58 38L111 58L54 74Z" fill="url(#purple)"/>
+      <text x="55" y="106" text-anchor="middle" font-size="19" font-weight="700" fill="#C8C1FF">输入 x</text>
+    </g>
+
+    <!-- main branch -->
+    <path d="M250 330H390" stroke="#8B7CFF" stroke-width="4" marker-end="url(#arrowP)"/>
+    <g transform="translate(420 264)" filter="url(#shadow)">
+      <rect width="230" height="132" rx="24" fill="#171B39" stroke="#8B7CFF" stroke-width="2"/>
+      <g transform="translate(34 28)"><rect width="48" height="76" rx="8" fill="#3A336D" stroke="#9C90FF"/><rect x="58" width="48" height="76" rx="8" fill="#312C60" stroke="#8B7CFF"/><rect x="116" width="48" height="76" rx="8" fill="#292751" stroke="#7365E9"/></g>
+      <text x="115" y="23" text-anchor="middle" font-size="16" font-weight="700" fill="#BFB7FF">CONV · BN · RELU</text>
+    </g>
+    <path d="M652 330H762" stroke="#8B7CFF" stroke-width="4" marker-end="url(#arrowP)"/>
+    <g transform="translate(790 286)" filter="url(#shadow)">
+      <rect width="164" height="88" rx="20" fill="#241D4D" stroke="#8B7CFF" stroke-width="2"/>
+      <text x="82" y="39" text-anchor="middle" font-size="23" font-weight="800" fill="#C9C3FF">变化量</text><text x="82" y="68" text-anchor="middle" font-size="21" font-style="italic" fill="#A99FFF">F(x)</text>
+    </g>
+
+    <!-- shortcut express lane -->
+    <path d="M170 292C206 210 300 202 410 202H1052C1120 202 1160 226 1178 276" fill="none" stroke="#F6C85F" stroke-width="5" stroke-linecap="round" marker-end="url(#arrowG)" filter="url(#glow)"/>
+    <g transform="translate(666 180)"><rect width="240" height="42" rx="21" fill="#3C2D16" stroke="#F6C85F" stroke-opacity=".55"/><text x="120" y="28" text-anchor="middle" font-size="18" font-weight="700" fill="#FFE092">恒等捷径：x 不加工</text></g>
+
+    <!-- add and output -->
+    <path d="M956 330H1135" stroke="#8B7CFF" stroke-width="4" marker-end="url(#arrowP)"/>
+    <g transform="translate(1186 330)" filter="url(#glow)"><circle r="46" fill="#3A2B14" stroke="#F6C85F" stroke-width="3"/><path d="M-18 0H18M0-18V18" stroke="#FFE092" stroke-width="5" stroke-linecap="round"/></g>
+    <path d="M1234 330H1350" stroke="#2DD4BF" stroke-width="4" marker-end="url(#arrowT)"/>
+    <g transform="translate(1378 286)" filter="url(#shadow)"><rect width="155" height="88" rx="22" fill="#123A3A" stroke="#22D3B6" stroke-width="2"/><text x="77" y="39" text-anchor="middle" font-size="20" font-weight="700" fill="#70F1DC">输出 y</text><text x="77" y="68" text-anchor="middle" font-size="18" fill="#A9FFF2">F(x) + x</text></g>
+    </g>
+
+    <g transform="translate(1040 74)"><text x="0" y="40" font-size="56" font-weight="800" fill="#F2F6FC">y = F(x) + x</text><text x="2" y="82" font-size="20" fill="#9FB0C7">加法保留尺寸 · 捷径保留信息 · 深层更易优化</text></g>
+  </g>
+</svg>

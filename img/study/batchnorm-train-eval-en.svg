@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 610" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">BatchNorm in Training and Evaluation</title>
+  <desc id="desc">Training mode normalizes with the current mini-batch mean and variance while updating running statistics. Evaluation mode does not recompute batch statistics; it reads the running statistics accumulated during training.</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#51493F" flood-opacity=".13"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+    <marker id="green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#3B9E88"/></marker>
+  </defs>
+  <g font-family="'Segoe UI','Arial',sans-serif" fill="#51493F">
+    <text x="560" y="54" text-anchor="middle" font-size="28" font-weight="700">One BN Layer, Two Operating Rules</text>
+    <g transform="translate(50 100)" filter="url(#shadow)">
+      <rect width="480" height="425" rx="22" fill="#FFFEFC" stroke="#75629C" stroke-width="2"/>
+      <rect width="480" height="66" rx="22" fill="#E9DEF3"/><path d="M0 44H480V66H0Z" fill="#E9DEF3"/>
+      <text x="240" y="42" text-anchor="middle" font-size="23" font-weight="700" fill="#5F4F85">Training: model.train()</text>
+      <rect x="42" y="98" width="135" height="66" rx="14" fill="#F1EBF8" stroke="#75629C"/><text x="109" y="126" text-anchor="middle" font-size="17" font-weight="700">Current batch</text><text x="109" y="150" text-anchor="middle" font-size="14">x1, x2, ...</text>
+      <path d="M179 131H217" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="225" y="90" width="205" height="82" rx="14" fill="#F6E8C0" stroke="#B68B2D"/><text x="327" y="122" text-anchor="middle" font-size="17" font-weight="700">Compute now</text><text x="327" y="149" text-anchor="middle" font-size="16">mu_batch, var_batch</text>
+      <path d="M327 174V214" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="215" y="222" width="225" height="70" rx="14" fill="#EAF4F0" stroke="#3B9E88"/><text x="327" y="251" text-anchor="middle" font-size="17" font-weight="700">Normalize current data</text><text x="327" y="276" text-anchor="middle" font-size="14">then apply gamma / beta</text>
+      <path d="M225 154C167 197 164 306 224 331" fill="none" stroke="#B68B2D" stroke-width="2.4" stroke-dasharray="7 6" marker-end="url(#arr)"/>
+      <rect x="225" y="319" width="205" height="72" rx="14" fill="#FBF2D7" stroke="#B68B2D"/><text x="327" y="347" text-anchor="middle" font-size="16" font-weight="700">Update at the same time</text><text x="327" y="373" text-anchor="middle" font-size="14">running_mean / var</text>
+      <text x="62" y="367" font-size="15" fill="#8F6A21">Stored for future inference</text>
+    </g>
+    <g transform="translate(590 100)" filter="url(#shadow)">
+      <rect width="480" height="425" rx="22" fill="#FFFEFC" stroke="#3B9E88" stroke-width="2"/>
+      <rect width="480" height="66" rx="22" fill="#E1F2EC"/><path d="M0 44H480V66H0Z" fill="#E1F2EC"/>
+      <text x="240" y="42" text-anchor="middle" font-size="23" font-weight="700" fill="#277F6E">Evaluation / inference: model.eval()</text>
+      <rect x="42" y="104" width="135" height="66" rx="14" fill="#EAF4F0" stroke="#3B9E88"/><text x="109" y="132" text-anchor="middle" font-size="17" font-weight="700">Current input</text><text x="109" y="156" text-anchor="middle" font-size="14">one or more samples</text>
+      <rect x="226" y="92" width="210" height="88" rx="14" fill="#FBF2D7" stroke="#B68B2D"/><text x="331" y="124" text-anchor="middle" font-size="16" font-weight="700">Read statistics accumulated</text><text x="331" y="151" text-anchor="middle" font-size="14">running_mean / var</text>
+      <path d="M177 137H213" stroke="#3B9E88" stroke-width="2.4" marker-end="url(#green)"/>
+      <path d="M331 182V228" stroke="#3B9E88" stroke-width="2.4" marker-end="url(#green)"/>
+      <rect x="218" y="236" width="218" height="72" rx="14" fill="#EAF4F0" stroke="#3B9E88"/><text x="327" y="266" text-anchor="middle" font-size="17" font-weight="700">Fixed-stat normalization</text><text x="327" y="291" text-anchor="middle" font-size="14">Independent of other batch samples</text>
+      <path d="M327 310V347" stroke="#3B9E88" stroke-width="2.4" marker-end="url(#green)"/>
+      <rect x="218" y="354" width="218" height="50" rx="14" fill="#E1F2EC" stroke="#3B9E88"/><text x="327" y="386" text-anchor="middle" font-size="16" font-weight="700">Stable output</text>
+      <path d="M74 222L162 310M162 222L74 310" stroke="#C14E69" stroke-width="4" stroke-linecap="round"/>
+      <text x="118" y="340" text-anchor="middle" font-size="15" font-weight="700" fill="#B45269">Do not re-estimate</text><text x="118" y="363" text-anchor="middle" font-size="15" font-weight="700" fill="#B45269">current-batch statistics</text>
+    </g>
+    <rect x="215" y="550" width="690" height="42" rx="13" fill="#FBF2D7" stroke="#B68B2D"/>
+    <text x="560" y="578" text-anchor="middle" font-size="17" font-weight="700" fill="#8F6A21">model.eval() changes layer behavior; torch.no_grad() disables gradient recording</text>
+  </g>
+</svg>

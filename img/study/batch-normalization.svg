@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 430" role="img" aria-labelledby="bn-title bn-desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="bn-title">Which values BN, LN, IN and GN average over</title>
+  <desc id="bn-desc">Four grids, each with the batch dimension N across and the channel dimension C down, every cell standing for one feature map of height H and width W. BatchNorm highlights one channel row across every sample. LayerNorm highlights every channel of one sample. InstanceNorm highlights a single cell. GroupNorm highlights a group of channels within one sample.</desc>
+  <defs>
+    <filter id="bn-shadow" x="-25%" y="-25%" width="150%" height="165%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#51493F" flood-opacity="0.13"/>
+    </filter>
+    <pattern id="bn-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+      <path d="M26 0H0V26" fill="none" stroke="#756F67" stroke-opacity="0.075"/>
+    </pattern>
+    <linearGradient id="bn-hl" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F1EBF8"/><stop offset="1" stop-color="#C9B6E2"/>
+    </linearGradient>
+    <linearGradient id="bn-hl2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F6E8C0"/><stop offset="1" stop-color="#E3C778"/>
+    </linearGradient>
+  </defs>
+
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif">
+    <text x="44" y="46" font-size="15" font-weight="700" letter-spacing="2.7" fill="#8F6A21">N × C × H × W</text>
+
+    <!-- one panel per method: x offsets 72, 322, 572, 822 -->
+    <g id="bn-panels">
+      <!-- ============ BatchNorm: one channel row, all samples ============ -->
+      <g transform="translate(72 86)">
+        <rect x="-16" y="-14" width="192" height="214" rx="16" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.6" filter="url(#bn-shadow)"/>
+        <g stroke="#B3ABA0" stroke-width="1.3" fill="#F5F1E9">
+          <rect x="0" y="0" width="38" height="38"/><rect x="40" y="0" width="38" height="38"/><rect x="80" y="0" width="38" height="38"/><rect x="120" y="0" width="38" height="38"/>
+          <rect x="0" y="40" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="40" y="40" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="80" y="40" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="120" y="40" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/>
+          <rect x="0" y="80" width="38" height="38"/><rect x="40" y="80" width="38" height="38"/><rect x="80" y="80" width="38" height="38"/><rect x="120" y="80" width="38" height="38"/>
+          <rect x="0" y="120" width="38" height="38"/><rect x="40" y="120" width="38" height="38"/><rect x="80" y="120" width="38" height="38"/><rect x="120" y="120" width="38" height="38"/>
+        </g>
+        <text x="79" y="192" text-anchor="middle" font-size="19" font-weight="700" fill="#5F4F85">BN</text>
+      </g>
+
+      <!-- ============ LayerNorm: all channels, one sample ============ -->
+      <g transform="translate(322 86)">
+        <rect x="-16" y="-14" width="192" height="214" rx="16" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.6" filter="url(#bn-shadow)"/>
+        <g stroke="#B3ABA0" stroke-width="1.3" fill="#F5F1E9">
+          <rect x="0" y="0" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="40" y="0" width="38" height="38"/><rect x="80" y="0" width="38" height="38"/><rect x="120" y="0" width="38" height="38"/>
+          <rect x="0" y="40" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="40" y="40" width="38" height="38"/><rect x="80" y="40" width="38" height="38"/><rect x="120" y="40" width="38" height="38"/>
+          <rect x="0" y="80" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="40" y="80" width="38" height="38"/><rect x="80" y="80" width="38" height="38"/><rect x="120" y="80" width="38" height="38"/>
+          <rect x="0" y="120" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="40" y="120" width="38" height="38"/><rect x="80" y="120" width="38" height="38"/><rect x="120" y="120" width="38" height="38"/>
+        </g>
+        <text x="79" y="192" text-anchor="middle" font-size="19" font-weight="700" fill="#5F4F85">LN</text>
+      </g>
+
+      <!-- ============ InstanceNorm: one channel of one sample ============ -->
+      <g transform="translate(572 86)">
+        <rect x="-16" y="-14" width="192" height="214" rx="16" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.6" filter="url(#bn-shadow)"/>
+        <g stroke="#B3ABA0" stroke-width="1.3" fill="#F5F1E9">
+          <rect x="0" y="0" width="38" height="38"/><rect x="40" y="0" width="38" height="38"/><rect x="80" y="0" width="38" height="38"/><rect x="120" y="0" width="38" height="38"/>
+          <rect x="0" y="40" width="38" height="38" fill="url(#bn-hl)" stroke="#75629C" stroke-width="1.8"/><rect x="40" y="40" width="38" height="38"/><rect x="80" y="40" width="38" height="38"/><rect x="120" y="40" width="38" height="38"/>
+          <rect x="0" y="80" width="38" height="38"/><rect x="40" y="80" width="38" height="38"/><rect x="80" y="80" width="38" height="38"/><rect x="120" y="80" width="38" height="38"/>
+          <rect x="0" y="120" width="38" height="38"/><rect x="40" y="120" width="38" height="38"/><rect x="80" y="120" width="38" height="38"/><rect x="120" y="120" width="38" height="38"/>
+        </g>
+        <text x="79" y="192" text-anchor="middle" font-size="19" font-weight="700" fill="#5F4F85">IN</text>
+      </g>
+
+      <!-- ============ GroupNorm: a group of channels, one sample ============ -->
+      <g transform="translate(822 86)">
+        <rect x="-16" y="-14" width="192" height="214" rx="16" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.6" filter="url(#bn-shadow)"/>
+        <g stroke="#B3ABA0" stroke-width="1.3" fill="#F5F1E9">
+          <rect x="0" y="0" width="38" height="38" fill="url(#bn-hl2)" stroke="#B68B2D" stroke-width="1.8"/><rect x="40" y="0" width="38" height="38"/><rect x="80" y="0" width="38" height="38"/><rect x="120" y="0" width="38" height="38"/>
+          <rect x="0" y="40" width="38" height="38" fill="url(#bn-hl2)" stroke="#B68B2D" stroke-width="1.8"/><rect x="40" y="40" width="38" height="38"/><rect x="80" y="40" width="38" height="38"/><rect x="120" y="40" width="38" height="38"/>
+          <rect x="0" y="80" width="38" height="38"/><rect x="40" y="80" width="38" height="38"/><rect x="80" y="80" width="38" height="38"/><rect x="120" y="80" width="38" height="38"/>
+          <rect x="0" y="120" width="38" height="38"/><rect x="40" y="120" width="38" height="38"/><rect x="80" y="120" width="38" height="38"/><rect x="120" y="120" width="38" height="38"/>
+        </g>
+        <text x="79" y="192" text-anchor="middle" font-size="19" font-weight="700" fill="#8F6A21">GN</text>
+      </g>
+    </g>
+
+    <!-- axes legend -->
+    <g font-size="14" font-weight="600" fill="#756F67">
+      <path d="M72 326H230" stroke="#8B837A" stroke-width="1.6" marker-end="url(#bn-ax)"/>
+      <text x="240" y="331" font-style="italic">N</text>
+      <path d="M72 326V392" stroke="#8B837A" stroke-width="1.6" marker-end="url(#bn-ax)"/>
+      <text x="64" y="406" font-style="italic" text-anchor="middle">C</text>
+      <text x="300" y="331" font-weight="500">1 □ = H × W</text>
+    </g>
+    <defs>
+      <marker id="bn-ax" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+        <path d="M0 0L10 5L0 10Z" fill="#8B837A"/>
+      </marker>
+    </defs>
+  </g>
+</svg>

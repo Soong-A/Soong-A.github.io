@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 610" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">ResNet BasicBlock vs. Bottleneck</title>
+  <desc id="desc">The BasicBlock on the left uses two 3 by 3 convolutions and keeps 64 channels. The Bottleneck on the right reduces 256 channels to 64 with a 1 by 1 convolution, processes them with a 3 by 3 convolution, then expands back to 256.</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#51493F" flood-opacity=".13"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+  </defs>
+  <g font-family="'Segoe UI','Arial',sans-serif" fill="#51493F">
+    <text x="550" y="52" text-anchor="middle" font-size="27" font-weight="700">Two Residual Building Blocks</text>
+    <g transform="translate(55 95)" filter="url(#shadow)">
+      <rect width="455" height="440" rx="22" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.5"/>
+      <text x="227" y="44" text-anchor="middle" font-size="23" font-weight="700" fill="#5F4F85">BasicBlock</text>
+      <text x="227" y="72" text-anchor="middle" font-size="15" fill="#756F67">Used in ResNet-18 / 34</text>
+      <rect x="75" y="118" width="305" height="76" rx="16" fill="#E9DEF3" stroke="#75629C" stroke-width="2"/>
+      <text x="227" y="149" text-anchor="middle" font-size="18" font-weight="700">3×3 Conv + BN + ReLU</text><text x="227" y="176" text-anchor="middle" font-size="16">64 → 64 channels</text>
+      <path d="M227 197V232" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="75" y="240" width="305" height="76" rx="16" fill="#E9DEF3" stroke="#75629C" stroke-width="2"/>
+      <text x="227" y="271" text-anchor="middle" font-size="18" font-weight="700">3×3 Conv + BN</text><text x="227" y="298" text-anchor="middle" font-size="16">64 → 64 channels</text>
+      <path d="M51 156V335Q51 351 67 351H197" fill="none" stroke="#B68B2D" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#arr)"/>
+      <circle cx="227" cy="351" r="27" fill="#F6E8C0" stroke="#B68B2D" stroke-width="2"/><path d="M215 351H239M227 339V363" stroke="#8F6A21" stroke-width="3"/>
+      <path d="M227 318V321" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="227" y="405" text-anchor="middle" font-size="17" font-weight="700">2 convolution layers</text>
+    </g>
+    <g transform="translate(590 95)" filter="url(#shadow)">
+      <rect width="455" height="440" rx="22" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.5"/>
+      <text x="227" y="44" text-anchor="middle" font-size="23" font-weight="700" fill="#277F6E">Bottleneck</text>
+      <text x="227" y="72" text-anchor="middle" font-size="15" fill="#756F67">Used in ResNet-50 / 101 / 152</text>
+      <rect x="75" y="98" width="305" height="66" rx="16" fill="#EAF4F0" stroke="#3B9E88" stroke-width="2"/>
+      <text x="227" y="125" text-anchor="middle" font-size="18" font-weight="700">1×1 Conv: reduce</text><text x="227" y="149" text-anchor="middle" font-size="15">256 → 64</text>
+      <path d="M227 166V183" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="110" y="190" width="235" height="66" rx="16" fill="#F1EBF8" stroke="#75629C" stroke-width="2"/>
+      <text x="227" y="217" text-anchor="middle" font-size="18" font-weight="700">3×3 Conv: process</text><text x="227" y="241" text-anchor="middle" font-size="15">64 → 64</text>
+      <path d="M227 258V275" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="75" y="282" width="305" height="66" rx="16" fill="#EAF4F0" stroke="#3B9E88" stroke-width="2"/>
+      <text x="227" y="309" text-anchor="middle" font-size="18" font-weight="700">1×1 Conv: expand</text><text x="227" y="333" text-anchor="middle" font-size="15">64 → 256</text>
+      <path d="M50 131V367Q50 382 65 382H197" fill="none" stroke="#B68B2D" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#arr)"/>
+      <circle cx="227" cy="382" r="27" fill="#F6E8C0" stroke="#B68B2D" stroke-width="2"/><path d="M215 382H239M227 370V394" stroke="#8F6A21" stroke-width="3"/>
+      <text x="227" y="424" text-anchor="middle" font-size="17" font-weight="700">3 convolution layers · narrowest in the middle</text>
+    </g>
+    <text x="550" y="575" text-anchor="middle" font-size="19" font-weight="700" fill="#8F6A21">Bottleneck applies the expensive 3×3 convolution to fewer channels</text>
+  </g>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 560" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">U-Net 解码块的数据流和尺寸</title>
+  <desc id="desc">深层256通道32乘32特征先上采样为128通道64乘64，与编码器128通道64乘64跳跃特征沿通道拼接成256通道，再经卷积融合为128通道64乘64。</desc>
+  <defs>
+    <pattern id="gridbg" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" flood-color="#51493F" flood-opacity=".13"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+    <marker id="gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#B68B2D"/></marker>
+  </defs>
+  <g font-family="'Noto Sans SC','Microsoft YaHei',sans-serif" fill="#51493F">
+    <text x="580" y="54" text-anchor="middle" font-size="28" font-weight="700">U-Net 解码块：放大只是第一步，融合才是目的</text>
+    <g filter="url(#shadow)">
+      <rect x="45" y="213" width="185" height="100" rx="17" fill="#E9DEF3" stroke="#75629C" stroke-width="2"/>
+      <rect x="294" y="213" width="185" height="100" rx="17" fill="#F6E8C0" stroke="#B68B2D" stroke-width="2"/>
+      <rect x="570" y="213" width="185" height="100" rx="17" fill="#EAF4F0" stroke="#3B9E88" stroke-width="2"/>
+      <rect x="850" y="213" width="210" height="100" rx="17" fill="#E1F2EC" stroke="#3B9E88" stroke-width="2"/>
+      <rect x="570" y="75" width="185" height="86" rx="17" fill="#FBF2D7" stroke="#B68B2D" stroke-width="2"/>
+    </g>
+    <text x="137" y="251" text-anchor="middle" font-size="19" font-weight="700" fill="#5F4F85">深层特征</text><text x="137" y="282" text-anchor="middle" font-size="17">256 × 32 × 32</text>
+    <path d="M232 263H281" stroke="#8B837A" stroke-width="2.5" marker-end="url(#arr)"/>
+    <text x="386" y="247" text-anchor="middle" font-size="19" font-weight="700" fill="#8F6A21">上采样 ×2</text><text x="386" y="278" text-anchor="middle" font-size="17">128 × 64 × 64</text>
+    <path d="M481 263H557" stroke="#8B837A" stroke-width="2.5" marker-end="url(#arr)"/>
+    <text x="662" y="247" text-anchor="middle" font-size="19" font-weight="700" fill="#277F6E">通道拼接</text><text x="662" y="278" text-anchor="middle" font-size="17">256 × 64 × 64</text>
+    <path d="M757 263H837" stroke="#8B837A" stroke-width="2.5" marker-end="url(#arr)"/>
+    <text x="955" y="247" text-anchor="middle" font-size="19" font-weight="700" fill="#277F6E">卷积融合</text><text x="955" y="278" text-anchor="middle" font-size="17">128 × 64 × 64</text>
+    <text x="662" y="107" text-anchor="middle" font-size="18" font-weight="700" fill="#8F6A21">编码器 skip</text><text x="662" y="136" text-anchor="middle" font-size="16">128 × 64 × 64</text>
+    <path d="M662 163V200" stroke="#B68B2D" stroke-width="3" marker-end="url(#gold)"/>
+    <text x="757" y="183" font-size="15" fill="#8F6A21">补回高分辨率细节</text>
+    <g transform="translate(55 378)">
+      <rect width="1050" height="120" rx="19" fill="#FFFEFC" stroke="#D8D0C4"/>
+      <text x="525" y="34" text-anchor="middle" font-size="18" font-weight="700">形状检查口诀</text>
+      <text x="180" y="72" text-anchor="middle" font-size="17" fill="#5F4F85">拼接前：H、W 必须相同</text>
+      <text x="525" y="72" text-anchor="middle" font-size="17" fill="#8F6A21">拼接后：C = C_up + C_skip</text>
+      <text x="870" y="72" text-anchor="middle" font-size="17" fill="#277F6E">融合后：卷积决定输出 C</text>
+      <text x="525" y="101" text-anchor="middle" font-size="14" fill="#756F67">奇数尺寸对不上时，优先显式对齐到 skip.shape[-2:]</text>
+    </g>
+  </g>
+</svg>

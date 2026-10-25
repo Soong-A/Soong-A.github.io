@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 590" role="img" aria-labelledby="title desc">
+  <style>text{paint-order:stroke;stroke:#FFFEFA;stroke-width:1.8px;stroke-linejoin:round;stroke-opacity:.84}</style>
+  <title id="title">Plain Mapping vs. Residual Mapping</title>
+  <desc id="desc">A plain network learns the complete target H(x). A residual block asks the main branch to learn only the difference F(x), then adds x back through the shortcut.</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><path d="M28 0H0V28" fill="none" stroke="#756F67" stroke-opacity=".07"/></pattern>
+    <filter id="shadow"><feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#51493F" flood-opacity=".14"/></filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#8B837A"/></marker>
+    <marker id="goldarr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5 0 10Z" fill="#B68B2D"/></marker>
+  </defs>
+  <g font-family="'Segoe UI','Arial',sans-serif" fill="#51493F">
+    <text x="550" y="54" text-anchor="middle" font-size="28" font-weight="700">Same Target, Easier Formulation</text>
+    <g transform="translate(70 105)" filter="url(#shadow)">
+      <rect width="420" height="390" rx="22" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.5"/>
+      <text x="210" y="48" text-anchor="middle" font-size="23" font-weight="700" fill="#5F4F85">Plain block: learn the whole mapping</text>
+      <circle cx="65" cy="177" r="32" fill="#F1EBF8" stroke="#75629C" stroke-width="2"/><text x="65" y="185" text-anchor="middle" font-size="24" font-style="italic">x</text>
+      <path d="M99 177H145" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="152" y="118" width="155" height="118" rx="16" fill="#E9DEF3" stroke="#75629C" stroke-width="2"/>
+      <text x="229" y="164" text-anchor="middle" font-size="18" font-weight="700">Many layers</text><text x="229" y="195" text-anchor="middle" font-size="22" font-style="italic">H(x)</text>
+      <path d="M309 177H352" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <circle cx="367" cy="177" r="32" fill="#EAF4F0" stroke="#3B9E88" stroke-width="2"/><text x="367" y="185" text-anchor="middle" font-size="24" font-style="italic">y</text>
+      <rect x="52" y="278" width="316" height="70" rx="15" fill="#F1EBF8" stroke="#75629C" stroke-width="1.5"/>
+      <text x="210" y="307" text-anchor="middle" font-size="17">If the target is the identity</text>
+      <text x="210" y="334" text-anchor="middle" font-size="18" font-weight="700" fill="#5F4F85">Layers must reconstruct H(x)=x</text>
+    </g>
+    <g transform="translate(610 105)" filter="url(#shadow)">
+      <rect width="420" height="390" rx="22" fill="#FFFEFC" stroke="#D8D0C4" stroke-width="1.5"/>
+      <text x="210" y="48" text-anchor="middle" font-size="23" font-weight="700" fill="#277F6E">Residual block: learn only the change</text>
+      <circle cx="55" cy="165" r="32" fill="#F1EBF8" stroke="#75629C" stroke-width="2"/><text x="55" y="173" text-anchor="middle" font-size="24" font-style="italic">x</text>
+      <path d="M89 165H122" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <rect x="128" y="108" width="135" height="112" rx="16" fill="#E9DEF3" stroke="#75629C" stroke-width="2"/>
+      <text x="195" y="151" text-anchor="middle" font-size="18" font-weight="700">Main branch</text><text x="195" y="184" text-anchor="middle" font-size="22" font-style="italic">F(x)</text>
+      <path d="M265 165H302" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <circle cx="330" cy="165" r="27" fill="#F6E8C0" stroke="#B68B2D" stroke-width="2.2"/><path d="M318 165H342M330 153V177" stroke="#8F6A21" stroke-width="3" stroke-linecap="round"/>
+      <path d="M357 165H379" stroke="#8B837A" stroke-width="2" marker-end="url(#arr)"/>
+      <text x="392" y="173" font-size="24" font-style="italic">y</text>
+      <path d="M55 198V246Q55 260 69 260H316Q330 260 330 246V195" fill="none" stroke="#B68B2D" stroke-width="3" stroke-dasharray="9 7" marker-end="url(#goldarr)"/>
+      <text x="193" y="284" text-anchor="middle" font-size="16" font-weight="700" fill="#8F6A21">The shortcut adds x directly</text>
+      <rect x="52" y="303" width="316" height="60" rx="15" fill="#EAF4F0" stroke="#3B9E88" stroke-width="1.5"/>
+      <text x="210" y="329" text-anchor="middle" font-size="17">If the target is the identity</text>
+      <text x="210" y="352" text-anchor="middle" font-size="18" font-weight="700" fill="#277F6E">Main branch learns F(x)=0</text>
+    </g>
+    <text x="550" y="548" text-anchor="middle" font-size="20" font-weight="700" fill="#8F6A21">The expressive power can be the same while optimization difficulty is very different</text>
+  </g>
+</svg>
