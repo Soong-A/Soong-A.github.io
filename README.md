@@ -10,6 +10,25 @@
 一个关于机器学习、深度学习、计算机视觉与**医学图像分割**的学习笔记站。目前有 21 篇笔记，
 从课程基础一路写到 MM-UNet 论文精读，每一篇都有**中文与英文两个版本**。
 
+<table>
+<tr>
+<td width="50%"><img src="img/readme/home.jpg" alt="首页：最新文章列表"></td>
+<td width="50%"><img src="img/readme/post.jpg" alt="文章页：LaTeX 公式与常驻目录"></td>
+</tr>
+<tr>
+<td align="center"><sub>首页 · 最新文章</sub></td>
+<td align="center"><sub>文章页 · LaTeX 公式 + 常驻目录</sub></td>
+</tr>
+<tr>
+<td width="50%"><img src="img/readme/explore.jpg" alt="知识星图：按分类排布的笔记关系图"></td>
+<td width="50%"><img src="img/readme/tags.jpg" alt="主题星座：标签云与关系图"></td>
+</tr>
+<tr>
+<td align="center"><sub><a href="https://soong-a.github.io/explore/">知识星图</a></sub></td>
+<td align="center"><sub><a href="https://soong-a.github.io/tags/">主题星座</a></sub></td>
+</tr>
+</table>
+
 ---
 
 ## ⚠️ 这个仓库里是什么
