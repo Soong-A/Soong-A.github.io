@@ -33,8 +33,8 @@
       <description>从四个数字手算 BatchNorm，图解 NCHW 上的统计范围、gamma/beta、running mean/var、train/eval 模式，并比较 LayerNorm、InstanceNorm 与 GroupNorm，解释小 batch 和医学影像中的选择。</description>
       <author>Soong</author>
       <category domain="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
       <category domain="https://soong-a.github.io/tags/%E5%BD%92%E4%B8%80%E5%8C%96/">归一化</category>
       <pubDate>Sun, 25 Oct 2026 12:30:00 GMT</pubDate>
@@ -94,8 +94,8 @@
       <description>GFLOPs 到底在数什么：卷积层浮点运算量的推导，以及它和参数量为什么不是一回事。</description>
       <author>Soong</author>
       <category domain="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%A4%8D%E6%9D%82%E5%BA%A6/">模型复杂度</category>
       <pubDate>Tue, 16 Dec 2025 12:00:00 GMT</pubDate>
     </item>
@@ -105,8 +105,8 @@
       <description>逐层拆解参数量的计算方式，并解释卷积的参数共享为什么让它比全连接层轻得多。</description>
       <author>Soong</author>
       <category domain="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
       <category domain="https://soong-a.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%A4%8D%E6%9D%82%E5%BA%A6/">模型复杂度</category>
       <pubDate>Tue, 16 Dec 2025 12:00:00 GMT</pubDate>
@@ -187,19 +187,6 @@
       <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
     </item>
     <item>
-      <title>MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</title>
-      <link>https://soong-a.github.io/2025/11/12/mm-unet-overview/</link>
-      <description>MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</description>
-      <author>Soong</author>
-      <category domain="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/">MM-UNet 论文精读</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</category>
-      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
-      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</category>
-      <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
-      <category domain="https://soong-a.github.io/tags/Mamba/">Mamba</category>
-      <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
-    </item>
-    <item>
       <title>MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取</title>
       <link>https://soong-a.github.io/2025/11/12/mm-unet-res2net/</link>
       <description>编码器细节：为什么选 Res2Net、2D 权重怎样改造成 3D，以及通道数增长背后的取舍。</description>
@@ -210,6 +197,19 @@
       <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
       <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
       <category domain="https://soong-a.github.io/tags/Res2Net/">Res2Net</category>
+      <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</title>
+      <link>https://soong-a.github.io/2025/11/12/mm-unet-overview/</link>
+      <description>MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</description>
+      <author>Soong</author>
+      <category domain="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/">MM-UNet 论文精读</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</category>
+      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
+      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</category>
+      <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
+      <category domain="https://soong-a.github.io/tags/Mamba/">Mamba</category>
       <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
     </item>
     <item>
@@ -231,8 +231,8 @@
       <description>阈值分割、边缘检测与机器学习三类方法的原理、代价与适用场景对比。</description>
       <author>Soong</author>
       <category domain="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</category>
       <category domain="https://soong-a.github.io/tags/%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B/">边缘检测</category>
       <pubDate>Tue, 11 Nov 2025 12:00:00 GMT</pubDate>
@@ -257,11 +257,11 @@
       <description>线性分类器、损失、优化器、反向传播、初始化、批归一化、卷积、架构演进、迁移学习，以及网络到底学到了什么。</description>
       <author>Soong</author>
       <category domain="https://soong-a.github.io/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/">基础概念</category>
-      <category domain="https://soong-a.github.io/tags/CS231n/">CS231n</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/">计算机视觉</category>
       <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/">课程笔记</category>
+      <category domain="https://soong-a.github.io/tags/CS231n/">CS231n</category>
       <category domain="https://soong-a.github.io/tags/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD/">反向传播</category>
       <pubDate>Sat, 02 Aug 2025 11:00:00 GMT</pubDate>
     </item>

@@ -34,8 +34,8 @@
       <name>Soong</name>
     </author>
     <category term="基础概念" scheme="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
-    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="基础概念" scheme="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
+    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="卷积神经网络" scheme="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     <category term="归一化" scheme="https://soong-a.github.io/tags/%E5%BD%92%E4%B8%80%E5%8C%96/"/>
     <id>https://soong-a.github.io/2026/10/25/BatchNorm/</id>
@@ -115,8 +115,8 @@
       <name>Soong</name>
     </author>
     <category term="基础概念" scheme="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
-    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="基础概念" scheme="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
+    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="模型复杂度" scheme="https://soong-a.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%A4%8D%E6%9D%82%E5%BA%A6/"/>
     <id>https://soong-a.github.io/2025/12/16/GFLOPs/</id>
     <link href="https://soong-a.github.io/2025/12/16/GFLOPs/"/>
@@ -130,8 +130,8 @@
       <name>Soong</name>
     </author>
     <category term="基础概念" scheme="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
-    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="基础概念" scheme="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
+    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="卷积神经网络" scheme="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     <category term="模型复杂度" scheme="https://soong-a.github.io/tags/%E6%A8%A1%E5%9E%8B%E5%A4%8D%E6%9D%82%E5%BA%A6/"/>
     <id>https://soong-a.github.io/2025/12/16/parameter-count/</id>
@@ -245,23 +245,6 @@
       <name>Soong</name>
     </author>
     <category term="MM-UNet 论文精读" scheme="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/"/>
-    <category term="论文与综述" scheme="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/"/>
-    <category term="医学影像" scheme="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/"/>
-    <category term="医学图像分割" scheme="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/"/>
-    <category term="MM-UNet" scheme="https://soong-a.github.io/tags/MM-UNet/"/>
-    <category term="Mamba" scheme="https://soong-a.github.io/tags/Mamba/"/>
-    <id>https://soong-a.github.io/2025/11/12/mm-unet-overview/</id>
-    <link href="https://soong-a.github.io/2025/11/12/mm-unet-overview/"/>
-    <published>2025-11-12T12:00:00.000Z</published>
-    <summary>MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</summary>
-    <title>MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</title>
-    <updated>2026-10-25T20:29:46.961Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Soong</name>
-    </author>
-    <category term="MM-UNet 论文精读" scheme="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/"/>
     <category term="卷积神经网络" scheme="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
     <category term="论文与综述" scheme="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/"/>
     <category term="医学影像" scheme="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/"/>
@@ -273,6 +256,23 @@
     <summary>编码器细节：为什么选 Res2Net、2D 权重怎样改造成 3D，以及通道数增长背后的取舍。</summary>
     <title>MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取</title>
     <updated>2026-10-22T16:08:28.360Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Soong</name>
+    </author>
+    <category term="MM-UNet 论文精读" scheme="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/"/>
+    <category term="论文与综述" scheme="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/"/>
+    <category term="医学影像" scheme="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/"/>
+    <category term="医学图像分割" scheme="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/"/>
+    <category term="MM-UNet" scheme="https://soong-a.github.io/tags/MM-UNet/"/>
+    <category term="Mamba" scheme="https://soong-a.github.io/tags/Mamba/"/>
+    <id>https://soong-a.github.io/2025/11/12/mm-unet-overview/</id>
+    <link href="https://soong-a.github.io/2025/11/12/mm-unet-overview/"/>
+    <published>2025-11-12T12:00:00.000Z</published>
+    <summary>MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</summary>
+    <title>MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</title>
+    <updated>2026-10-25T20:29:46.961Z</updated>
   </entry>
   <entry>
     <author>
@@ -296,8 +296,8 @@
       <name>Soong</name>
     </author>
     <category term="基础概念" scheme="https://soong-a.github.io/categories/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
-    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="基础概念" scheme="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
+    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="医学图像分割" scheme="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/"/>
     <category term="边缘检测" scheme="https://soong-a.github.io/tags/%E8%BE%B9%E7%BC%98%E6%A3%80%E6%B5%8B/"/>
     <id>https://soong-a.github.io/2025/11/11/thresholding-edges-and-learning/</id>
@@ -330,11 +330,11 @@
       <name>Soong</name>
     </author>
     <category term="课程笔记" scheme="https://soong-a.github.io/categories/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
-    <category term="课程笔记" scheme="https://soong-a.github.io/tags/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
-    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="基础概念" scheme="https://soong-a.github.io/tags/%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5/"/>
-    <category term="CS231n" scheme="https://soong-a.github.io/tags/CS231n/"/>
+    <category term="计算机视觉" scheme="https://soong-a.github.io/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E8%A7%86%E8%A7%89/"/>
     <category term="卷积神经网络" scheme="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/"/>
+    <category term="课程笔记" scheme="https://soong-a.github.io/tags/%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/"/>
+    <category term="CS231n" scheme="https://soong-a.github.io/tags/CS231n/"/>
     <category term="反向传播" scheme="https://soong-a.github.io/tags/%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD/"/>
     <id>https://soong-a.github.io/2025/08/02/cs231n-foundations/</id>
     <link href="https://soong-a.github.io/2025/08/02/cs231n-foundations/"/>

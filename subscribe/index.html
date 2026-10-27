@@ -1,0 +1,266 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>订阅 | Soong AI Notes</title><meta name="author" content="Soong"><meta name="copyright" content="Soong"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#F8FBFC"><meta name="description" content="有新笔记时收到通知 这个站是纯静态的，没有后台、没有账号系统，下面两种订阅方式都不需要注册这个网站本身——只是把文章的更新地址交给你自己选的工具。   ① 邮件提醒 打开 Blogtrottr，把下面这个地址粘贴进它的订阅框，填一个邮箱、选更新频率即可。新文章发布后会在你设置的周期内发到邮箱，随时可以退订。 https:&#x2F;&#x2F;soong-a.github.io&#x2F;atom.xml复制   ② RSS">
+<meta property="og:type" content="website">
+<meta property="og:title" content="订阅">
+<meta property="og:url" content="https://soong-a.github.io/subscribe/">
+<meta property="og:site_name" content="Soong AI Notes">
+<meta property="og:description" content="有新笔记时收到通知 这个站是纯静态的，没有后台、没有账号系统，下面两种订阅方式都不需要注册这个网站本身——只是把文章的更新地址交给你自己选的工具。   ① 邮件提醒 打开 Blogtrottr，把下面这个地址粘贴进它的订阅框，填一个邮箱、选更新频率即可。新文章发布后会在你设置的周期内发到邮箱，随时可以退订。 https:&#x2F;&#x2F;soong-a.github.io&#x2F;atom.xml复制   ② RSS">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://soong-a.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-10-27T12:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-27T13:21:00.238Z">
+<meta property="article:author" content="Soong">
+<meta property="article:tag" content="机器学习, 深度学习, 计算机视觉, 医学影像, 医学图像分割">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://soong-a.github.io/img/avatar.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://soong-a.github.io/subscribe/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//www.google-analytics.com" crossorigin=""/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#101722')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F8FBFC')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>(() => {
+  const hostname = window.location.hostname
+  const isLocalPreview = hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.local')
+
+  window.soongAnalyticsEnabled = !isLocalPreview
+
+  // Keep theme/PJAX integrations safe on localhost without loading or
+  // sending anything to the production Analytics property.
+  if (isLocalPreview) {
+    window.gtag = () => {}
+    return
+  }
+
+  const measurementId = 'G-EL6GS17XHJ'
+  const loader = document.createElement('script')
+  loader.async = true
+  loader.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`
+  document.head.appendChild(loader)
+
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function () { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', measurementId)
+  btf.addGlobalFn('pjaxComplete', () => {
+    window.gtag('config', measurementId, {
+      page_title: document.title,
+      page_location: window.location.href,
+      page_path: window.location.pathname
+    })
+  }, 'google_analytics')
+})()
+</script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '订阅',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/caveat-brush@5.1.0/index.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="/css/custom.css?v=20261027a"><link rel="stylesheet" href="/css/pixel.css?v=20261023b"><link rel="preload" as="image" href="/img/index1.webp"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><script src="/js/card-transition.js?v=20261021a"></script><meta name="generator" content="Hexo 7.3.0"><link rel="alternate" href="/atom.xml" title="Soong AI Notes" type="application/atom+xml">
+<link rel="alternate" href="/rss2.xml" title="Soong AI Notes" type="application/rss+xml">
+<script>(function(){try{var p=new URLSearchParams(location.search).get("lang");var l=p||localStorage.getItem("site-lang");if(l==="en")document.documentElement.setAttribute("data-lang","en")}catch(e){}})()</script><style>html:not([data-lang="en"]) .lang-block[data-lang="en"],html[data-lang="en"] .lang-block[data-lang="zh"],html:not([data-lang="en"]) #card-toc li[data-lang="en"],html[data-lang="en"] #card-toc li[data-lang="zh"]{display:none!important}</style></head><body><div id="web_bg" style="background-image: url(/img/index-soft.webp);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-author"><div class="sidebar-author-name">Soong</div><div class="sidebar-author-role">AI × Medical Imaging</div><div class="sidebar-author-desc">记录机器学习、深度学习与医学影像的学习笔记。</div><div class="sidebar-author-links"><a href="https://github.com/Soong-A" target="_blank" rel="noopener"><i class="fab fa-github" aria-hidden="true"></i><span>GitHub ↗</span></a><a href="mailto:yurongsong5@gmail.com" target="_blank" rel="noopener"><i class="fas fa-envelope" aria-hidden="true"></i><span>Email ↗</span></a><a href="/subscribe/" target="_blank" rel="noopener"><i class="fas fa-envelope-open-text" aria-hidden="true"></i><span>Subscribe ↗</span></a></div></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">21</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">35</div></a><a href="/archives/"><div class="headline">分类</div><div class="length-num">5</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div><div class="menus_item"><a class="site-page" href="/subscribe/"><i class="fa-fw fas fa-envelope-open-text"></i><span> 订阅</span></a></div></div><button class="sidebar-darkmode" type="button"><i class="fas fa-adjust" aria-hidden="true"></i><span>切换夜间模式</span></button></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Soong AI Notes</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-book-open"></i><span> 知识库</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-diagram-project"></i><span> 主题星座</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div><div class="menus_item"><a class="site-page" href="/feedback/"><i class="fa-fw fas fa-comments"></i><span> 反馈</span></a></div><div class="menus_item"><a class="site-page" href="/subscribe/"><i class="fa-fw fas fa-envelope-open-text"></i><span> 订阅</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><h1 class="title-seo">订阅</h1></header><main class="layout hide-aside" id="content-inner"><div id="page"><div class="page-title">订阅</div><div class="container" id="article-container"><div class="lang-block" data-lang="zh">
+<p class="about-title">有新笔记时收到通知</p>
+<p class="about-lead">这个站是纯静态的，没有后台、没有账号系统，下面两种订阅方式都不需要注册这个网站本身——只是把文章的更新地址交给你自己选的工具。</p>
+<div class="about-grid">
+<div class="about-card">
+<h3>① 邮件提醒</h3>
+<p>打开 <a href="https://blogtrottr.com/" target="_blank" rel="noopener">Blogtrottr</a>，把下面这个地址粘贴进它的订阅框，填一个邮箱、选更新频率即可。新文章发布后会在你设置的周期内发到邮箱，随时可以退订。</p>
+<p class="subscribe-feed-row"><code class="subscribe-feed-url" id="feed-url-zh">https://soong-a.github.io/atom.xml</code><button type="button" class="subscribe-copy" data-copy-target="feed-url-zh">复制</button></p>
+</div>
+<div class="about-card">
+<h3>② RSS 阅读器</h3>
+<p>已经在用 Feedly、NetNewsWire、Inoreader 这类工具的话，直接订阅下面的链接；两种格式内容一样，选你的阅读器支持的那个。</p>
+<p class="about-actions subscribe-feed-actions"><a href="/atom.xml">Atom 订阅</a><a href="/rss2.xml">RSS 订阅</a></p>
+</div>
+</div>
+<p class="subscribe-note">邮件提醒由 Blogtrottr 独立提供：你的邮箱只交给他们，不会出现在这个仓库或网站的任何地方。</p>
+</div>
+<div class="lang-block" data-lang="en" lang="en">
+<p class="about-title">Get notified when a new note goes up</p>
+<p class="about-lead">This site is fully static — no backend, no accounts. Neither option below needs you to sign up here; it just hands the update feed to a tool of your own choosing.</p>
+<div class="about-grid">
+<div class="about-card">
+<h3>① Email</h3>
+<p>Open <a href="https://blogtrottr.com/" target="_blank" rel="noopener">Blogtrottr</a>, paste the address below into its subscribe box, add an email and pick a delivery schedule. New posts land in your inbox on that schedule, and you can unsubscribe any time.</p>
+<p class="subscribe-feed-row"><code class="subscribe-feed-url" id="feed-url-en">https://soong-a.github.io/atom.xml</code><button type="button" class="subscribe-copy" data-copy-target="feed-url-en">Copy</button></p>
+</div>
+<div class="about-card">
+<h3>② RSS reader</h3>
+<p>Already using Feedly, NetNewsWire, Inoreader or similar? Subscribe to either feed below directly — same content, two formats.</p>
+<p class="about-actions subscribe-feed-actions"><a href="/atom.xml">Atom feed</a><a href="/rss2.xml">RSS feed</a></p>
+</div>
+</div>
+<p class="subscribe-note">Email delivery is handled entirely by Blogtrottr, independently of this site: your address goes to them, never into this repository or anywhere on this site.</p>
+</div>
+</div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Soong</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"><script>(() => {
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      const mermaidThemeConfig = `%%{init:{ 'theme':'${theme}'}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+      }
+
+      // mermaid v9 and v10 compatibility
+      typeof renderFn === 'string' ? renderMermaid(renderFn) : renderFn.then(({ svg }) => renderMermaid(svg))
+    })
+  }
+
+  const codeToMermaid = () => {
+    const codeMermaidEle = document.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    if (true) codeToMermaid()
+    const $mermaid = document.querySelectorAll('#article-container .mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script></div><script defer src="/js/site-polish.js?v=20261027a"></script><script defer src="/js/reading-trail.js?v=20261021a"></script><script defer src="/js/analytics-events.js?v=20261021a"></script><script defer src="/js/mobile-toc.js?v=20261021b"></script><script defer src="/js/site-search.js?v=20261021b"></script><script defer src="/js/pixel-archive.js?v=20261020n"></script></div><script src="/js/i18n.js?v=mvqpyipc"></script></body></html>

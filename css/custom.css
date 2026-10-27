@@ -198,6 +198,54 @@
   color: #fff;
 }
 
+/* ---------- Subscribe page (source/subscribe/index.md) ---------- */
+.subscribe-feed-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: .9rem 0 0 !important;
+}
+.subscribe-feed-url {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: .5em .7em;
+  overflow-wrap: anywhere;
+  border-radius: 8px;
+  background: var(--soong-blue-pale, #F6F9FB);
+  border: 1px solid var(--soong-line, rgba(82, 122, 150, .13));
+  color: var(--soong-blue-deep, #3E6077);
+  font-size: .92em;
+}
+#article-container .subscribe-copy {
+  flex: 0 0 auto;
+  padding: .5em 1em;
+  border: 1px solid #527A96;
+  border-radius: 999px;
+  background: transparent;
+  color: #527A96;
+  font-weight: 600;
+  font-size: .9em;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+#article-container .subscribe-copy:hover {
+  background: #527A96;
+  color: #fff;
+}
+#article-container .subscribe-copy:disabled {
+  opacity: .75;
+  cursor: default;
+}
+#article-container .subscribe-feed-actions {
+  margin-top: .9rem !important;
+}
+.subscribe-note {
+  margin-top: .4rem;
+  color: var(--soong-muted, #6f7d8c);
+  font-size: .92em;
+}
+
 /* ---------- Tags page: word cloud ---------- */
 .wc-wrap {
   margin-top: .4rem;

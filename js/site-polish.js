@@ -192,4 +192,36 @@
 
   document.addEventListener('pjax:complete', enhance)
   document.addEventListener('site-lang-change', enhance)
+
+  // Subscribe page (source/subscribe/index.md): click-to-copy the feed URL.
+  // Delegated on document so it needs no re-binding after pjax navigation.
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.position = 'fixed'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    try { document.execCommand('copy') } catch (e) { /* clipboard unavailable */ }
+    document.body.removeChild(ta)
+  }
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.subscribe-copy')
+    if (!btn) return
+    const src = document.getElementById(btn.dataset.copyTarget)
+    if (!src) return
+    const text = src.textContent.trim()
+    const copied = () => {
+      const was = btn.textContent
+      btn.textContent = btn.closest('[data-lang="en"]') ? 'Copied' : '已复制'
+      btn.disabled = true
+      setTimeout(() => { btn.textContent = was; btn.disabled = false }, 1600)
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(copied, () => { fallbackCopy(text); copied() })
+    } else {
+      fallbackCopy(text)
+      copied()
+    }
+  })
 })()
