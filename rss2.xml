@@ -150,18 +150,6 @@
       <pubDate>Wed, 19 Nov 2025 12:00:00 GMT</pubDate>
     </item>
     <item>
-      <title>MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征</title>
-      <link>https://soong-a.github.io/2025/11/13/mm-unet-macm/</link>
-      <description>用四个尺度的各向异性卷积分支，同时理解切片内结构与切片间连续性，并控制大卷积核的成本。</description>
-      <author>Soong</author>
-      <category domain="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/">MM-UNet 论文精读</category>
-      <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</category>
-      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
-      <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
-      <pubDate>Thu, 13 Nov 2025 12:00:00 GMT</pubDate>
-    </item>
-    <item>
       <title>MM-UNet GCM 模块详解：Mamba 如何建模 3D MRI 全局上下文</title>
       <link>https://soong-a.github.io/2025/11/13/mm-unet-gcm/</link>
       <description>把 3D 特征体展开为序列，在保留卷积局部能力的同时，用 Mamba 以线性复杂度建模长距离联系。</description>
@@ -171,6 +159,18 @@
       <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
       <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
       <category domain="https://soong-a.github.io/tags/Mamba/">Mamba</category>
+      <pubDate>Thu, 13 Nov 2025 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>MM-UNet MACM 模块详解：多尺度各向异性卷积如何提取 3D 特征</title>
+      <link>https://soong-a.github.io/2025/11/13/mm-unet-macm/</link>
+      <description>用四个尺度的各向异性卷积分支，同时理解切片内结构与切片间连续性，并控制大卷积核的成本。</description>
+      <author>Soong</author>
+      <category domain="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/">MM-UNet 论文精读</category>
+      <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</category>
+      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
+      <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
       <pubDate>Thu, 13 Nov 2025 12:00:00 GMT</pubDate>
     </item>
     <item>
@@ -187,19 +187,6 @@
       <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
     </item>
     <item>
-      <title>MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取</title>
-      <link>https://soong-a.github.io/2025/11/12/mm-unet-res2net/</link>
-      <description>编码器细节：为什么选 Res2Net、2D 权重怎样改造成 3D，以及通道数增长背后的取舍。</description>
-      <author>Soong</author>
-      <category domain="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/">MM-UNet 论文精读</category>
-      <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
-      <category domain="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</category>
-      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
-      <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
-      <category domain="https://soong-a.github.io/tags/Res2Net/">Res2Net</category>
-      <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
-    </item>
-    <item>
       <title>MM-UNet 论文详解：3D MRI 分割架构与 AFFM、GCM、MACM 模块</title>
       <link>https://soong-a.github.io/2025/11/12/mm-unet-overview/</link>
       <description>MM-UNet 的三个创新点：AFFM 如何过滤噪声、GCM 如何看见全局、MACM 如何适应各向异性分辨率。</description>
@@ -210,6 +197,19 @@
       <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%9B%BE%E5%83%8F%E5%88%86%E5%89%B2/">医学图像分割</category>
       <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
       <category domain="https://soong-a.github.io/tags/Mamba/">Mamba</category>
+      <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>MM-UNet 3D Res2Net 编码器详解：2D 权重扩展与多尺度特征提取</title>
+      <link>https://soong-a.github.io/2025/11/12/mm-unet-res2net/</link>
+      <description>编码器细节：为什么选 Res2Net、2D 权重怎样改造成 3D，以及通道数增长背后的取舍。</description>
+      <author>Soong</author>
+      <category domain="https://soong-a.github.io/categories/MM-UNet-%E8%AE%BA%E6%96%87%E7%B2%BE%E8%AF%BB/">MM-UNet 论文精读</category>
+      <category domain="https://soong-a.github.io/tags/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/">卷积神经网络</category>
+      <category domain="https://soong-a.github.io/tags/%E8%AE%BA%E6%96%87%E4%B8%8E%E7%BB%BC%E8%BF%B0/">论文与综述</category>
+      <category domain="https://soong-a.github.io/tags/%E5%8C%BB%E5%AD%A6%E5%BD%B1%E5%83%8F/">医学影像</category>
+      <category domain="https://soong-a.github.io/tags/MM-UNet/">MM-UNet</category>
+      <category domain="https://soong-a.github.io/tags/Res2Net/">Res2Net</category>
       <pubDate>Wed, 12 Nov 2025 12:00:00 GMT</pubDate>
     </item>
     <item>

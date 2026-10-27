@@ -193,8 +193,9 @@
   document.addEventListener('pjax:complete', enhance)
   document.addEventListener('site-lang-change', enhance)
 
-  // Subscribe page (source/subscribe/index.md): click-to-copy the feed URL.
-  // Delegated on document so it needs no re-binding after pjax navigation.
+  // Subscribe page (source/subscribe/index.md): one click copies the feed
+  // URL and opens Blogtrottr in a new tab. Delegated on document so it
+  // needs no re-binding after pjax navigation.
   function fallbackCopy(text) {
     const ta = document.createElement('textarea')
     ta.value = text
@@ -206,22 +207,22 @@
     document.body.removeChild(ta)
   }
   document.addEventListener('click', e => {
-    const btn = e.target.closest('.subscribe-copy')
+    const btn = e.target.closest('.subscribe-go')
     if (!btn) return
-    const src = document.getElementById(btn.dataset.copyTarget)
-    if (!src) return
-    const text = src.textContent.trim()
-    const copied = () => {
-      const was = btn.textContent
-      btn.textContent = btn.closest('[data-lang="en"]') ? 'Copied' : '已复制'
-      btn.disabled = true
-      setTimeout(() => { btn.textContent = was; btn.disabled = false }, 1600)
+    const text = btn.dataset.feedUrl
+    const isEn = btn.closest('[data-lang="en"]')
+    const open = () => window.open(btn.dataset.openUrl, '_blank', 'noopener')
+    const done = () => {
+      const label = btn.innerHTML
+      btn.innerHTML = isEn ? 'Copied — opening Blogtrottr…' : '已复制，正在打开 Blogtrottr…'
+      open()
+      setTimeout(() => { btn.innerHTML = label }, 2200)
     }
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(copied, () => { fallbackCopy(text); copied() })
+      navigator.clipboard.writeText(text).then(done, done)
     } else {
       fallbackCopy(text)
-      copied()
+      done()
     }
   })
 })()
